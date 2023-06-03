@@ -7,6 +7,7 @@ function App() {
 
   const [ data, setData ] = useState([])
   const [ dataTest, setDataTest ] = useState([])
+  const [ status, setStatus ] = useState(null)
 
   useEffect(() => {
 
@@ -18,7 +19,16 @@ function App() {
       console.log(data1);
     }
 
-    fetchData()
+    const fetchStatus = async () => {
+      const res = await fetch("http://localhost:5000/get_status");
+      const data1 = await res.json();
+
+      setStatus(data1);
+      console.log(data1);
+    }
+
+    fetchData();
+    fetchStatus();
   }, [])
 
   const handleButton = async () => {
@@ -27,6 +37,48 @@ function App() {
 
       setDataTest(data2)
       console.log(data2);
+  }
+
+  const handleOff = async () => {
+    // setStatus(0)
+    const options = {
+      method: 'POST',
+      headers: {
+          'Content-Type': 'application/json'
+      }
+    }
+
+    try {
+        const res = await fetch("http://localhost:5000/turn_off_status", options);
+        const data = await res.json();
+
+        console.log(data);
+        setStatus(data.status)
+        
+    } catch (error) {
+        console.log(error);
+    }
+  }
+
+  const handleOn = async () => {
+    // setStatus(1)
+    const options = {
+      method: 'POST',
+      headers: {
+          'Content-Type': 'application/json'
+      }
+    }
+
+    try {
+        const res = await fetch("http://localhost:5000/turn_on_status", options);
+        const data = await res.json();
+
+        console.log(data);
+        setStatus(data.status)
+        
+    } catch (error) {
+        console.log(error);
+    }
   }
  
   return (
@@ -55,6 +107,9 @@ function App() {
               </div>
             )}
           </div>
+      </div>
+      <div>
+        {status === 1 ? <button onClick={handleOff}>Off</button> : <button onClick={handleOn}>On</button>}
       </div>
     </div>
   );
