@@ -68,5 +68,48 @@ def get_data():
 
     return jsonify(data)
 
+@app.route('/get_status')
+def get_status():
+    cursor = mysql.connection.cursor()
+
+    cursor.execute(f"SELECT * FROM heating_status")
+
+    rows = cursor.fetchall()
+
+    for row in rows:
+        row_dict = row[1]
+        data = row_dict
+
+    mysql.connection.commit()
+
+    return jsonify(data)
+
+
+@app.route('/turn_on_status', methods = ['POST'])
+def turn_on_status():
+    if request.method == 'POST':
+        cursor = mysql.connection.cursor()
+
+        cursor.execute(f"""
+                    UPDATE heating_status SET status = 1 WHERE id = 1
+                    """)
+        mysql.connection.commit()
+
+        return jsonify({"stare": "on", "status": 1})
+    
+
+@app.route('/turn_off_status', methods = ['POST'])
+def turn_off_status():
+    if request.method == 'POST':
+        cursor = mysql.connection.cursor()
+
+        cursor.execute(f"""
+                    UPDATE heating_status SET status = 0 WHERE id = 1
+                    """)
+        mysql.connection.commit()
+
+        return jsonify({"stare": "on", "status": 0})
+
+
 if __name__ == '__main__':
     app.run(port = 5000, debug = True)
