@@ -100,7 +100,7 @@ def turn_on_status():
 
 @app.route('/turn_off_status', methods = ['POST'])
 def turn_off_status():
-    if request.method == 'POST':
+    if request.method == 'POST':         
         cursor = mysql.connection.cursor()
 
         cursor.execute(f"""
@@ -109,6 +109,61 @@ def turn_off_status():
         mysql.connection.commit()
 
         return jsonify({"stare": "on", "status": 0})
+    
+
+@app.route('/set_heating_temp', methods = ['POST'])
+def set_heating_temp():
+    if request.method == 'POST':
+        data = request.get_json()
+        value = data.get('value')         
+        cursor = mysql.connection.cursor()
+
+        cursor.execute(f"""
+                    UPDATE heating_temp SET temperature = {value} WHERE id = 1
+                    """)
+        mysql.connection.commit()
+
+        return jsonify({"temperature": value})
+    
+
+@app.route('/get_heating_temp')
+def get_heating_temp():
+    cursor = mysql.connection.cursor()
+
+    cursor.execute(f"SELECT * FROM heating_temp")
+
+    rows = cursor.fetchall()
+
+    for row in rows:
+        row_dict = row[1]
+        data = row_dict
+
+    mysql.connection.commit()
+
+    return jsonify(data)
+
+
+@app.route('/get_recent_temp')
+def get_recent_temp():
+    cursor = mysql.connection.cursor()
+
+    cursor.execute(f"SELECT * FROM data_senzori WHERE id = (SELECT MAX(id) FROM data_senzori)")
+
+    rows = cursor.fetchall()
+
+    data = []
+
+    for row in rows:
+        row_dict = {
+            "temperature": row[1],
+            "humidity": row[2],
+        }
+
+        data.append(row_dict)
+
+    mysql.connection.commit()
+
+    return jsonify(row_dict)
 
 
 if __name__ == '__main__':
