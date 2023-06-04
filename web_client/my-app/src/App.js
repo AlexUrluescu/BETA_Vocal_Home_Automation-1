@@ -8,6 +8,7 @@ function App() {
   const [ data, setData ] = useState([])
   const [ dataTest, setDataTest ] = useState([])
   const [ status, setStatus ] = useState(null)
+  const [ temp, setTemp ] = useState(20)
 
   useEffect(() => {
 
@@ -80,6 +81,18 @@ function App() {
         console.log(error);
     }
   }
+
+  const handlePLus = () => {
+    setTemp(temp + 1)
+  }
+
+  const handleMinus = () => {
+    setTemp(temp - 1)
+  }
+
+  const handleSet = () => {
+    console.log(temp);
+  }
  
   return (
     <div className="App">
@@ -109,9 +122,21 @@ function App() {
           </div>
       </div>
       <div>
-        {status === 1 ? (
-          <button className="bg-slate-800 text-white p-2 rounded-md" onClick={handleOff}>Off</button>)
-           : (<button className="bg-slate-800 text-white p-2 rounded-md" onClick={handleOn}>On</button>)}
+        {status === 1 ? (<div>
+            <h2>The heating is ON</h2>
+            <button className="bg-red-800 text-white p-2 rounded-md" onClick={handleOff}>Off</button>
+          </div>)
+           : (<div>
+                <h2>The heating is OFF</h2>
+                <button className="bg-green-700 text-white p-2 rounded-md" onClick={handleOn}>On</button>
+              </div>)}
+      </div>
+
+      <div>
+        <h2>Temp: {temp}</h2>
+        <button onClick={handlePLus} className="bg-slate-800 text-white p-2 rounded-md m-4">+</button>
+        <button onClick={handleMinus} className="bg-slate-800 text-white p-2 rounded-md m-4">-</button>
+        <button onClick={handleSet} className="bg-slate-800 text-white p-2 rounded-md m-4">Set</button>
       </div>
     </div>
   );
