@@ -83,7 +83,7 @@ function App() {
  
   return (
     <div className="App">
-      <h1>Hello</h1>
+      <h1 className='text-green-500 text-4xl font-semibold'>Hello</h1>
       <div>
         {data.map((el) => (
           <div key={el.id}>
@@ -94,7 +94,7 @@ function App() {
       </div>
 
       <div>
-        <button onClick={handleButton}>Incarca</button>
+        <button className="bg-slate-800 text-white p-2 rounded-md" onClick={handleButton}>Incarca</button>
           <div>
             {dataTest.length === 0 ? <h1>Nu avem date</h1> : (
               <div>
@@ -109,7 +109,9 @@ function App() {
           </div>
       </div>
       <div>
-        {status === 1 ? <button onClick={handleOff}>Off</button> : <button onClick={handleOn}>On</button>}
+        {status === 1 ? (
+          <button className="bg-slate-800 text-white p-2 rounded-md" onClick={handleOff}>Off</button>)
+           : (<button className="bg-slate-800 text-white p-2 rounded-md" onClick={handleOn}>On</button>)}
       </div>
     </div>
   );
