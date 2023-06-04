@@ -1,48 +1,41 @@
+import "./App.css";
 
-import './App.css';
-
-import { useState, useEffect } from 'react'
+import { useState, useEffect } from "react";
 
 function App() {
+  const [data, setData] = useState([]);
+  const [status, setStatus] = useState(null);
+  const [recentData, setRecentData] = useState({});
 
-  const [ data, setData ] = useState([])
-  const [ status, setStatus ] = useState(null)
-  const [ recentData, setRecentData ] = useState({})
-
-  const [ finalTemp, setFinalTemp ] = useState()
-  const [ temp, setTemp ] = useState(null)
-
+  const [finalTemp, setFinalTemp] = useState();
+  const [temp, setTemp] = useState(null);
 
   useEffect(() => {
-
     // get all the temperatures and humiditys
     const fetchData = async () => {
       try {
-        const res = await fetch('http://localhost:5000/get_data');
-        const data1 = await res.json()
-  
-        setData(data1)
+        const res = await fetch("http://localhost:5000/get_data");
+        const data1 = await res.json();
+
+        setData(data1);
         console.log(data1);
-        
       } catch (error) {
         console.log(error);
       }
-    }
+    };
 
     // get the status of the heating system
     const fetchStatus = async () => {
       try {
         const res = await fetch("http://localhost:5000/get_status");
         const data1 = await res.json();
-  
+
         setStatus(data1);
         console.log(data1);
-        
       } catch (error) {
         console.log(error);
       }
-
-    }
+    };
 
     // get the temperature of the heating system
     const fetchHeatingTemp = async () => {
@@ -51,13 +44,12 @@ function App() {
         const data1 = await res.json();
 
         setFinalTemp(data1);
-        setTemp(data1)
+        setTemp(data1);
         console.log(data1);
-        
       } catch (error) {
         console.log(error);
       }
-    }
+    };
 
     // get the recent temperature and humidty of the sensors
     const fetchRecentTemp = async () => {
@@ -67,132 +59,188 @@ function App() {
 
         setRecentData(data1);
         console.log(data1);
-        
       } catch (error) {
         console.log(error);
       }
-    }
+    };
 
     fetchData();
     fetchStatus();
     fetchHeatingTemp();
     fetchRecentTemp();
-  }, [])
-
+  }, []);
 
   // turn OFF the heating system
   const handleOff = async () => {
     const options = {
-      method: 'POST',
+      method: "POST",
       headers: {
-          'Content-Type': 'application/json'
-      }
-    }
+        "Content-Type": "application/json",
+      },
+    };
 
     try {
-        const res = await fetch("http://localhost:5000/turn_off_status", options);
-        const data = await res.json();
+      const res = await fetch("http://localhost:5000/turn_off_status", options);
+      const data = await res.json();
 
-        console.log(data);
-        setStatus(data.status)
-        
+      console.log(data);
+      setStatus(data.status);
     } catch (error) {
-        console.log(error);
+      console.log(error);
     }
-  }
-
+  };
 
   // turn ON the heating system
   const handleOn = async () => {
     const options = {
-      method: 'POST',
+      method: "POST",
       headers: {
-          'Content-Type': 'application/json'
-      }
-    }
+        "Content-Type": "application/json",
+      },
+    };
 
     try {
-        const res = await fetch("http://localhost:5000/turn_on_status", options);
-        const data = await res.json();
+      const res = await fetch("http://localhost:5000/turn_on_status", options);
+      const data = await res.json();
 
-        console.log(data);
-        setStatus(data.status)
-        
+      console.log(data);
+      setStatus(data.status);
     } catch (error) {
-        console.log(error);
+      console.log(error);
     }
-  }
-
+  };
 
   // increment the value of the temperature
   const handlePLus = () => {
-    setTemp(temp + 1)
-  }
+    setTemp(temp + 1);
+  };
 
   // decrement the value of the temperature
   const handleMinus = () => {
-    setTemp(temp - 1)
-  }
+    setTemp(temp - 1);
+  };
 
   // set the final temperature
   const handleSet = async () => {
     console.log(temp);
 
     const value_temp = {
-      value: temp
-    }
+      value: temp,
+    };
 
     const options = {
-      method: 'POST',
+      method: "POST",
       headers: {
-          'Content-Type': 'application/json'
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify(value_temp)
-    }
+      body: JSON.stringify(value_temp),
+    };
 
     try {
-        const res = await fetch("http://localhost:5000/set_heating_temp", options);
-        const data = await res.json();
+      const res = await fetch(
+        "http://localhost:5000/set_heating_temp",
+        options
+      );
+      const data = await res.json();
 
-        console.log(data);
-        setFinalTemp(data.temperature)
-        
+      console.log(data);
+      setFinalTemp(data.temperature);
     } catch (error) {
-        console.log(error);
+      console.log(error);
     }
-  }
- 
+  };
+
   return (
     <div className="App">
-      <div className="bg-black text-white flex justify-center items-center p-5">
-        <div className="w-2/4 border-r border-r-white p-3">
-          <div><h1 className="text-4xl font-semibold">Smart Heating</h1></div>
-          <div className="bg-white mt-10 text-black">
-            <h1>Home's temperature: {recentData.temperature} ° C</h1>
-            <h1>Home's humidity: {recentData.humidity}</h1>
+      <div className="bg-slate-700 text-white flex justify-center items-center p-10 h-screen">
+        <div className="p-3 w-screen">
+          <div className="p-3">
+            <h1 className="text-6xl font-semibold">Smart Heating</h1>
           </div>
-          <div>
-            <div className="bg-white text-black mt-10">
-              {status === 1 ? (<div>
-                <h2 className="text-green-700 font-semibold">The heating is ON</h2>
-                <button className="bg-red-800 text-white p-2 rounded-xl mt-5" onClick={handleOff}>Off</button>
-              </div>)
-              : (<div>
-                  <h2 className="text-red-700 font-semibold">The heating is OFF</h2>
-                  <button className="bg-green-700 text-white p-2 rounded-xl mt-5" onClick={handleOn}>On</button>
-                </div>)}
+          <div className="flex p-5 mt-20">
+            <div className="flex flex-col items-center justify-center w-1/3">
+              <h1 className="mb-10 mt-10 text-3xl font-semibold">
+                Home's data
+              </h1>
+
+              <div>
+                <div className="bg-gray-900 h-40 w-40 flex justify-center items-center rounded-full mb-4 text-6xl border-4 border-white-300">
+                  {recentData.temperature}
+                  <sup className="text-lg">° C</sup>
+                </div>
+                <div className="bg-gray-900 h-40 w-40 flex justify-center items-center rounded-full text-6xl border-4 border-white-300">
+                  {recentData.humidity}
+                  <sup className="text-lg">%</sup>
+                </div>
+              </div>
+            </div>
+            <div className="border-x-2 border-white-500 w-1/3">
+              <div>
+                {status === 1 ? (
+                  <h1 className="bg-green-200 w-80 m-auto mt-10 mb-10 p-3 rounded-full border-4 border-green-500 text-black">
+                    The heating system is ON
+                  </h1>
+                ) : (
+                  <h1 className="bg-red-200 w-80 m-auto mt-10 mb-10 p-3 rounded-full border-4 border-red-500 text-black">
+                    The heating system is OFF
+                  </h1>
+                )}
+              </div>
+              <div className="flex justify-center items-center gap-4">
+                <div>
+                  {status === 1 ? (
+                    <button
+                      className="bg-red-800 text-white text-xl flex flex-col items-center justify-center rounded-full m-4 h-16 w-16 border-4 border-white-300"
+                      onClick={handleOff}
+                    >
+                      Off
+                    </button>
+                  ) : (
+                    <button
+                      className="bg-green-700 text-white text-xl flex flex-col items-center justify-center rounded-full m-4 h-16 w-16 border-4 border-white-300"
+                      onClick={handleOn}
+                    >
+                      On
+                    </button>
+                  )}
+                </div>
+
+                <div className="bg-gray-900 h-40 w-40 flex justify-center items-center rounded-full text-6xl border-4 border-white-300">
+                  {temp} <sup className="text-lg"> ° C</sup>
+                </div>
+                <div className="flex flex-col">
+                  <button
+                    onClick={handlePLus}
+                    className="btn"
+                  >
+                    +
+                  </button>
+                  <button
+                    onClick={handleSet}
+                    className="bg-amber-400 text-white text-xl flex flex-col items-center justify-center rounded-full m-4 h-16 w-16 border-4 border-white-300"
+                  >
+                    Set
+                  </button>
+                  <button
+                    onClick={handleMinus}
+                    className="btn"
+                  >
+                    -
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div className="flex flex-col items-center justify-start w-1/3">
+              <h1 className="mb-32 mt-10 text-3xl font-semibold">Heating System</h1>
+              <div>
+                <div className="bg-gray-900 h-40 w-40 flex justify-center items-center rounded-full text-6xl border-4 border-white-300">
+                  {finalTemp}
+                  <sup className="text-lg">° C</sup>
+                </div>
+              </div>
             </div>
           </div>
-          <div className="bg-white mt-10 text-black p-5">
-            <h2>Heating system settings</h2>
-            <h2>The temperature of the heating system: {finalTemp}</h2>
-            <h2 className="mt-5">Set temperature: <span className="bg-gray-600 text-white p-1">{temp} ° C</span></h2>
-            <button onClick={handlePLus} className="bg-slate-800 text-white p-2 rounded-xl m-4 h-10 w-10">+</button>
-            <button onClick={handleMinus} className="bg-slate-800 text-white p-2 rounded-xl m-4 h-10 w-10">-</button>
-            <button onClick={handleSet} className="bg-slate-800 text-white p-2 rounded-xl m-4 h-10 w-13">Set</button>
-          </div>
         </div>
-        <div className="w-2/4">Chart</div>
       </div>
     </div>
   );
