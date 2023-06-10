@@ -152,13 +152,13 @@ function App() {
 
   return (
     <div className="App">
-      <div className="bg-slate-700 text-white flex justify-center items-center p-10 h-screen">
+      <div className="bg-slate-700 text-white flex justify-center items-center p-10 pb-20 sm:h-screen">
         <div className="p-3 w-screen">
-          <div className="p-3">
+          <div className="p-3 mb-6">
             <h1 className="text-6xl font-semibold">Smart Heating</h1>
           </div>
-          <div className="flex p-5 mt-20">
-            <div className="flex flex-col items-center justify-center w-1/3">
+          <div className="flex flex-col gap-8 sm:flex-row">
+            <div className="w-full p-5 sm:w-2/4 flex flex-col items-center justify-center">
               <h1 className="mb-10 mt-10 text-3xl font-semibold">
                 Home's data
               </h1>
@@ -174,7 +174,7 @@ function App() {
                 </div>
               </div>
             </div>
-            <div className="border-x-2 border-white-500 w-1/3">
+            <div className="w-full border-x-0 border-white-500 border-t-2 border-white-500 p-5 sm:w-2/4 sm:border-l-4 border-white-500 sm:border-t-0">
               <div>
                 {status === 1 ? (
                   <h1 className="bg-green-200 w-80 m-auto mt-10 mb-10 p-3 rounded-full border-4 border-green-500 text-black">
@@ -227,15 +227,6 @@ function App() {
                   >
                     -
                   </button>
-                </div>
-              </div>
-            </div>
-            <div className="flex flex-col items-center justify-start w-1/3">
-              <h1 className="mb-32 mt-10 text-3xl font-semibold">Heating System</h1>
-              <div>
-                <div className="bg-gray-900 h-40 w-40 flex justify-center items-center rounded-full text-6xl border-4 border-white-300">
-                  {finalTemp}
-                  <sup className="text-lg">° C</sup>
                 </div>
               </div>
             </div>
