@@ -1,6 +1,13 @@
 import "./App.css";
+// import dotenv from "dotenv";
+
+// dotenv.config()
+
+// const url = process.env.SERVER_URL 
 
 import { useState, useEffect } from "react";
+
+const url = "http://192.168.1.101:5000";
 
 function App() {
   // eslint-disable-next-line
@@ -16,7 +23,7 @@ function App() {
     // get all the temperatures and humiditys
     const fetchData = async () => {
       try {
-        const res = await fetch("http://localhost:5000/get_data");
+        const res = await fetch(`${url}/get_data`);
         const data1 = await res.json();
 
         setData(data1);
@@ -29,7 +36,7 @@ function App() {
     // get the status of the heating system
     const fetchStatus = async () => {
       try {
-        const res = await fetch("http://localhost:5000/get_status");
+        const res = await fetch(`${url}/get_status`);
         const data1 = await res.json();
 
         setStatus(data1);
@@ -42,7 +49,7 @@ function App() {
     // get the temperature of the heating system
     const fetchHeatingTemp = async () => {
       try {
-        const res = await fetch("http://localhost:5000/get_heating_temp");
+        const res = await fetch(`${url}/get_heating_temp`);
         const data1 = await res.json();
 
         setFinalTemp(data1);
@@ -56,7 +63,7 @@ function App() {
     // get the recent temperature and humidty of the sensors
     const fetchRecentTemp = async () => {
       try {
-        const res = await fetch("http://localhost:5000/get_recent_temp");
+        const res = await fetch(`${url}/get_recent_temp`);
         const data1 = await res.json();
 
         setRecentData(data1);
@@ -82,7 +89,7 @@ function App() {
     };
 
     try {
-      const res = await fetch("http://localhost:5000/turn_off_status", options);
+      const res = await fetch(`${url}/turn_off_status`, options);
       const data = await res.json();
 
       console.log(data);
@@ -102,7 +109,7 @@ function App() {
     };
 
     try {
-      const res = await fetch("http://localhost:5000/turn_on_status", options);
+      const res = await fetch(`${url}/turn_on_status`, options);
       const data = await res.json();
 
       console.log(data);
@@ -140,7 +147,7 @@ function App() {
 
     try {
       const res = await fetch(
-        "http://localhost:5000/set_heating_temp",
+        `${url}/set_heating_temp`,
         options
       );
       const data = await res.json();
