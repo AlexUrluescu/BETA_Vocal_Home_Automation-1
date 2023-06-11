@@ -3,10 +3,12 @@ import "./App.css";
 import { useState, useEffect } from "react";
 
 function App() {
+  // eslint-disable-next-line
   const [data, setData] = useState([]);
   const [status, setStatus] = useState(null);
   const [recentData, setRecentData] = useState({});
 
+  // eslint-disable-next-line
   const [finalTemp, setFinalTemp] = useState();
   const [temp, setTemp] = useState(null);
 
