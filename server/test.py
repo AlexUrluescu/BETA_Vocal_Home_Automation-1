@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, jsonify
 from flask_mysqldb import MySQL
-from flask_cors import CORS
+from flask_cors import CORS, cross_origin
 
 app = Flask(__name__)
 CORS(app)
@@ -145,7 +145,14 @@ def get_recent_temp():
     return jsonify(row_dict)
 
 
+@app.route('/test')
+@cross_origin()
+def test():
+    data = {
+        "nume": 'Alex'
+    }
 
+    return jsonify(data)
 
 if __name__ == '__main__':
     app.run(port = 5000, debug = True)

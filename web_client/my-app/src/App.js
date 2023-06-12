@@ -7,7 +7,7 @@ import "./App.css";
 
 import { useState, useEffect } from "react";
 
-const url = "http://192.168.1.101:5000";
+const url = "http://127.0.0.1:5000";
 
 function App() {
   // eslint-disable-next-line
@@ -24,6 +24,31 @@ function App() {
     const fetchData = async () => {
       try {
         const res = await fetch(`${url}/get_data`);
+        const data1 = await res.json();
+
+        setData(data1);
+        console.log(data1);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    const fetchData2 = async () => {
+      try {
+        const res = await fetch(`https://jsonplaceholder.typicode.com/users`);
+        const data1 = await res.json();
+
+        // setData(data1);
+        console.log(data1);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+
+    const fetchData3 = async () => {
+      try {
+        const res = await fetch(`${url}/test`);
         const data1 = await res.json();
 
         setData(data1);
@@ -74,6 +99,8 @@ function App() {
     };
 
     fetchData();
+    fetchData2();
+    fetchData3();
     fetchStatus();
     fetchHeatingTemp();
     fetchRecentTemp();
