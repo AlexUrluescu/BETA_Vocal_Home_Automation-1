@@ -7,7 +7,7 @@ import "./App.css";
 
 import { useState, useEffect } from "react";
 
-const url = "http://127.0.0.1:5000";
+const url = "http://192.168.1.101:5000";
 
 function App() {
   // eslint-disable-next-line
