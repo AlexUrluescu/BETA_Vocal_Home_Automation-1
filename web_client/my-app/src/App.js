@@ -7,7 +7,7 @@ import "./App.css";
 
 import { useState, useEffect } from "react";
 
-const url = "http://localhost:5000";
+const url = "https://smarthome-dowt.onrender.com";
 
 function App() {
   // eslint-disable-next-line
