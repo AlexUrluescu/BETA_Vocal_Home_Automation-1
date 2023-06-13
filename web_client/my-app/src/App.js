@@ -7,51 +7,24 @@ import "./App.css";
 
 import { useState, useEffect } from "react";
 
-const url = "http://192.168.1.101:5000";
+const url = "http://localhost:5000";
 
 function App() {
   // eslint-disable-next-line
-  const [data, setData] = useState([]);
-  const [status, setStatus] = useState(null);
-  const [recentData, setRecentData] = useState({});
-
-  // eslint-disable-next-line
-  const [finalTemp, setFinalTemp] = useState();
-  const [temp, setTemp] = useState(null);
+  const [tempHome, setTempHome] = useState(0);
+  const [humHome, setHumHome] = useState(0);
+  const [statusHeating, setStatusHeating] = useState(0);
+  const [heatingTemp, setHeatingTemp] = useState(0);
 
   useEffect(() => {
     // get all the temperatures and humiditys
     const fetchData = async () => {
       try {
-        const res = await fetch(`${url}/get_data`);
+        const res = await fetch(`${url}/datasenzors`);
         const data1 = await res.json();
 
-        setData(data1);
-        console.log(data1);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
-    const fetchData2 = async () => {
-      try {
-        const res = await fetch(`https://jsonplaceholder.typicode.com/users`);
-        const data1 = await res.json();
-
-        // setData(data1);
-        console.log(data1);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
-
-    const fetchData3 = async () => {
-      try {
-        const res = await fetch(`${url}/test`);
-        const data1 = await res.json();
-
-        setData(data1);
+        setTempHome(data1[0].temperature);
+        setHumHome(data1[0].humidity)
         console.log(data1);
       } catch (error) {
         console.log(error);
@@ -61,10 +34,10 @@ function App() {
     // get the status of the heating system
     const fetchStatus = async () => {
       try {
-        const res = await fetch(`${url}/get_status`);
+        const res = await fetch(`${url}/heatingstatus`);
         const data1 = await res.json();
 
-        setStatus(data1);
+        setStatusHeating(data1[0]);
         console.log(data1);
       } catch (error) {
         console.log(error);
@@ -74,24 +47,11 @@ function App() {
     // get the temperature of the heating system
     const fetchHeatingTemp = async () => {
       try {
-        const res = await fetch(`${url}/get_heating_temp`);
+        const res = await fetch(`${url}/heatingtemp`);
         const data1 = await res.json();
 
-        setFinalTemp(data1);
-        setTemp(data1);
-        console.log(data1);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
-    // get the recent temperature and humidty of the sensors
-    const fetchRecentTemp = async () => {
-      try {
-        const res = await fetch(`${url}/get_recent_temp`);
-        const data1 = await res.json();
-
-        setRecentData(data1);
+        // setFinalTemp(data1);
+        setHeatingTemp(data1[0]);
         console.log(data1);
       } catch (error) {
         console.log(error);
@@ -99,28 +59,31 @@ function App() {
     };
 
     fetchData();
-    fetchData2();
-    fetchData3();
     fetchStatus();
     fetchHeatingTemp();
-    fetchRecentTemp();
   }, []);
 
   // turn OFF the heating system
   const handleOff = async () => {
-    const options = {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    };
+
+    const status = 0;
 
     try {
-      const res = await fetch(`${url}/turn_off_status`, options);
-      const data = await res.json();
+      const data = await fetch(`${url}/changestatus/${statusHeating._id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+      },
+        body: JSON.stringify({ status })
+      });
 
-      console.log(data);
-      setStatus(data.status);
+      const res = await data.json();
+
+      console.log(res);
+      if(res.message === "ok"){
+        setStatusHeating({...statusHeating, status: 0})
+      }
+      // setStatus(data.status);
     } catch (error) {
       console.log(error);
     }
@@ -128,59 +91,68 @@ function App() {
 
   // turn ON the heating system
   const handleOn = async () => {
-    const options = {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    };
+    const status = 1;
 
     try {
-      const res = await fetch(`${url}/turn_on_status`, options);
-      const data = await res.json();
+      const data = await fetch(`${url}/changestatus/${statusHeating._id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+      },
+        body: JSON.stringify({ status })
+      });
 
-      console.log(data);
-      setStatus(data.status);
+      const res = await data.json();
+
+      console.log(res);
+      if(res.message === "ok"){
+        setStatusHeating({...statusHeating, status: 1})
+      }
+      // setStatus(data.status);
     } catch (error) {
       console.log(error);
     }
+
   };
 
   // increment the value of the temperature
   const handlePLus = () => {
-    setTemp(temp + 1);
+  
+    const temperature = heatingTemp.temperature;
+    setHeatingTemp({...heatingTemp, temperature: temperature + 1})
+
   };
 
   // decrement the value of the temperature
   const handleMinus = () => {
-    setTemp(temp - 1);
+
+    const temperature = heatingTemp.temperature;
+    setHeatingTemp({...heatingTemp, temperature: temperature - 1});
+
+
   };
 
   // set the final temperature
   const handleSet = async () => {
-    console.log(temp);
 
-    const value_temp = {
-      value: temp,
-    };
-
-    const options = {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(value_temp),
-    };
+    const temperature = heatingTemp.temperature;
 
     try {
-      const res = await fetch(
-        `${url}/set_heating_temp`,
-        options
-      );
-      const data = await res.json();
+      const data = await fetch(`${url}/changeheatingtemp/${heatingTemp._id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+      },
+        body: JSON.stringify({ temperature })
+      });
 
-      console.log(data);
-      setFinalTemp(data.temperature);
+      const res = await data.json();
+
+      console.log(res);
+      if(res.message === "ok"){
+        setHeatingTemp({...heatingTemp, temperature: temperature})
+      }
+
     } catch (error) {
       console.log(error);
     }
@@ -201,18 +173,18 @@ function App() {
 
               <div>
                 <div className="bg-gray-900 h-40 w-40 flex justify-center items-center rounded-full mb-4 text-6xl border-4 border-white-300">
-                  {recentData.temperature}
+                  {tempHome}
                   <sup className="text-lg">° C</sup>
                 </div>
                 <div className="bg-gray-900 h-40 w-40 flex justify-center items-center rounded-full text-6xl border-4 border-white-300">
-                  {recentData.humidity}
+                  {humHome}
                   <sup className="text-lg">%</sup>
                 </div>
               </div>
             </div>
             <div className="w-full border-x-0 border-white-500 border-t-2 border-white-500 p-5 sm:w-2/4 sm:border-l-4 border-white-500 sm:border-t-0">
               <div>
-                {status === 1 ? (
+                {statusHeating.status === 1 ? (
                   <h1 className="bg-green-200 w-80 m-auto mt-10 mb-10 p-3 rounded-full border-4 border-green-500 text-black">
                     The heating system is ON
                   </h1>
@@ -224,7 +196,7 @@ function App() {
               </div>
               <div className="flex justify-center items-center gap-4">
                 <div>
-                  {status === 1 ? (
+                  {statusHeating.status === 1 ? (
                     <button
                       className="bg-red-800 text-white text-xl flex flex-col items-center justify-center rounded-full m-4 h-16 w-16 border-4 border-white-300"
                       onClick={handleOff}
@@ -242,7 +214,7 @@ function App() {
                 </div>
 
                 <div className="bg-gray-900 h-40 w-40 flex justify-center items-center rounded-full text-6xl border-4 border-white-300">
-                  {temp} <sup className="text-lg"> ° C</sup>
+                  {heatingTemp.temperature} <sup className="text-lg"> ° C</sup>
                 </div>
                 <div className="flex flex-col">
                   <button
