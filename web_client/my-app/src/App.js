@@ -60,7 +60,7 @@ function App() {
 
     const fetchTest = async () => {
       try {
-        const res = await fetch("http://192.168.1.101:5000/get_data")
+        const res = await fetch("https://192.168.1.101:5000/get_data")
         const data = await res.json()
 
         console.log(data);
