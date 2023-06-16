@@ -58,9 +58,22 @@ function App() {
       }
     };
 
+    const fetchTest = async () => {
+      try {
+        const res = await fetch("http://192.168.1.101:5000/get_data")
+        const data = await res.json()
+
+        console.log(data);
+        
+      } catch (error) {
+        console.log(error);
+      }
+    }
+
     fetchData();
     fetchStatus();
     fetchHeatingTemp();
+    fetchTest();
   }, []);
 
   // turn OFF the heating system
