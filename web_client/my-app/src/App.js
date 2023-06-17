@@ -57,7 +57,7 @@ function App() {
         console.log(error);
       }
     };
-
+    
     fetchData();
     fetchStatus();
     fetchHeatingTemp();
