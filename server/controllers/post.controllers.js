@@ -45,7 +45,14 @@ export const changeStatus = async (req, res) => {
     try {
         const updateStatus = await HeatingStatus.findByIdAndUpdate(req.params.id, req.body, { new: true })
         console.log(updateStatus);
-        return res.json({"message": "ok"});
+
+        if(req.body === "On"){
+            return res.json({"message": "On"});
+        }
+
+        else{
+            return res.json({"message": "Off"});
+        }
 
     } catch (error) {
         return res.status(500).json({message: error.message})
