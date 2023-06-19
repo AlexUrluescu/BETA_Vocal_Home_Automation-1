@@ -1,4 +1,14 @@
 import "./App.css";
+
+//theme
+import "primereact/resources/themes/lara-light-indigo/theme.css";     
+    
+//core
+import "primereact/resources/primereact.min.css";
+import { Button } from 'primereact/button';
+
+import { SelectButton } from 'primereact/selectbutton';
+              
 // import dotenv from "dotenv";
 
 // dotenv.config()
@@ -15,6 +25,9 @@ function App() {
   const [humHome, setHumHome] = useState(0);
   const [statusHeating, setStatusHeating] = useState(0);
   const [heatingTemp, setHeatingTemp] = useState(0);
+
+  const options = ['Off', 'On'];
+  const [value, setValue] = useState(options[0]);
 
   useEffect(() => {
     // get all the temperatures and humiditys
@@ -73,8 +86,63 @@ function App() {
     fetchData();
     fetchStatus();
     fetchHeatingTemp();
-    fetchTest();
+    // fetchTest();
   }, []);
+
+  const handleChange = async (e) => {
+      setValue(e.value)
+      console.log(e.value);
+
+      if(e.value === 'On'){
+        const status = 1;
+
+        try {
+          const data = await fetch(`http://localhost:5000/changestatus/${statusHeating._id}`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json'
+          },
+            body: JSON.stringify({ status })
+          });
+    
+          const res = await data.json();
+    
+          console.log(res);
+          if(res.message === "ok"){
+            setStatusHeating({...statusHeating, status: 1})
+          }
+          // setStatus(data.status);
+        } catch (error) {
+          console.log(error);
+        }
+       
+
+      }
+
+      else if(e.value === "Off"){
+        try {
+          const status = 0;
+          const data = await fetch(`http://localhost:5000/changestatus/${statusHeating._id}`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json'
+          },
+            body: JSON.stringify({ status })
+          });
+    
+          const res = await data.json();
+    
+          console.log(res);
+          if(res.message === "ok"){
+            setStatusHeating({...statusHeating, status: 0})
+          }
+          
+        } catch (error) {
+          console.log(error);
+        }
+      }
+    
+  }
 
   // turn OFF the heating system
   const handleOff = async () => {
@@ -177,6 +245,9 @@ function App() {
         <div className="p-3 w-screen">
           <div className="p-3 mb-6">
             <h1 className="text-6xl font-semibold">Smart Heating</h1>
+            <Button label="Check"/>
+            <SelectButton value={value} onChange={handleChange} options={options} />
+            {value === "On" ? <h2>On</h2> : <h2>Off</h2>}
           </div>
           <div className="flex flex-col gap-8 sm:flex-row">
             <div className="w-full p-5 sm:w-2/4 flex flex-col items-center justify-center">
