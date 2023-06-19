@@ -5,17 +5,11 @@ import "primereact/resources/themes/lara-light-indigo/theme.css";
     
 //core
 import "primereact/resources/primereact.min.css";
-import { Button } from 'primereact/button';
 
-import { SelectButton } from 'primereact/selectbutton';
-              
-// import dotenv from "dotenv";
-
-// dotenv.config()
-
-// const url = process.env.SERVER_URL 
 
 import { useState, useEffect } from "react";
+import Slider from "./components/Slider";
+
 
 const url = "https://smarthome-dowt.onrender.com";
 
@@ -26,8 +20,8 @@ function App() {
   const [statusHeating, setStatusHeating] = useState(0);
   const [heatingTemp, setHeatingTemp] = useState(0);
 
-  const options = ['Off', 'On'];
-  const [value, setValue] = useState(options[0]);
+  const [isToggled, setIsToggled] = useState(false);
+
 
   useEffect(() => {
     // get all the temperatures and humiditys
@@ -71,17 +65,18 @@ function App() {
       }
     };
 
-    const fetchTest = async () => {
-      try {
-        const res = await fetch("https://192.168.1.101:5000/get_data")
-        const data = await res.json()
+    // const fetchTest = async () => {
+    //   try {
+    //     const res = await fetch("https://192.168.1.101:5000/get_data")
+    //     const data = await res.json()
 
-        console.log(data);
+    //     console.log(data);
         
-      } catch (error) {
-        console.log(error);
-      }
-    }
+    //   } catch (error) {
+    //     console.log(error);
+    //   }
+    // }
+
 
     fetchData();
     fetchStatus();
@@ -89,21 +84,15 @@ function App() {
     // fetchTest();
   }, []);
 
-  const handleChange = async (e) => {
-      setValue(e.value)
-      console.log(e.value);
+  useEffect(() => {
 
-      if(e.value === 'On'){
-        const status = 1;
+    console.log(isToggled);
+
+    const statusOn = async () => {
+      const status = 1;
 
         try {
-          const data = await fetch(`http://localhost:5000/changestatus/${statusHeating._id}`, {
-            method: 'PUT',
-            headers: {
-              'Content-Type': 'application/json'
-          },
-            body: JSON.stringify({ status })
-          });
+          const data = await fetch(`http://localhost:5000/test/${status}`)
     
           const res = await data.json();
     
@@ -116,19 +105,13 @@ function App() {
           console.log(error);
         }
        
+    }
 
-      }
+    const statusOff = async () => {
+      const status = 0;
 
-      else if(e.value === "Off"){
         try {
-          const status = 0;
-          const data = await fetch(`http://localhost:5000/changestatus/${statusHeating._id}`, {
-            method: 'PUT',
-            headers: {
-              'Content-Type': 'application/json'
-          },
-            body: JSON.stringify({ status })
-          });
+          const data = await fetch(`http://localhost:5000/test/${status}`)
     
           const res = await data.json();
     
@@ -136,13 +119,23 @@ function App() {
           if(res.message === "ok"){
             setStatusHeating({...statusHeating, status: 0})
           }
-          
+          // setStatus(data.status);
         } catch (error) {
           console.log(error);
         }
-      }
-    
-  }
+       
+    }
+
+    if(isToggled){
+      statusOn()
+    }
+
+    else{
+      statusOff()
+    }
+
+  }, [isToggled, statusHeating])
+
 
   // turn OFF the heating system
   const handleOff = async () => {
@@ -239,15 +232,26 @@ function App() {
     }
   };
 
+  const handleSlider = () => {
+    setIsToggled(!isToggled);
+
+  }
+
   return (
     <div className="App">
       <div className="bg-slate-700 text-white flex justify-center items-center p-10 pb-20 sm:h-screen">
         <div className="p-3 w-screen">
           <div className="p-3 mb-6">
             <h1 className="text-6xl font-semibold">Smart Heating</h1>
-            <Button label="Check"/>
-            <SelectButton value={value} onChange={handleChange} options={options} />
-            {value === "On" ? <h2>On</h2> : <h2>Off</h2>}
+            
+            <div className={isToggled === true ? "bg-green-700" : "bg-red-700"}>
+              {isToggled === true ? <h2>On</h2> : <h2>Off</h2>}
+            </div>
+            <div className="bg-white">
+             
+            <Slider rounded = {true} isToggled={isToggled} onToggle={handleSlider}/>
+
+            </div>
           </div>
           <div className="flex flex-col gap-8 sm:flex-row">
             <div className="w-full p-5 sm:w-2/4 flex flex-col items-center justify-center">
@@ -297,7 +301,7 @@ function App() {
                   )}
                 </div>
 
-                <div className="bg-gray-900 h-40 w-40 flex justify-center items-center rounded-full text-6xl border-4 border-white-300">
+                <div className={isToggled === true ? "bg-gray-900 h-40 w-40 flex justify-center items-center rounded-full text-6xl border-4 border-yellow-300": "bg-gray-900 h-40 w-40 flex justify-center items-center rounded-full text-6xl border-4 border-white-300"}>
                   {heatingTemp.temperature} <sup className="text-lg"> ° C</sup>
                 </div>
                 <div className="flex flex-col">

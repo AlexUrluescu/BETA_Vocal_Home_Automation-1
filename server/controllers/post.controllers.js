@@ -71,6 +71,25 @@ export const changeHeatingTemp = async (req, res) => {
         return res.status(500).json({message: error.message})
         
     }
+}; 
+
+export const testStatus = async (req, res) => {
+
+    try {
+
+        const status = req.params.status;
+        console.log(status);
+        if(status == 1){
+            return res.json({"message": "On"})
+        } else{
+            return res.json({"message": "Off"})
+            
+        }
+
+    } catch (error) {
+        return res.status(500).json({message: error.message})
+        
+    }
 };   
 
 
