@@ -1,15 +1,6 @@
 import "./App.css";
-
-//theme
-import "primereact/resources/themes/lara-light-indigo/theme.css";     
-    
-//core
-import "primereact/resources/primereact.min.css";
-
-
 import { useState, useEffect } from "react";
 import Slider from "./components/Slider";
-
 
 const url = "https://smarthome-dowt.onrender.com";
 
@@ -21,7 +12,9 @@ function App() {
   const [heatingTemp, setHeatingTemp] = useState(0);
 
   const [isToggled, setIsToggled] = useState(false);
-
+  // eslint-disable-next-line
+  const [finalTemp, setFinalTemp] = useState();
+  const [styleHeating, setStyleHeating] = useState(0);
 
   useEffect(() => {
     // get all the temperatures and humiditys
@@ -31,7 +24,7 @@ function App() {
         const data1 = await res.json();
 
         setTempHome(data1[0].temperature);
-        setHumHome(data1[0].humidity)
+        setHumHome(data1[0].humidity);
         console.log(data1);
       } catch (error) {
         console.log(error);
@@ -65,201 +58,204 @@ function App() {
       }
     };
 
-    // const fetchTest = async () => {
-    //   try {
-    //     const res = await fetch("https://192.168.1.101:5000/get_data")
-    //     const data = await res.json()
-
-    //     console.log(data);
-        
-    //   } catch (error) {
-    //     console.log(error);
-    //   }
-    // }
-
-
     fetchData();
     fetchStatus();
     fetchHeatingTemp();
-    // fetchTest();
   }, []);
 
   useEffect(() => {
+    const timer = setTimeout(async () => {
+      setFinalTemp(heatingTemp);
 
+      console.log("salvat");
+      console.log("inceput mesaj");
+      setStyleHeating(1);
+
+      setTimeout(async () => {
+        try {
+          const temperature = heatingTemp.temperature;
+
+          const data = await fetch(
+            `${url}/changeheatingtemp/${heatingTemp._id}`,
+            {
+              method: "PUT",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ temperature }),
+            }
+          );
+
+          const res = await data.json();
+
+          console.log(res);
+          if (res.message === "ok") {
+            setFinalTemp({ ...heatingTemp, temperature: temperature });
+          }
+        } catch (error) {
+          console.log(error);
+        }
+        console.log("sfarsit mesaj");
+        setStyleHeating(0);
+      }, 2000);
+
+      console.log("iasa");
+    }, 5000);
+
+    return () => {
+      console.log("intra");
+      clearTimeout(timer);
+    };
+  }, [heatingTemp]);
+
+  useEffect(() => {
     console.log(isToggled);
 
     const statusOn = async () => {
       const status = 1;
 
-        try {
-          const data = await fetch(`http://localhost:5000/test/${status}`)
-    
-          const res = await data.json();
-    
-          console.log(res);
-          if(res.message === "ok"){
-            setStatusHeating({...statusHeating, status: 1})
-          }
-          // setStatus(data.status);
-        } catch (error) {
-          console.log(error);
+      try {
+        // de trecut url adevarat, inloc de localhost
+        const data = await fetch(`http://localhost:5000/test/${status}`);
+
+        const res = await data.json();
+
+        console.log(res);
+        if (res.message === "ok") {
+          setStatusHeating({ ...statusHeating, status: 1 });
         }
-       
-    }
+        // setStatus(data.status);
+      } catch (error) {
+        console.log(error);
+      }
+    };
 
     const statusOff = async () => {
       const status = 0;
 
-        try {
-          const data = await fetch(`http://localhost:5000/test/${status}`)
-    
-          const res = await data.json();
-    
-          console.log(res);
-          if(res.message === "ok"){
-            setStatusHeating({...statusHeating, status: 0})
-          }
-          // setStatus(data.status);
-        } catch (error) {
-          console.log(error);
+      try {
+        const data = await fetch(`http://localhost:5000/test/${status}`);
+
+        const res = await data.json();
+
+        console.log(res);
+        if (res.message === "ok") {
+          setStatusHeating({ ...statusHeating, status: 0 });
         }
-       
+        // setStatus(data.status);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    if (isToggled) {
+      statusOn();
+    } else {
+      statusOff();
     }
-
-    if(isToggled){
-      statusOn()
-    }
-
-    else{
-      statusOff()
-    }
-
-  }, [isToggled, statusHeating])
-
+  }, [isToggled, statusHeating]);
 
   // turn OFF the heating system
-  const handleOff = async () => {
+  // const handleOff = async () => {
+  //   const status = 0;
 
-    const status = 0;
+  //   try {
+  //     const data = await fetch(`${url}/changestatus/${statusHeating._id}`, {
+  //       method: "PUT",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify({ status }),
+  //     });
 
-    try {
-      const data = await fetch(`${url}/changestatus/${statusHeating._id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json'
-      },
-        body: JSON.stringify({ status })
-      });
+  //     const res = await data.json();
 
-      const res = await data.json();
-
-      console.log(res);
-      if(res.message === "ok"){
-        setStatusHeating({...statusHeating, status: 0})
-      }
-      // setStatus(data.status);
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  //     console.log(res);
+  //     if (res.message === "ok") {
+  //       setStatusHeating({ ...statusHeating, status: 0 });
+  //     }
+  //     // setStatus(data.status);
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
 
   // turn ON the heating system
-  const handleOn = async () => {
-    const status = 1;
+  // const handleOn = async () => {
+  //   const status = 1;
 
-    try {
-      const data = await fetch(`${url}/changestatus/${statusHeating._id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json'
-      },
-        body: JSON.stringify({ status })
-      });
+  //   try {
+  //     const data = await fetch(`${url}/changestatus/${statusHeating._id}`, {
+  //       method: "PUT",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify({ status }),
+  //     });
 
-      const res = await data.json();
+  //     const res = await data.json();
 
-      console.log(res);
-      if(res.message === "ok"){
-        setStatusHeating({...statusHeating, status: 1})
-      }
-      // setStatus(data.status);
-    } catch (error) {
-      console.log(error);
-    }
-
-  };
+  //     console.log(res);
+  //     if (res.message === "ok") {
+  //       setStatusHeating({ ...statusHeating, status: 1 });
+  //     }
+  //     // setStatus(data.status);
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
 
   // increment the value of the temperature
   const handlePLus = () => {
-  
     const temperature = heatingTemp.temperature;
-    setHeatingTemp({...heatingTemp, temperature: temperature + 1})
-
+    setHeatingTemp({ ...heatingTemp, temperature: temperature + 1 });
   };
 
   // decrement the value of the temperature
   const handleMinus = () => {
-
     const temperature = heatingTemp.temperature;
-    setHeatingTemp({...heatingTemp, temperature: temperature - 1});
-
-
+    setHeatingTemp({ ...heatingTemp, temperature: temperature - 1 });
   };
 
   // set the final temperature
-  const handleSet = async () => {
+  // const handleSet = async () => {
+  //   const temperature = heatingTemp.temperature;
 
-    const temperature = heatingTemp.temperature;
+  //   try {
+  //     const data = await fetch(`${url}/changeheatingtemp/${heatingTemp._id}`, {
+  //       method: "PUT",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify({ temperature }),
+  //     });
 
-    try {
-      const data = await fetch(`${url}/changeheatingtemp/${heatingTemp._id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json'
-      },
-        body: JSON.stringify({ temperature })
-      });
+  //     const res = await data.json();
 
-      const res = await data.json();
-
-      console.log(res);
-      if(res.message === "ok"){
-        setHeatingTemp({...heatingTemp, temperature: temperature})
-      }
-
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  //     console.log(res);
+  //     if (res.message === "ok") {
+  //       setHeatingTemp({ ...heatingTemp, temperature: temperature });
+  //     }
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
 
   const handleSlider = () => {
     setIsToggled(!isToggled);
-
-  }
+  };
 
   return (
     <div className="App">
       <div className="bg-slate-700 text-white flex justify-center items-center p-10 pb-20 sm:h-screen">
         <div className="p-3 w-screen">
-          <div className="p-3 mb-6">
+          <div className="p-3 mb-20">
             <h1 className="text-6xl font-semibold">Smart Heating</h1>
-            
-            <div className={isToggled === true ? "bg-green-700" : "bg-red-700"}>
-              {isToggled === true ? <h2>On</h2> : <h2>Off</h2>}
-            </div>
-            <div className="bg-white">
-             
-            <Slider rounded = {true} isToggled={isToggled} onToggle={handleSlider}/>
-
-            </div>
           </div>
           <div className="flex flex-col gap-8 sm:flex-row">
             <div className="w-full p-5 sm:w-2/4 flex flex-col items-center justify-center">
-              <h1 className="mb-10 mt-10 text-3xl font-semibold">
-                Home's data
-              </h1>
-
-              <div>
+              <h1 className="mb-20 text-3xl font-semibold">Home's data</h1>
+              <div className="flex flex-col items-center justify-center gap-10">
                 <div className="bg-gray-900 h-40 w-40 flex justify-center items-center rounded-full mb-4 text-6xl border-4 border-white-300">
                   {tempHome}
                   <sup className="text-lg">° C</sup>
@@ -271,59 +267,58 @@ function App() {
               </div>
             </div>
             <div className="w-full border-x-0 border-white-500 border-t-2 border-white-500 p-5 sm:w-2/4 sm:border-l-4 border-white-500 sm:border-t-0">
-              <div>
-                {statusHeating.status === 1 ? (
-                  <h1 className="bg-green-200 w-80 m-auto mt-10 mb-10 p-3 rounded-full border-4 border-green-500 text-black">
-                    The heating system is ON
-                  </h1>
+              <div className="h-10 mb-5 flex justify-center">
+                {styleHeating === 1 ? (
+                  <p className="bg-green-500 text-xl rounded-md w-72 flex justify-center items-center">
+                    Temperatura este actualizata
+                  </p>
                 ) : (
-                  <h1 className="bg-red-200 w-80 m-auto mt-10 mb-10 p-3 rounded-full border-4 border-red-500 text-black">
-                    The heating system is OFF
-                  </h1>
+                  <p> </p>
                 )}
+              </div>
+              <div>
+                <div>
+                  {isToggled === true ? (
+                    <h2 className="text-2xl">On</h2>
+                  ) : (
+                    <h2 className="text-2xl">Off</h2>
+                  )}
+                </div>
+                <Slider
+                  rounded={true}
+                  isToggled={isToggled}
+                  onToggle={handleSlider}
+                />
               </div>
               <div className="flex justify-center items-center gap-4">
                 <div>
-                  {statusHeating.status === 1 ? (
-                    <button
-                      className="bg-red-800 text-white text-xl flex flex-col items-center justify-center rounded-full m-4 h-16 w-16 border-4 border-white-300"
-                      onClick={handleOff}
-                    >
-                      Off
-                    </button>
-                  ) : (
-                    <button
-                      className="bg-green-700 text-white text-xl flex flex-col items-center justify-center rounded-full m-4 h-16 w-16 border-4 border-white-300"
-                      onClick={handleOn}
-                    >
-                      On
-                    </button>
-                  )}
+                  <div
+                    className={
+                      isToggled === true && tempHome < heatingTemp.temperature
+                        ? "bg-gray-900 h-40 w-40 flex justify-center items-center rounded-full text-6xl border-8 border-yellow-300"
+                        : "bg-gray-900 h-40 w-40 flex justify-center items-center rounded-full text-6xl border-4 border-white-300"
+                    }
+                  >
+                    {heatingTemp.temperature}{" "}
+                    <sup className="text-lg"> ° C</sup>
+                  </div>
                 </div>
 
-                <div className={isToggled === true ? "bg-gray-900 h-40 w-40 flex justify-center items-center rounded-full text-6xl border-4 border-yellow-300": "bg-gray-900 h-40 w-40 flex justify-center items-center rounded-full text-6xl border-4 border-white-300"}>
-                  {heatingTemp.temperature} <sup className="text-lg"> ° C</sup>
-                </div>
-                <div className="flex flex-col">
-                  <button
-                    onClick={handlePLus}
-                    className="btn"
-                  >
-                    +
-                  </button>
-                  <button
-                    onClick={handleSet}
-                    className="bg-amber-400 text-white text-xl flex flex-col items-center justify-center rounded-full m-4 h-16 w-16 border-4 border-white-300"
-                  >
-                    Set
-                  </button>
-                  <button
-                    onClick={handleMinus}
-                    className="btn"
-                  >
-                    -
-                  </button>
-                </div>
+                {statusHeating.status === 1 ? (
+                  <div className="flex flex-col h-full gap-20">
+                    <button onClick={handlePLus} className="btn">
+                      +
+                    </button>
+                    <button onClick={handleMinus} className="btn">
+                      -
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex flex-col h-full gap-20">
+                    <button className="btn">+</button>
+                    <button className="btn">-</button>
+                  </div>
+                )}
               </div>
             </div>
           </div>

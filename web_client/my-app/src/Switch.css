@@ -1,8 +1,10 @@
 .switch{
     position: relative;
     display: inline-block;
-    width: 60px;
-    height: 34px;
+    width: 80px;
+    height: 40px;
+    margin-top: 10px;
+    margin-bottom: 20px;
 }
 
 .switch input{
@@ -18,7 +20,7 @@
     top: 0;
     left: 0;
     right: 0;
-    bottom: 0;
+    bottom: 6px;
 
     background-color: #ccc;
     transition: 0.4s;
@@ -37,12 +39,12 @@
 }
 
 input:checked + .slider{
-    background-color: blue;
+    background-color: #5cb85c;
 
 }
 
 input:checked + .slider:before{
-    transform: translateX(26px);
+    transform: translateX(46px);
 }
 
 .slider.rounded{
