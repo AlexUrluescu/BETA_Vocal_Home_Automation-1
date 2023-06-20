@@ -97,7 +97,7 @@ function App() {
         }
         console.log("sfarsit mesaj");
         setStyleHeating(0);
-      }, 2000);
+      }, 3000);
 
       console.log("iasa");
     }, 5000);
@@ -269,7 +269,7 @@ function App() {
             <div className="w-full border-x-0 border-white-500 border-t-2 border-white-500 p-5 sm:w-2/4 sm:border-l-4 border-white-500 sm:border-t-0">
               <div className="h-10 mb-5 flex justify-center">
                 {styleHeating === 1 ? (
-                  <p className="bg-green-500 text-xl rounded-md w-72 flex justify-center items-center">
+                  <p className="bg-green-500 text-xl rounded-md w-72 flex justify-center items-center ease-in-out duration-300">
                     Temperatura este actualizata
                   </p>
                 ) : (
