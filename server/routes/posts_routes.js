@@ -10,6 +10,6 @@ router.get('/heatingtemp', getHeatingTemp);
 router.put('/changestatus/:id', changeStatus);
 router.put('/changeheatingtemp/:id', changeHeatingTemp);
 
-router.get('/test/:status', testStatus);
+router.put('/test/:id', testStatus);
 
 export default router

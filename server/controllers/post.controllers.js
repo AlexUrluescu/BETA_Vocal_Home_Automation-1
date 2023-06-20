@@ -77,12 +77,32 @@ export const testStatus = async (req, res) => {
 
     try {
 
-        const status = req.params.status;
-        console.log(status);
+        const status = req.body.status;
+        // console.log(status);
+
+        const _id = req.params.id;
+        // console.log(_id);
+
         if(status == 1){
-            return res.json({"message": "On"})
-        } else{
-            return res.json({"message": "Off"})
+            try {
+                const updateStatus = await HeatingStatus.findByIdAndUpdate(req.params.id, req.body, { new: true });
+                console.log(updateStatus);
+                return res.json({"message": "On"})
+                
+            } catch (error) {
+                console.log(error);
+            }
+            
+        } 
+        if(status == 0){
+            try {
+                const updateStatus = await HeatingStatus.findByIdAndUpdate(req.params.id, req.body, { new: true });
+                console.log(updateStatus);
+                return res.json({"message": "Off"})
+
+            } catch (error) {
+                console.log(error);
+            }
             
         }
 
