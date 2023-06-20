@@ -108,103 +108,6 @@ function App() {
     };
   }, [heatingTemp]);
 
-  useEffect(() => {
-    console.log(isToggled);
-
-    const statusOn = async () => {
-      const status = 1;
-
-      try {
-        // de trecut url adevarat, inloc de localhost
-        const data = await fetch(`http://localhost:5000/test/${status}`);
-
-        const res = await data.json();
-
-        console.log(res);
-        if (res.message === "ok") {
-          setStatusHeating({ ...statusHeating, status: 1 });
-        }
-        // setStatus(data.status);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
-    const statusOff = async () => {
-      const status = 0;
-
-      try {
-        const data = await fetch(`http://localhost:5000/test/${status}`);
-
-        const res = await data.json();
-
-        console.log(res);
-        if (res.message === "ok") {
-          setStatusHeating({ ...statusHeating, status: 0 });
-        }
-        // setStatus(data.status);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
-    if (isToggled) {
-      statusOn();
-    } else {
-      statusOff();
-    }
-  }, [isToggled, statusHeating]);
-
-  // turn OFF the heating system
-  // const handleOff = async () => {
-  //   const status = 0;
-
-  //   try {
-  //     const data = await fetch(`${url}/changestatus/${statusHeating._id}`, {
-  //       method: "PUT",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //       body: JSON.stringify({ status }),
-  //     });
-
-  //     const res = await data.json();
-
-  //     console.log(res);
-  //     if (res.message === "ok") {
-  //       setStatusHeating({ ...statusHeating, status: 0 });
-  //     }
-  //     // setStatus(data.status);
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // };
-
-  // turn ON the heating system
-  // const handleOn = async () => {
-  //   const status = 1;
-
-  //   try {
-  //     const data = await fetch(`${url}/changestatus/${statusHeating._id}`, {
-  //       method: "PUT",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //       body: JSON.stringify({ status }),
-  //     });
-
-  //     const res = await data.json();
-
-  //     console.log(res);
-  //     if (res.message === "ok") {
-  //       setStatusHeating({ ...statusHeating, status: 1 });
-  //     }
-  //     // setStatus(data.status);
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // };
-
   // increment the value of the temperature
   const handlePLus = () => {
     const temperature = heatingTemp.temperature;
@@ -217,32 +120,69 @@ function App() {
     setHeatingTemp({ ...heatingTemp, temperature: temperature - 1 });
   };
 
-  // set the final temperature
-  // const handleSet = async () => {
-  //   const temperature = heatingTemp.temperature;
-
-  //   try {
-  //     const data = await fetch(`${url}/changeheatingtemp/${heatingTemp._id}`, {
-  //       method: "PUT",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //       body: JSON.stringify({ temperature }),
-  //     });
-
-  //     const res = await data.json();
-
-  //     console.log(res);
-  //     if (res.message === "ok") {
-  //       setHeatingTemp({ ...heatingTemp, temperature: temperature });
-  //     }
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // };
 
   const handleSlider = () => {
+    console.log(isToggled);
     setIsToggled(!isToggled);
+
+    if(isToggled === false){
+
+      const statusOn = async () => {
+        try {
+          const status = 1;
+
+          const data = await fetch(`http://localhost:5000/test/${statusHeating._id}`, {
+            method: "PUT",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ status }),
+          });
+  
+          const res = await data.json();
+  
+          console.log(res);
+          if (res.message === "On") {
+            setStatusHeating({ ...statusHeating, status: 1 });
+          }
+          // setStatus(data.status);
+        } catch (error) {
+          console.log(error);
+        }
+      }
+
+      statusOn();
+      
+    }
+
+    if(isToggled){
+      const statusOff = async () => {
+        const status = 0;
+  
+        try {
+          const data = await fetch(`http://localhost:5000/test/${statusHeating._id}`, {
+            method: "PUT",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ status }),
+          });
+  
+          const res = await data.json();
+  
+          console.log(res);
+          if (res.message === "Off") {
+            setStatusHeating({ ...statusHeating, status: 0 });
+          }
+          // setStatus(data.status);
+        } catch (error) {
+          console.log(error);
+        }
+      };
+
+      statusOff();
+    }
+    
   };
 
   return (
