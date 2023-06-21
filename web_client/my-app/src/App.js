@@ -4,6 +4,7 @@ import Slider from "./components/Slider";
 
 const url = "https://smarthome-dowt.onrender.com";
 
+
 function App() {
   // eslint-disable-next-line
   const [tempHome, setTempHome] = useState(0);
@@ -122,13 +123,13 @@ function App() {
   // increment the value of the temperature
   const handlePLus = () => {
     const temperature = heatingTemp.temperature;
-    setHeatingTemp({ ...heatingTemp, temperature: temperature + 1 });
+    setHeatingTemp({ ...heatingTemp, temperature: temperature + 0.5 });
   };
 
   // decrement the value of the temperature
   const handleMinus = () => {
     const temperature = heatingTemp.temperature;
-    setHeatingTemp({ ...heatingTemp, temperature: temperature - 1 });
+    setHeatingTemp({ ...heatingTemp, temperature: temperature - 0.5 });
   };
 
 
