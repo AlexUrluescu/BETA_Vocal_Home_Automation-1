@@ -131,7 +131,7 @@ function App() {
         try {
           const status = 1;
 
-          const data = await fetch(`http://localhost:5000/test/${statusHeating._id}`, {
+          const data = await fetch(`${url}/test/${statusHeating._id}`, {
             method: "PUT",
               headers: {
                 "Content-Type": "application/json",
@@ -160,7 +160,7 @@ function App() {
         const status = 0;
   
         try {
-          const data = await fetch(`http://localhost:5000/test/${statusHeating._id}`, {
+          const data = await fetch(`${url}/test/${statusHeating._id}`, {
             method: "PUT",
               headers: {
                 "Content-Type": "application/json",
