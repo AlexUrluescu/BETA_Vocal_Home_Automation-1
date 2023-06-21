@@ -108,6 +108,17 @@ function App() {
     };
   }, [heatingTemp]);
 
+  useEffect(() => {
+    if(statusHeating.status === 0){
+      setIsToggled(false)
+    }
+
+    if(statusHeating.status === 1){
+      setIsToggled(true)
+    }
+
+  }, [statusHeating])
+
   // increment the value of the temperature
   const handlePLus = () => {
     const temperature = heatingTemp.temperature;
@@ -225,6 +236,7 @@ function App() {
                   )}
                 </div>
                 <Slider
+                  statusHeating = {statusHeating}
                   rounded={true}
                   isToggled={isToggled}
                   onToggle={handleSlider}
