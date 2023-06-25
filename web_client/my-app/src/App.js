@@ -4,18 +4,6 @@ import Slider from "./components/Slider";
 
 const url = "https://smarthome-dowt.onrender.com";
 
-setInterval( async () => {
-  try {
-          const res = await fetch(`${url}/senzor`);
-          const data = await res.json()
-  
-          console.log(data);
-          
-        } catch (error) {
-          console.log(error);
-        }
-}, 5000)
-
 
 function App() {
   // eslint-disable-next-line
@@ -30,7 +18,30 @@ function App() {
   const [styleHeating, setStyleHeating] = useState(0);
 
   useEffect(() => {
+    const intervalId = setInterval( async () => {
+      try {
+        const res = await fetch(`${url}/senzor`);
+        const data = await res.json()
+
+        setTempHome(data.temperature)
+        setHumHome(data.humidity)
+
+        console.log(data);
+        
+      } catch (error) {
+        console.log(error);
+      }
+    }, 5000);
+
+    // Cleanup: oprește timer-ul când componenta se demontează
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, []);
+
+  useEffect(() => {
     // get all the temperatures and humiditys
+    // eslint-disable-next-line
     const fetchData = async () => {
       try {
         const res = await fetch(`${url}/datasenzors`);
@@ -71,7 +82,7 @@ function App() {
       }
     };
     
-    fetchData();
+    // fetchData();
     fetchStatus();
     fetchHeatingTemp();
   }, []);
