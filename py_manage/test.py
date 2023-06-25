@@ -1,14 +1,13 @@
 import requests
+from senzor import dht_sensor
+from time import sleep
 
-# Funcția pentru a trimite datele către API în cloud
 def send_sensor_data_to_cloud(data):
     url = 'https://smarthome-dowt.onrender.com/datasenzor' 
-    # url = 'http://localhost:5000/datasenzor' # Inlocuiți cu URL-ul real al API-ului în cloud
+    # url = 'http://localhost:5000/datasenzor' 
 
-    # Trimiteți datele prin cererea POST către API-ul în cloud
     response = requests.post(url, json=data)
 
-    # Verificați răspunsul de la API
     if response.status_code == 200:
         print('Datele au fost trimise cu succes către API în cloud.')
 
@@ -17,12 +16,18 @@ def send_sensor_data_to_cloud(data):
     else:
         print('Eroare la trimiterea datelor către API în cloud.')
 
-# Exemplu de date de la senzori
-sensor_data = {
-    'temperature': 23.5,
-    'humidity': 59.2,
-    # alte date de la senzori
-}
 
-# Apelați funcția pentru a trimite datele către API în cloud
-send_sensor_data_to_cloud(sensor_data)
+senzor = dht_sensor()
+
+while True:
+    temp = senzor.get_t()
+    hum = senzor.get_h()
+
+    sensor_data = {
+        'temperature': temp,
+        'humidity': hum,
+    }
+
+    send_sensor_data_to_cloud(sensor_data)
+
+    sleep(5)
