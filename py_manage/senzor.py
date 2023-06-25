@@ -1,5 +1,5 @@
 # import Adafruit_DHT
-
+import random
 class dht_sensor:
     def __init__(self):
         # self.dht_sensor22 = Adafruit_DHT.DHT22
@@ -8,6 +8,7 @@ class dht_sensor:
         self.humidity = 89
 
     def get_t(self):
+        self.temperature = random.randint(0,40)
         return self.temperature
         # humidity, temperature = Adafruit_DHT.read_retry(self.dht_sensor22, self.dht_pin)
         # if humidity is not None and temperature is not None:
@@ -16,6 +17,7 @@ class dht_sensor:
         #     print("Failed to retreive data from temperature sensor")
 
     def get_h(self):
+        self.humidity = random.randint(40,99)
         return self.humidity
         # humidity, temperature= Adafruit_DHT.read_retry(self.dht_sensor22, self.dht_pin)
         # if humidity is not None and temperature is not None:
