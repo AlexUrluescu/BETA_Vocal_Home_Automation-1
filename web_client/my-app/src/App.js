@@ -4,6 +4,18 @@ import Slider from "./components/Slider";
 
 const url = "https://smarthome-dowt.onrender.com";
 
+setInterval( async () => {
+  try {
+          const res = await fetch(`${url}/senzor`);
+          const data = await res.json()
+  
+          console.log(data);
+          
+        } catch (error) {
+          console.log(error);
+        }
+}, 5000)
+
 
 function App() {
   // eslint-disable-next-line
