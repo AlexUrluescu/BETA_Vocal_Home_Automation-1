@@ -1,5 +1,5 @@
 import { Router } from "express"
-import { getDataSenzors, getHeatingStatus, getHeatingTemp, changeStatus, changeHeatingTemp, testStatus, datasenzor} from "../controllers/post.controllers.js";
+import { getDataSenzors, getHeatingStatus, getHeatingTemp, changeStatus, changeHeatingTemp, testStatus, datasenzor, getSenzor} from "../controllers/post.controllers.js";
 
 const router = Router()
 
@@ -13,5 +13,6 @@ router.put('/changeheatingtemp/:id', changeHeatingTemp);
 router.put('/test/:id', testStatus);
 
 router.post('/datasenzor', datasenzor)
+router.get('/senzor', getSenzor)
 
 export default router

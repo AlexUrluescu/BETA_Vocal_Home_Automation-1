@@ -3,6 +3,8 @@ import DataSenzors from "../models/DataSenzors.js";
 import HeatingStatus from "../models/HeatingStatus.js";
 import HeatingTemp from "../models/HeatingTemp.js";
 
+let data_sezor = {};
+
 
 export const getDataSenzors = async (req, res) => {
     try {    
@@ -117,6 +119,8 @@ export const testStatus = async (req, res) => {
 export const datasenzor = async (req, res) => {
     const data = req.body;
 
+    data_sezor = data
+
     // Procesați datele primite cum doriți
     // Exemplu: Salvare într-o bază de date, trimitere notificări, etc.
   
@@ -127,4 +131,13 @@ export const datasenzor = async (req, res) => {
     };
   
     res.json(response);
+}
+
+export const getSenzor = async (req, res) => {
+    try {
+        res.send(data_sezor)
+        
+    } catch (error) {
+        console.log(error);
+    }
 }
