@@ -114,4 +114,17 @@ export const testStatus = async (req, res) => {
 
 
 
+export const datasenzor = async (req, res) => {
+    const data = req.body;
 
+    // Procesați datele primite cum doriți
+    // Exemplu: Salvare într-o bază de date, trimitere notificări, etc.
+  
+    // Răspuns către scriptul de pe Raspberry Pi pentru a indica succesul preluării datelor
+    const response = {
+      message: 'Datele de la senzori au fost primite cu succes!',
+      body: data
+    };
+  
+    res.json(response);
+}
