@@ -2,8 +2,8 @@ import requests
 
 # Funcția pentru a trimite datele către API în cloud
 def send_sensor_data_to_cloud(data):
-    # url = 'https://smarthome-dowt.onrender.com/datasenzor' 
-    url = 'http://localhost:5000/datasenzor' # Inlocuiți cu URL-ul real al API-ului în cloud
+    url = 'https://smarthome-dowt.onrender.com/datasenzor' 
+    # url = 'http://localhost:5000/datasenzor' # Inlocuiți cu URL-ul real al API-ului în cloud
 
     # Trimiteți datele prin cererea POST către API-ul în cloud
     response = requests.post(url, json=data)
