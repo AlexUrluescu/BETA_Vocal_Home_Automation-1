@@ -1,6 +1,7 @@
 from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QLabel
 import sys
 from PyQt5.QtCore import Qt
+import requests
 
 app = QApplication(sys.argv)
 
@@ -11,9 +12,78 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("Exemplu PyQt5")
         self.setGeometry(100, 100, 1000, 600)
 
+        self.status = ""
+        self.treshlod = ""
+        self.temperature = ""
+        self.humidity = ""
+
         self.initUI()
 
+    
+    def fetch_data(self):
+        print("intra")
+        url = "https://smarthome-dowt.onrender.com/heatingstatus"
+        print("iasa")
+
+        response = requests.get(url)
+
+        if response.status_code == 200:
+            data = response.json()
+            print(data)
+            print(data[0]["status"])
+            self.status = str(data[0]["status"])
+            print(self.status)
+            print(type(self.status))
+
+        else:
+            # self.label.setText('Eroare la preluarea datelor API')
+            print("eroare")
+
+    
+    def fetch_heatingTemp(self):
+        print("intra")
+        url = "https://smarthome-dowt.onrender.com/heatingtemp"
+        print("iasa")
+
+        response = requests.get(url)
+
+        if response.status_code == 200:
+            data = response.json()
+            print(data)
+            print(data[0]["temperature"])
+            self.treshlod = str(data[0]["temperature"])
+            print(self.treshlod)
+            print(type(self.treshlod))
+
+        else:
+            # self.label.setText('Eroare la preluarea datelor API')
+            print("eroare")
+
+    
+    def fetch_dataSenzors(self):
+        print("intra")
+        url = "https://smarthome-dowt.onrender.com/datasenzors"
+        print("iasa")
+
+        response = requests.get(url)
+
+        if response.status_code == 200:
+            data = response.json()
+            print(data)
+            print(data[-1])
+            # self.temperature = 
+            # print(data[0]["temperature"])
+            # self.treshlod = str(data[0]["temperature"])
+            # print(self.treshlod)
+            # print(type(self.treshlod))
+
+        else:
+            # self.label.setText('Eroare la preluarea datelor API')
+            print("eroare")
+
+
     def initUI(self):
+        print("intra imagine")
 
         # ------------------------ VARIABLES --------------------------------------------------------------------
         temperature = "Temp"
@@ -71,12 +141,14 @@ class MainWindow(QMainWindow):
         # ------------------------ LABELS -----------------------------------------------------------------------
         home_temp_label = QLabel(temperature, div_home_temp)
         home_temp_label.setStyleSheet(" QLabel { font-size: 30px; }")
+        home_temp_label.setText("test")
         
         home_hum_label = QLabel(humidity, div_home_hum)
         home_hum_label.setStyleSheet(" QLabel { font-size: 30px; }")
 
         treshold_label = QLabel(treshold, div_treshold)
         treshold_label.setStyleSheet(" QLabel { font-size: 50px; }")
+        treshold_label.setText(self.treshlod)
 
         plus_label = QLabel(plus, div_plus)
         plus_label.setStyleSheet(" QLabel { font-size: 45px; }")
@@ -102,7 +174,12 @@ class MainWindow(QMainWindow):
 
 
 if __name__ == '__main__':
+    
     window = MainWindow()
+    window.fetch_data()
+    window.fetch_heatingTemp()
+    window.fetch_dataSenzors()
+    window.initUI()
     window.show()
 
     sys.exit(app.exec_())
