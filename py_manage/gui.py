@@ -26,7 +26,6 @@ class MainWindow(QMainWindow):
 
 
         # ------------------------- LAYOUT CONTAINERS -------------------------
-        
         self.div_treshold_layout = QVBoxLayout(self.div_treshold)
         self.div_treshold.setLayout(self.div_treshold_layout)
 
@@ -61,7 +60,6 @@ class MainWindow(QMainWindow):
             print(type(self.status))
 
         else:
-            # self.label.setText('Eroare la preluarea datelor API')
             print("eroare")
 
     
@@ -81,7 +79,6 @@ class MainWindow(QMainWindow):
             print(type(self.treshlod))
 
         else:
-            # self.label.setText('Eroare la preluarea datelor API')
             print("eroare")
 
     
@@ -100,81 +97,52 @@ class MainWindow(QMainWindow):
             print(data[-1]["humidity"])
             self.temperature = str(data[-1]["temperature"])
             self.humidity = str(data[-1]["humidity"])
-            # self.treshlod = str(data[0]["temperature"])
-            # print(self.treshlod)
-            # print(type(self.treshlod))
 
         else:
-            # self.label.setText('Eroare la preluarea datelor API')
             print("eroare")
 
 
     def initUI(self):
         print("intra imagine")
+        self.setStyleSheet("background-color: rgb(12, 74, 110);")
 
         # ------------------------ VARIABLES --------------------------------------------------------------------
         temperature = "Temp"
         humidity = "Hum"
-        treshold = "23"
-        # plus = "+"
-        # minus = "-"
-
-
+   
         # ------------------------- BUTTONS ----------------------------------------------------------------------
         
         button_plus = QPushButton('+', self)
-        button_plus.setGeometry(680, 130, 100, 100)
-        # button.setFixedSize(300, 50)
-        button_plus.setStyleSheet("QPushButton { width: 50px; height: 50px; border-radius: 50%; background-color: blue; font-size: 45px; }")
-
-        # Atribuirea funcției button_clicked la evenimentul de apăsare al butonului
+        button_plus.setGeometry(680, 140, 80, 80)
+        button_plus.setStyleSheet("QPushButton { width: 50px; height: 50px; border-radius: 40%; background-color: yellow; font-size: 45px; font-family: 'Poppins', sans-serif;}")
         button_plus.clicked.connect(self.button_plus_clicked)
 
-
         button_minus = QPushButton('-', self)
-        button_minus.setGeometry(680, 350, 100, 100)
-        # button.setFixedSize(300, 50)
-        button_minus.setStyleSheet("QPushButton { width: 50px; height: 50px; border-radius: 50%; background-color: blue; font-size: 45px; }")
-
-        # Atribuirea funcției button_clicked la evenimentul de apăsare al butonului
+        button_minus.setGeometry(680, 370, 80, 80)
+        button_minus.setStyleSheet("QPushButton { width: 50px; height: 50px; border-radius: 40%; background-color: yellow; font-size: 45px; font-family: 'Poppins', sans-serif; }")
         button_minus.clicked.connect(self.button_minus_clicked)
-
 
         # ------------------------- CONTAINERS --------------------------------------------------------------------
         div_home_temp = QWidget(self)
-        div_home_temp.setStyleSheet("QWidget { background-color: green; border-radius: 70%; }")
+        div_home_temp.setStyleSheet("QWidget { background-color: white; border-radius: 75%; font-family: 'Poppins', sans-serif; }")
         div_home_temp.setFixedSize(150, 150)
         div_home_temp.move(200, 80)
 
         div_home_hum = QWidget(self)
-        div_home_hum.setStyleSheet("QWidget { background-color: red; border-radius: 70%; }")
+        div_home_hum.setStyleSheet("QWidget { background-color: white; border-radius: 75%; font-family: 'Poppins', sans-serif; }")
         div_home_hum.setFixedSize(150, 150)
         div_home_hum.move(200, 330)
 
-
-        self.div_treshold.setStyleSheet("QWidget { background-color: blue; border-radius: 70%; }")
+        self.div_treshold.setStyleSheet("QWidget { background-color: white; border-radius: 75%; font-family: 'Poppins', sans-serif; border: 5px solid red; }")
         self.div_treshold.setFixedSize(150, 150)
         self.div_treshold.move(550, 220)
-
-        
-        # div_plus = QWidget(self)
-        # div_plus.setStyleSheet("QWidget { background-color: yellow; border-radius: 50%; }")
-        # div_plus.setFixedSize(100, 100)
-        # div_plus.move(680, 130)
-
-                
-        # div_minus = QWidget(self)
-        # div_minus.setStyleSheet("QWidget { background-color: yellow; border-radius: 50%; }")
-        # div_minus.setFixedSize(100, 100)
-        # div_minus.move(680, 350)
-
-        
+ 
         div_status = QWidget(self)
         if(self.status == 0):
-            div_status.setStyleSheet("QWidget { background-color: red; border-radius: 50%; }")
+            div_status.setStyleSheet("QWidget { background-color: red; border-radius: 50%; font-family: 'Poppins', sans-serif; }")
         
         else:
-            div_status.setStyleSheet("QWidget { background-color: green; border-radius: 50%; }")
+            div_status.setStyleSheet("QWidget { background-color: green; border-radius: 50%; font-family: 'Poppins', sans-serif; }")
 
         div_status.setFixedSize(100, 100)
         div_status.move(800, 200)
@@ -186,34 +154,21 @@ class MainWindow(QMainWindow):
         div_home_hum_layout = QVBoxLayout(div_home_hum)
         div_home_hum.setLayout(div_home_hum_layout)
 
-
-        # div_plus_layout = QVBoxLayout(div_plus)
-        # div_plus.setLayout(div_plus_layout)
-
-        # div_minus_layout = QVBoxLayout(div_minus)
-        # div_minus.setLayout(div_minus_layout)
-
         div_status_layout = QVBoxLayout(div_status)
         div_status.setLayout(div_status_layout)
 
         # ------------------------ LABELS -----------------------------------------------------------------------
         home_temp_label = QLabel(temperature, div_home_temp)
-        home_temp_label.setStyleSheet(" QLabel { font-size: 30px; }")
-        home_temp_label.setText(self.temperature)
+        home_temp_label.setStyleSheet(" QLabel { font-size: 40px; }")
+        home_temp_label.setText(f"{self.temperature} °C")
         
         home_hum_label = QLabel(humidity, div_home_hum)
-        home_hum_label.setStyleSheet(" QLabel { font-size: 30px; }")
-        home_hum_label.setText(self.humidity)
+        home_hum_label.setStyleSheet(" QLabel { font-size: 40px; }")
+        home_hum_label.setText(f"{self.humidity} %")
 
 
-        self.treshold_label.setStyleSheet(" QLabel { font-size: 50px; }")
+        self.treshold_label.setStyleSheet(" QLabel { font-size: 50px; border: none; }")
         self.treshold_label.setText(str(self.val))
-
-        # plus_label = QLabel(plus, div_plus)
-        # plus_label.setStyleSheet(" QLabel { font-size: 45px; }")
-    
-        # minus_label = QLabel(minus, div_minus)
-        # minus_label.setStyleSheet(" QLabel { font-size: 45px; }")
 
         if(self.status == 0):
             status_label = QLabel("Off", div_status)
@@ -227,23 +182,17 @@ class MainWindow(QMainWindow):
         # ---------------- LAYOUTS ADDS --------------------------------------------------------------------------
         div_home_temp_layout.addWidget(home_temp_label)
         div_home_hum_layout.addWidget(home_hum_label)
-        # div_plus_layout.addWidget(plus_label)
-        # div_minus_layout.addWidget(minus_label)
         div_status_layout.addWidget(status_label)
 
         # ---------------------- CENTER THE LABELS --------------------------------------------------------------
         div_home_temp_layout.setAlignment(Qt.AlignCenter) 
         div_home_hum_layout.setAlignment(Qt.AlignCenter) 
-        # div_plus_layout.setAlignment(Qt.AlignCenter) 
-        # div_minus_layout.setAlignment(Qt.AlignCenter) 
         div_status_layout.setAlignment(Qt.AlignCenter) 
 
 
     def button_plus_clicked(self):
         print('plus')
-        print(self.val)
         self.val = self.val + 1
-        print(self.val)
         self.treshold_label.setText(str(self.val))
 
 
@@ -257,9 +206,9 @@ class MainWindow(QMainWindow):
 if __name__ == '__main__':
     
     window = MainWindow()
-    # window.fetch_status()
-    # window.fetch_heatingTemp()
-    # window.fetch_dataSenzors()
+    window.fetch_status()
+    window.fetch_heatingTemp()
+    window.fetch_dataSenzors()
     window.initUI()
     window.show()
 
