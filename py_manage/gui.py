@@ -16,7 +16,7 @@ class MainWindow(QMainWindow):
         self.treshlod = ""
         self.temperature = ""
         self.humidity = ""
-        self.val = 0
+        self.val = 30
 
         treshold = ""
 
@@ -114,12 +114,12 @@ class MainWindow(QMainWindow):
         
         button_plus = QPushButton('+', self)
         button_plus.setGeometry(680, 140, 80, 80)
-        button_plus.setStyleSheet("QPushButton { width: 50px; height: 50px; border-radius: 40%; background-color: yellow; font-size: 45px; font-family: 'Poppins', sans-serif;}")
+        button_plus.setStyleSheet("QPushButton { width: 50px; height: 50px; border-radius: 40%; background-color: gold; font-size: 45px; font-family: 'Poppins', sans-serif;}")
         button_plus.clicked.connect(self.button_plus_clicked)
 
         button_minus = QPushButton('-', self)
         button_minus.setGeometry(680, 370, 80, 80)
-        button_minus.setStyleSheet("QPushButton { width: 50px; height: 50px; border-radius: 40%; background-color: yellow; font-size: 45px; font-family: 'Poppins', sans-serif; }")
+        button_minus.setStyleSheet("QPushButton { width: 50px; height: 50px; border-radius: 40%; background-color: gold; font-size: 45px; font-family: 'Poppins', sans-serif; }")
         button_minus.clicked.connect(self.button_minus_clicked)
 
         # ------------------------- CONTAINERS --------------------------------------------------------------------
@@ -133,7 +133,7 @@ class MainWindow(QMainWindow):
         div_home_hum.setFixedSize(150, 150)
         div_home_hum.move(200, 330)
 
-        self.div_treshold.setStyleSheet("QWidget { background-color: white; border-radius: 75%; font-family: 'Poppins', sans-serif; border: 5px solid red; }")
+        self.div_treshold.setStyleSheet("QWidget { background-color: white; border-radius: 75%; font-family: 'Poppins', sans-serif; }")
         self.div_treshold.setFixedSize(150, 150)
         self.div_treshold.move(550, 220)
  
@@ -192,14 +192,27 @@ class MainWindow(QMainWindow):
 
     def button_plus_clicked(self):
         print('plus')
-        self.val = self.val + 1
+        self.val = self.val + 0.5
         self.treshold_label.setText(str(self.val))
+
+        print(type(self.val))
+        print(type(self.temperature))
+
+        if(self.val > int(self.temperature)):
+            print("Ai depasit valoarea din casa")
+            self.div_treshold.setStyleSheet("QWidget { background-color: white; border-radius: 75%; font-family: 'Poppins', sans-serif; border: 8px solid gold; }")
 
 
     def button_minus_clicked(self):
         print("minus")
-        self.val = self.val - 1
+        self.val = self.val - 0.5
         self.treshold_label.setText(str(self.val))
+
+        
+        if(self.val < int(self.temperature)):
+            print("Ai depasit valoarea din casa")
+            self.div_treshold.setStyleSheet("QWidget { background-color: white; border-radius: 75%; font-family: 'Poppins', sans-serif; border: none; }")
+
 
 
 
