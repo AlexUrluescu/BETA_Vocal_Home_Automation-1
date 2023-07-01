@@ -12,7 +12,7 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("Exemplu PyQt5")
         self.setGeometry(100, 100, 1000, 600)
 
-        self.status = ""
+        self.status = 0
         self.treshlod = ""
         self.temperature = ""
         self.humidity = ""
@@ -20,7 +20,7 @@ class MainWindow(QMainWindow):
         self.initUI()
 
     
-    def fetch_data(self):
+    def fetch_status(self):
         print("intra")
         url = "https://smarthome-dowt.onrender.com/heatingstatus"
         print("iasa")
@@ -31,7 +31,7 @@ class MainWindow(QMainWindow):
             data = response.json()
             print(data)
             print(data[0]["status"])
-            self.status = str(data[0]["status"])
+            self.status = int(data[0]["status"])
             print(self.status)
             print(type(self.status))
 
@@ -71,8 +71,10 @@ class MainWindow(QMainWindow):
             data = response.json()
             print(data)
             print(data[-1])
-            # self.temperature = 
-            # print(data[0]["temperature"])
+            print(data[-1]["temperature"])
+            print(data[-1]["humidity"])
+            self.temperature = str(data[-1]["temperature"])
+            self.humidity = str(data[-1]["humidity"])
             # self.treshlod = str(data[0]["temperature"])
             # print(self.treshlod)
             # print(type(self.treshlod))
@@ -120,6 +122,16 @@ class MainWindow(QMainWindow):
         div_minus.setFixedSize(100, 100)
         div_minus.move(680, 350)
 
+        
+        div_status = QWidget(self)
+        if(self.status == 0):
+            div_status.setStyleSheet("QWidget { background-color: red; border-radius: 50%; }")
+        
+        else:
+            div_status.setStyleSheet("QWidget { background-color: green; border-radius: 50%; }")
+
+        div_status.setFixedSize(100, 100)
+        div_status.move(800, 200)
 
         # ---------------- LAYOUT CONTAINERS ---------------------------------------------------------------------
         div_home_temp_layout = QVBoxLayout(div_home_temp)
@@ -137,14 +149,17 @@ class MainWindow(QMainWindow):
         div_minus_layout = QVBoxLayout(div_minus)
         div_minus.setLayout(div_minus_layout)
 
+        div_status_layout = QVBoxLayout(div_status)
+        div_status.setLayout(div_status_layout)
 
         # ------------------------ LABELS -----------------------------------------------------------------------
         home_temp_label = QLabel(temperature, div_home_temp)
         home_temp_label.setStyleSheet(" QLabel { font-size: 30px; }")
-        home_temp_label.setText("test")
+        home_temp_label.setText(self.temperature)
         
         home_hum_label = QLabel(humidity, div_home_hum)
         home_hum_label.setStyleSheet(" QLabel { font-size: 30px; }")
+        home_hum_label.setText(self.humidity)
 
         treshold_label = QLabel(treshold, div_treshold)
         treshold_label.setStyleSheet(" QLabel { font-size: 50px; }")
@@ -156,6 +171,14 @@ class MainWindow(QMainWindow):
         minus_label = QLabel(minus, div_minus)
         minus_label.setStyleSheet(" QLabel { font-size: 45px; }")
 
+        if(self.status == 0):
+            status_label = QLabel("Off", div_status)
+            status_label.setStyleSheet(" QLabel { font-size: 35px; }")
+
+        else:
+            status_label = QLabel("On", div_status)
+            status_label.setStyleSheet(" QLabel { font-size: 35px; }")
+
 
         # ---------------- LAYOUTS ADDS --------------------------------------------------------------------------
         div_home_temp_layout.addWidget(home_temp_label)
@@ -163,7 +186,7 @@ class MainWindow(QMainWindow):
         div_treshold_layout.addWidget(treshold_label)
         div_plus_layout.addWidget(plus_label)
         div_minus_layout.addWidget(minus_label)
-
+        div_status_layout.addWidget(status_label)
 
         # ---------------------- CENTER THE LABELS --------------------------------------------------------------
         div_home_temp_layout.setAlignment(Qt.AlignCenter) 
@@ -171,12 +194,13 @@ class MainWindow(QMainWindow):
         div_treshold_layout.setAlignment(Qt.AlignCenter) 
         div_plus_layout.setAlignment(Qt.AlignCenter) 
         div_minus_layout.setAlignment(Qt.AlignCenter) 
+        div_status_layout.setAlignment(Qt.AlignCenter) 
 
 
 if __name__ == '__main__':
     
     window = MainWindow()
-    window.fetch_data()
+    window.fetch_status()
     window.fetch_heatingTemp()
     window.fetch_dataSenzors()
     window.initUI()
