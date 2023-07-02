@@ -17,6 +17,7 @@ class MainWindow(QMainWindow):
         self.temperature = ""
         self.humidity = ""
         self.val = 30
+        self.button_status = True
 
         self.stil_on = """
             QSlider::groove:horizontal {
@@ -64,6 +65,19 @@ class MainWindow(QMainWindow):
         self.slider.setFixedSize(100, 50)
         self.slider.valueChanged.connect(self.slider_value_changed)
 
+        # ------------------------- BUTTONS ----------------------------------------------------------------------
+        self.button_plus = QPushButton('+', self)
+        self.button_plus.setGeometry(680, 140, 80, 80)
+        self.button_plus.setStyleSheet("QPushButton { width: 50px; height: 50px; border-radius: 40%; background-color: gold; font-size: 45px; font-family: 'Poppins', sans-serif;}")
+        self.button_plus.setEnabled(self.button_status)
+        self.button_plus.clicked.connect(self.button_plus_clicked)
+
+        self.button_minus = QPushButton('-', self)
+        self.button_minus.setGeometry(680, 370, 80, 80)
+        self.button_minus.setStyleSheet("QPushButton { width: 50px; height: 50px; border-radius: 40%; background-color: gold; font-size: 45px; font-family: 'Poppins', sans-serif; }")
+        self.button_minus.setEnabled(self.button_status)
+        self.button_minus.clicked.connect(self.button_minus_clicked)
+
         # ------------------------ CONTAINERS ---------------------------------
         self.div_treshold = QWidget(self)
 
@@ -99,6 +113,13 @@ class MainWindow(QMainWindow):
             print(data)
             print(data[0]["status"])
             self.status = int(data[0]["status"])
+
+            if self.status == 1:
+                self.button_status = True
+            
+            else:
+                self.button_status = False
+
             print(self.status)
             print(type(self.status))
 
@@ -170,18 +191,6 @@ class MainWindow(QMainWindow):
         slider.setTickPosition(QSlider.TicksBelow)
         slider.setFixedSize(100, 50)
         slider.move(300, 300)
-   
-        # ------------------------- BUTTONS ----------------------------------------------------------------------
-        
-        button_plus = QPushButton('+', self)
-        button_plus.setGeometry(680, 140, 80, 80)
-        button_plus.setStyleSheet("QPushButton { width: 50px; height: 50px; border-radius: 40%; background-color: gold; font-size: 45px; font-family: 'Poppins', sans-serif;}")
-        button_plus.clicked.connect(self.button_plus_clicked)
-
-        button_minus = QPushButton('-', self)
-        button_minus.setGeometry(680, 370, 80, 80)
-        button_minus.setStyleSheet("QPushButton { width: 50px; height: 50px; border-radius: 40%; background-color: gold; font-size: 45px; font-family: 'Poppins', sans-serif; }")
-        button_minus.clicked.connect(self.button_minus_clicked)
 
         # ------------------------- CONTAINERS --------------------------------------------------------------------
         div_home_temp = QWidget(self)
@@ -255,10 +264,24 @@ class MainWindow(QMainWindow):
         if(value == 0):
             print("off")
             self.slider.setStyleSheet(self.stil_off)
+            # print(self.button_status)
+            self.button_status = False
+            self.button_plus.setEnabled(self.button_status)
+            self.button_minus.setEnabled(self.button_status)
+            # print(self.button_status)
+            # print(self.test_status)
+
         
         else:
             print("on")
             self.slider.setStyleSheet(self.stil_on)
+            # print(self.button_status)
+            self.button_status = True
+            self.button_plus.setEnabled(self.button_status)
+            self.button_minus.setEnabled(self.button_status)
+            # print(self.button_status)
+            # print(self.test_status)
+
 
 
 if __name__ == '__main__':
