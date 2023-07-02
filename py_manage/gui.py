@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QLabel, QPushButton
+from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QLabel, QPushButton, QSlider
 import sys
 from PyQt5.QtCore import Qt
 import requests
@@ -12,14 +12,57 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("Exemplu PyQt5")
         self.setGeometry(100, 100, 1000, 600)
 
-        self.status = 0
+        self.status = ""
         self.treshlod = ""
         self.temperature = ""
         self.humidity = ""
         self.val = 30
 
+        self.stil_on = """
+            QSlider::groove:horizontal {
+                background-color: #ddd;
+                height: 20px;
+                border-radius: 10px;
+            }
+            
+                QSlider::handle:horizontal {
+                    background-color: green;
+                    width: 25px;
+                    margin: -5px 0;
+                    border-radius: 12px;
+                }
+            """
+        
+        self.stil_off = """
+            QSlider::groove:horizontal {
+                background-color: #ddd;
+                height: 20px;
+                border-radius: 10px;
+            }
+            
+                QSlider::handle:horizontal {
+                    background-color: red;
+                    width: 25px;
+                    margin: -5px 0;
+                    border-radius: 12px;
+                }
+            """
+
+        self.status_test = 0
+
         treshold = ""
 
+        print(f"status = {self.status}")
+
+        # --------------- SLIDER -------------------------------------------
+        self.slider = QSlider(self)
+        self.slider.setOrientation(Qt.Horizontal)
+        self.slider.setMinimum(0)
+        self.slider.setMaximum(1)
+        self.slider.setGeometry(580,100, 100, 20) 
+        self.slider.setValue(self.val)
+        self.slider.setFixedSize(100, 50)
+        self.slider.valueChanged.connect(self.slider_value_changed)
 
         # ------------------------ CONTAINERS ---------------------------------
         self.div_treshold = QWidget(self)
@@ -109,6 +152,24 @@ class MainWindow(QMainWindow):
         # ------------------------ VARIABLES --------------------------------------------------------------------
         temperature = "Temp"
         humidity = "Hum"
+
+        if(self.status == 1):
+            self.slider.setValue(1)
+            self.slider.setStyleSheet(self.stil_on)
+
+        else:
+            self.slider.setValue(0)
+            self.slider.setStyleSheet(self.stil_off)
+
+        # -------------------------- SLIDER -------------------------------------
+        slider = QSlider(Qt.Horizontal)
+        slider.setMinimum(0)
+        slider.setMaximum(1)
+        slider.setValue(30)
+        slider.setTickInterval(1)
+        slider.setTickPosition(QSlider.TicksBelow)
+        slider.setFixedSize(100, 50)
+        slider.move(300, 300)
    
         # ------------------------- BUTTONS ----------------------------------------------------------------------
         
@@ -136,16 +197,6 @@ class MainWindow(QMainWindow):
         self.div_treshold.setStyleSheet("QWidget { background-color: white; border-radius: 75%; font-family: 'Poppins', sans-serif; }")
         self.div_treshold.setFixedSize(150, 150)
         self.div_treshold.move(550, 220)
- 
-        div_status = QWidget(self)
-        if(self.status == 0):
-            div_status.setStyleSheet("QWidget { background-color: red; border-radius: 50%; font-family: 'Poppins', sans-serif; }")
-        
-        else:
-            div_status.setStyleSheet("QWidget { background-color: green; border-radius: 50%; font-family: 'Poppins', sans-serif; }")
-
-        div_status.setFixedSize(100, 100)
-        div_status.move(800, 200)
 
         # ---------------- LAYOUT CONTAINERS ---------------------------------------------------------------------
         div_home_temp_layout = QVBoxLayout(div_home_temp)
@@ -153,9 +204,6 @@ class MainWindow(QMainWindow):
 
         div_home_hum_layout = QVBoxLayout(div_home_hum)
         div_home_hum.setLayout(div_home_hum_layout)
-
-        div_status_layout = QVBoxLayout(div_status)
-        div_status.setLayout(div_status_layout)
 
         # ------------------------ LABELS -----------------------------------------------------------------------
         home_temp_label = QLabel(temperature, div_home_temp)
@@ -170,24 +218,13 @@ class MainWindow(QMainWindow):
         self.treshold_label.setStyleSheet(" QLabel { font-size: 50px; border: none; }")
         self.treshold_label.setText(str(self.val))
 
-        if(self.status == 0):
-            status_label = QLabel("Off", div_status)
-            status_label.setStyleSheet(" QLabel { font-size: 35px; }")
-
-        else:
-            status_label = QLabel("On", div_status)
-            status_label.setStyleSheet(" QLabel { font-size: 35px; }")
-
-
         # ---------------- LAYOUTS ADDS --------------------------------------------------------------------------
         div_home_temp_layout.addWidget(home_temp_label)
         div_home_hum_layout.addWidget(home_hum_label)
-        div_status_layout.addWidget(status_label)
 
         # ---------------------- CENTER THE LABELS --------------------------------------------------------------
         div_home_temp_layout.setAlignment(Qt.AlignCenter) 
-        div_home_hum_layout.setAlignment(Qt.AlignCenter) 
-        div_status_layout.setAlignment(Qt.AlignCenter) 
+        div_home_hum_layout.setAlignment(Qt.AlignCenter)  
 
 
     def button_plus_clicked(self):
@@ -212,8 +249,16 @@ class MainWindow(QMainWindow):
         if(self.val < int(self.temperature)):
             print("Ai depasit valoarea din casa")
             self.div_treshold.setStyleSheet("QWidget { background-color: white; border-radius: 75%; font-family: 'Poppins', sans-serif; border: none; }")
+            
 
-
+    def slider_value_changed(self, value):
+        if(value == 0):
+            print("off")
+            self.slider.setStyleSheet(self.stil_off)
+        
+        else:
+            print("on")
+            self.slider.setStyleSheet(self.stil_on)
 
 
 if __name__ == '__main__':
