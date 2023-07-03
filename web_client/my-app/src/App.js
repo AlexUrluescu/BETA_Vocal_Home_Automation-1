@@ -1,9 +1,16 @@
 import "./App.css";
 import { useState, useEffect } from "react";
-import Slider from "./components/Slider";
+import {
+  Title,
+  CircleData,
+  Slider,
+  Treshold,
+  CustomButton,
+  InfoMessage,
+  StatusHeating,
+} from "./components";
 
 const url = "https://smarthome-dowt.onrender.com";
-
 
 function App() {
   // eslint-disable-next-line
@@ -18,16 +25,15 @@ function App() {
   const [styleHeating, setStyleHeating] = useState(0);
 
   useEffect(() => {
-    const intervalId = setInterval( async () => {
+    const intervalId = setInterval(async () => {
       try {
         const res = await fetch(`${url}/senzor`);
-        const data = await res.json()
+        const data = await res.json();
 
-        setTempHome(data.temperature)
-        setHumHome(data.humidity)
+        setTempHome(data.temperature);
+        setHumHome(data.humidity);
 
         console.log(data);
-        
       } catch (error) {
         console.log(error);
       }
@@ -81,7 +87,7 @@ function App() {
         console.log(error);
       }
     };
-    
+
     // fetchData();
     fetchStatus();
     fetchHeatingTemp();
@@ -133,15 +139,14 @@ function App() {
   }, [heatingTemp]);
 
   useEffect(() => {
-    if(statusHeating.status === 0){
-      setIsToggled(false)
+    if (statusHeating.status === 0) {
+      setIsToggled(false);
     }
 
-    if(statusHeating.status === 1){
-      setIsToggled(true)
+    if (statusHeating.status === 1) {
+      setIsToggled(true);
     }
-
-  }, [statusHeating])
+  }, [statusHeating]);
 
   // increment the value of the temperature
   const handlePLus = () => {
@@ -155,27 +160,29 @@ function App() {
     setHeatingTemp({ ...heatingTemp, temperature: temperature - 0.5 });
   };
 
+  const handleVoid = () => {
+    return "";
+  };
 
   const handleSlider = () => {
     console.log(isToggled);
     setIsToggled(!isToggled);
 
-    if(isToggled === false){
-
+    if (isToggled === false) {
       const statusOn = async () => {
         try {
           const status = 1;
 
           const data = await fetch(`${url}/test/${statusHeating._id}`, {
             method: "PUT",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({ status }),
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ status }),
           });
-  
+
           const res = await data.json();
-  
+
           console.log(res);
           if (res.message === "On") {
             setStatusHeating({ ...statusHeating, status: 1 });
@@ -184,27 +191,26 @@ function App() {
         } catch (error) {
           console.log(error);
         }
-      }
+      };
 
       statusOn();
-      
     }
 
-    if(isToggled){
+    if (isToggled) {
       const statusOff = async () => {
         const status = 0;
-  
+
         try {
           const data = await fetch(`${url}/test/${statusHeating._id}`, {
             method: "PUT",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({ status }),
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ status }),
           });
-  
+
           const res = await data.json();
-  
+
           console.log(res);
           if (res.message === "Off") {
             setStatusHeating({ ...statusHeating, status: 0 });
@@ -217,82 +223,90 @@ function App() {
 
       statusOff();
     }
-    
   };
 
   return (
     <div className="App">
       <div className="bg-slate-700 text-white flex justify-center items-center p-10 pb-20 sm:h-screen">
         <div className="p-3 w-screen">
-          <div className="p-3 mb-20">
-            <h1 className="text-6xl font-semibold">Smart Heating</h1>
-          </div>
+          <Title title="Smart Heating" classStyle="text-6xl" />
           <div className="flex flex-col gap-8 sm:flex-row">
             <div className="w-full p-5 sm:w-2/4 flex flex-col items-center justify-center">
-              <h1 className="mb-20 text-3xl font-semibold">Home's data</h1>
+              <Title
+                title="Home's data"
+                classStyle="mb-20 text-3xl font-semibold"
+              />
               <div className="flex flex-col items-center justify-center gap-10">
-                <div className="bg-gray-900 h-40 w-40 flex justify-center items-center rounded-full mb-4 text-6xl border-4 border-white-300">
-                  {tempHome}
-                  <sup className="text-lg">° C</sup>
-                </div>
-                <div className="bg-gray-900 h-40 w-40 flex justify-center items-center rounded-full text-6xl border-4 border-white-300">
-                  {humHome}
-                  <sup className="text-lg">%</sup>
-                </div>
+                <CircleData
+                  data={tempHome}
+                  text="° C"
+                  classStyle="bg-gray-900 h-40 w-40 flex justify-center items-center rounded-full mb-4 text-6xl border-4 border-white-300"
+                />
+                <CircleData
+                  data={humHome}
+                  text="%"
+                  classStyle="bg-gray-900 h-40 w-40 flex justify-center items-center rounded-full text-6xl border-4 border-white-300"
+                />
               </div>
             </div>
             <div className="w-full border-x-0 border-white-500 border-t-2 border-white-500 p-5 sm:w-2/4 sm:border-l-4 border-white-500 sm:border-t-0">
-              <div className="h-10 mb-5 flex justify-center">
-                {styleHeating === 1 ? (
-                  <p className="bg-green-500 text-xl rounded-md w-72 flex justify-center items-center ease-in-out duration-300">
-                    Temperatura este actualizata
-                  </p>
-                ) : (
-                  <p> </p>
-                )}
-              </div>
+              <InfoMessage
+                styleHeating={styleHeating}
+                classStyle="h-10 mb-5 flex justify-center"
+                textStyle="bg-green-500 text-xl rounded-md w-72 flex justify-center items-center ease-in-out duration-300"
+                text="Temperatura este actualizata"
+              />
               <div>
-                <div>
-                  {isToggled === true ? (
-                    <h2 className="text-2xl">On</h2>
-                  ) : (
-                    <h2 className="text-2xl">Off</h2>
-                  )}
-                </div>
+                <StatusHeating
+                  isToggled={isToggled}
+                  textStyle="text-2xl"
+                  text1="On"
+                  text2="Off"
+                />
                 <Slider
-                  statusHeating = {statusHeating}
+                  statusHeating={statusHeating}
                   rounded={true}
                   isToggled={isToggled}
                   onToggle={handleSlider}
                 />
               </div>
               <div className="flex justify-center items-center gap-4">
-                <div>
-                  <div
-                    className={
-                      isToggled === true && tempHome < heatingTemp.temperature
-                        ? "bg-gray-900 h-40 w-40 flex justify-center items-center rounded-full text-6xl border-8 border-yellow-300"
-                        : "bg-gray-900 h-40 w-40 flex justify-center items-center rounded-full text-6xl border-4 border-white-300"
-                    }
-                  >
-                    {heatingTemp.temperature}{" "}
-                    <sup className="text-lg"> ° C</sup>
-                  </div>
-                </div>
+                <Treshold
+                  isToggled={isToggled}
+                  tempHome={tempHome}
+                  heatingTemp={heatingTemp.temperature}
+                  classStyle1="bg-gray-900 h-40 w-40 flex justify-center items-center rounded-full text-6xl border-8 border-yellow-300"
+                  classStyle2="bg-gray-900 h-40 w-40 flex justify-center items-center rounded-full text-6xl border-4 border-white-300"
+                  text="° C"
+                />
 
                 {statusHeating.status === 1 ? (
                   <div className="flex flex-col h-full gap-20">
-                    <button onClick={handlePLus} className="btn">
-                      +
-                    </button>
-                    <button onClick={handleMinus} className="btn">
-                      -
-                    </button>
+                    <CustomButton
+                      functie={handlePLus}
+                      classStyle="btn"
+                      text="+"
+                    />
+
+                    <CustomButton
+                      functie={handleMinus}
+                      classStyle="btn"
+                      text="-"
+                    />
                   </div>
                 ) : (
                   <div className="flex flex-col h-full gap-20">
-                    <button className="btn">+</button>
-                    <button className="btn">-</button>
+                    <CustomButton
+                      functie={handleVoid}
+                      classStyle="btn"
+                      text="+"
+                    />
+
+                    <CustomButton
+                      functie={handleVoid}
+                      classStyle="btn"
+                      text="-"
+                    />
                   </div>
                 )}
               </div>
