@@ -2,11 +2,11 @@ import requests
 from senzor import dht_sensor
 from time import sleep
 
-def send_sensor_data_to_cloud(data):
+def send_sensor_data_to_cloud(senzor_data):
     url = 'https://smarthome-dowt.onrender.com/datasenzor' 
     # url = 'http://localhost:5000/datasenzor' 
 
-    response = requests.post(url, json=data)
+    response = requests.post(url, json=senzor_data)
 
     if response.status_code == 200:
         print('Datele au fost trimise cu succes către API în cloud.')
