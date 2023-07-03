@@ -2,6 +2,7 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QLa
 import sys
 from PyQt5.QtCore import Qt
 import requests
+import json
 
 app = QApplication(sys.argv)
 
@@ -18,6 +19,7 @@ class MainWindow(QMainWindow):
         self.humidity = ""
         self.val = 30
         self.button_status = True
+        self.id_status = ""
 
         self.stil_on = """
             QSlider::groove:horizontal {
@@ -113,6 +115,7 @@ class MainWindow(QMainWindow):
             print(data)
             print(data[0]["status"])
             self.status = int(data[0]["status"])
+            self.id_status = data[0]["_id"]
 
             if self.status == 1:
                 self.button_status = True
@@ -260,6 +263,7 @@ class MainWindow(QMainWindow):
             self.div_treshold.setStyleSheet("QWidget { background-color: white; border-radius: 75%; font-family: 'Poppins', sans-serif; border: none; }")
             
 
+
     def slider_value_changed(self, value):
         if(value == 0):
             print("off")
@@ -268,6 +272,18 @@ class MainWindow(QMainWindow):
             self.button_status = False
             self.button_plus.setEnabled(self.button_status)
             self.button_minus.setEnabled(self.button_status)
+
+            payload = {'status': 0}
+            json_payload = json.dumps(payload)
+            url = f"https://smarthome-dowt.onrender.com/test/{self.id_status}"
+            headers = {'Content-Type': 'application/json'}
+            response = requests.put(url, headers=headers, data=json_payload)
+            
+            if response.status_code == 200:
+                print(response.text)
+            else:
+                print(f"Eroare ({response.status_code}): {response.text}")
+
             # print(self.button_status)
             # print(self.test_status)
 
@@ -279,10 +295,20 @@ class MainWindow(QMainWindow):
             self.button_status = True
             self.button_plus.setEnabled(self.button_status)
             self.button_minus.setEnabled(self.button_status)
+
+            payload = {'status': 1}
+            json_payload = json.dumps(payload)
+            url = f"https://smarthome-dowt.onrender.com/test/{self.id_status}"
+            headers = {'Content-Type': 'application/json'}
+            response = requests.put(url, headers=headers, data=json_payload)
+            
+            if response.status_code == 200:
+                print(response.text)
+            else:
+                print(f"Eroare ({response.status_code}): {response.text}")
+
             # print(self.button_status)
             # print(self.test_status)
-
-
 
 if __name__ == '__main__':
     
