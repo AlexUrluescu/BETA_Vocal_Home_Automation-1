@@ -3,6 +3,7 @@ import sys
 from PyQt5.QtCore import Qt
 import requests
 import json
+from PyQt5.QtCore import QTimer
 
 app = QApplication(sys.argv)
 
@@ -101,6 +102,7 @@ class MainWindow(QMainWindow):
 
 
         self.initUI()
+        self.init_timer()
 
     
     def fetch_status(self):
@@ -262,6 +264,16 @@ class MainWindow(QMainWindow):
             print("Ai depasit valoarea din casa")
             self.div_treshold.setStyleSheet("QWidget { background-color: white; border-radius: 75%; font-family: 'Poppins', sans-serif; border: none; }")
             
+
+    def init_timer(self):
+        print("timer")
+        self.timer = QTimer()
+        self.timer.timeout.connect(self.get_data_senzors)
+        self.timer.start(5000)
+        
+
+    def get_data_senzors(self):
+        print("Funcția este apelată!")
 
 
     def slider_value_changed(self, value):
