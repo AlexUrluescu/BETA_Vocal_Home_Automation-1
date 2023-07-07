@@ -3,6 +3,8 @@ import sys
 from PyQt5.QtCore import Qt, QTimer
 import requests
 import json
+from PyQt5.QtCore import QTimer
+from senzor import dht_sensor
 
 app = QApplication(sys.argv)
 
@@ -20,6 +22,10 @@ class MainWindow(QMainWindow):
         self.val = 30
         self.button_status = True
         self.id_status = ""
+
+        self.senzor = dht_sensor()
+        self.temp_senzor = ""
+        self.hum_senzor = ""
 
         self.stil_on = """
             QSlider::groove:horizontal {
@@ -54,6 +60,9 @@ class MainWindow(QMainWindow):
         self.status_test = 0
 
         treshold = ""
+        temperature = "Temp"
+        humidity = "Hum"
+
 
         print(f"status = {self.status}")
 
@@ -82,25 +91,58 @@ class MainWindow(QMainWindow):
 
         # ------------------------ CONTAINERS ---------------------------------
         self.div_treshold = QWidget(self)
+        self.div_treshold.setStyleSheet("QWidget { background-color: white; border-radius: 75%; font-family: 'Poppins', sans-serif; }")
+        self.div_treshold.setFixedSize(150, 150)
+        self.div_treshold.move(550, 220)
+
+        self.div_home_temp = QWidget(self)
+        self.div_home_temp.setStyleSheet("QWidget { background-color: white; border-radius: 75%; font-family: 'Poppins', sans-serif; }")
+        self.div_home_temp.setFixedSize(150, 150)
+        self.div_home_temp.move(200, 80)
+
+        self.div_home_hum = QWidget(self)
+        self.div_home_hum.setStyleSheet("QWidget { background-color: white; border-radius: 75%; font-family: 'Poppins', sans-serif; }")
+        self.div_home_hum.setFixedSize(150, 150)
+        self.div_home_hum.move(200, 330)
 
 
         # ------------------------- LAYOUT CONTAINERS -------------------------
         self.div_treshold_layout = QVBoxLayout(self.div_treshold)
         self.div_treshold.setLayout(self.div_treshold_layout)
 
+        self.div_home_temp_layout = QVBoxLayout(self.div_home_temp)
+        self.div_home_temp.setLayout(self.div_home_temp_layout)
+
+        self.div_home_hum_layout = QVBoxLayout(self.div_home_hum)
+        self.div_home_hum.setLayout(self.div_home_hum_layout)
+
         # -------------------------- LABELS -----------------------------------
         self.treshold_label = QLabel(treshold, self.div_treshold)
+        self.treshold_label.setStyleSheet(" QLabel { font-size: 50px; border: none; }")
+        self.treshold_label.setText(str(self.val))
+
+        self.home_temp_label = QLabel(temperature, self.div_home_temp)
+        self.home_temp_label.setStyleSheet(" QLabel { font-size: 40px; }")
+        self.home_temp_label.setText(f"{self.temperature} °C")
+        
+        self.home_hum_label = QLabel(humidity, self.div_home_hum)
+        self.home_hum_label.setStyleSheet(" QLabel { font-size: 40px; }")
+        self.home_hum_label.setText(f"{self.humidity} %")
 
 
         # ------------------------ LAYOUT ADDS ------------------------------
         self.div_treshold_layout.addWidget(self.treshold_label)
 
+        self.div_home_temp_layout.addWidget(self.home_temp_label)
+        self.div_home_hum_layout.addWidget(self.home_hum_label)
+
 
         # ------------------------ CENTER THE LABELS ---------------------------
         self.div_treshold_layout.setAlignment(Qt.AlignCenter) 
 
-        # self.startTimer()
+
         self.initUI()
+        self.init_timer()
 
     
     def fetch_status(self):
@@ -174,8 +216,6 @@ class MainWindow(QMainWindow):
         self.setStyleSheet("background-color: rgb(12, 74, 110);")
 
         # ------------------------ VARIABLES --------------------------------------------------------------------
-        temperature = "Temp"
-        humidity = "Hum"
 
         if(self.status == 1):
             self.slider.setValue(1)
@@ -194,49 +234,6 @@ class MainWindow(QMainWindow):
         slider.setTickPosition(QSlider.TicksBelow)
         slider.setFixedSize(100, 50)
         slider.move(300, 300)
-
-        # ------------------------- CONTAINERS --------------------------------------------------------------------
-        div_home_temp = QWidget(self)
-        div_home_temp.setStyleSheet("QWidget { background-color: white; border-radius: 75%; font-family: 'Poppins', sans-serif; }")
-        div_home_temp.setFixedSize(150, 150)
-        div_home_temp.move(200, 80)
-
-        div_home_hum = QWidget(self)
-        div_home_hum.setStyleSheet("QWidget { background-color: white; border-radius: 75%; font-family: 'Poppins', sans-serif; }")
-        div_home_hum.setFixedSize(150, 150)
-        div_home_hum.move(200, 330)
-
-        self.div_treshold.setStyleSheet("QWidget { background-color: white; border-radius: 75%; font-family: 'Poppins', sans-serif; }")
-        self.div_treshold.setFixedSize(150, 150)
-        self.div_treshold.move(550, 220)
-
-        # ---------------- LAYOUT CONTAINERS ---------------------------------------------------------------------
-        div_home_temp_layout = QVBoxLayout(div_home_temp)
-        div_home_temp.setLayout(div_home_temp_layout)
-
-        div_home_hum_layout = QVBoxLayout(div_home_hum)
-        div_home_hum.setLayout(div_home_hum_layout)
-
-        # ------------------------ LABELS -----------------------------------------------------------------------
-        home_temp_label = QLabel(temperature, div_home_temp)
-        home_temp_label.setStyleSheet(" QLabel { font-size: 40px; }")
-        home_temp_label.setText(f"{self.temperature} °C")
-        
-        home_hum_label = QLabel(humidity, div_home_hum)
-        home_hum_label.setStyleSheet(" QLabel { font-size: 40px; }")
-        home_hum_label.setText(f"{self.humidity} %")
-
-
-        self.treshold_label.setStyleSheet(" QLabel { font-size: 50px; border: none; }")
-        self.treshold_label.setText(str(self.val))
-
-        # ---------------- LAYOUTS ADDS --------------------------------------------------------------------------
-        div_home_temp_layout.addWidget(home_temp_label)
-        div_home_hum_layout.addWidget(home_hum_label)
-
-        # ---------------------- CENTER THE LABELS --------------------------------------------------------------
-        div_home_temp_layout.setAlignment(Qt.AlignCenter) 
-        div_home_hum_layout.setAlignment(Qt.AlignCenter)  
 
 
     def button_plus_clicked(self):
@@ -262,6 +259,22 @@ class MainWindow(QMainWindow):
             print("Ai depasit valoarea din casa")
             self.div_treshold.setStyleSheet("QWidget { background-color: white; border-radius: 75%; font-family: 'Poppins', sans-serif; border: none; }")
             
+
+    def init_timer(self):
+        print("timer")
+        self.timer = QTimer()
+        self.timer.timeout.connect(self.get_data_senzors)
+        self.timer.start(5000)
+
+
+    def get_data_senzors(self):
+        self.temp_senzor = self.senzor.get_t()
+        self.home_temp_label.setText(f"{self.temp_senzor} °C")
+
+        self.hum_senzor = self.senzor.get_h()
+        self.home_hum_label.setText(f"{self.hum_senzor} %")
+        print(f"temp: {self.temp_senzor}")
+        print(f"hum: {self.hum_senzor}")
 
 
     def slider_value_changed(self, value):
