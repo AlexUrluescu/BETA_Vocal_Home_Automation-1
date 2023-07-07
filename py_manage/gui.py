@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QLabel, QPushButton, QSlider
 import sys
-from PyQt5.QtCore import Qt, QTimer
+from PyQt5.QtCore import Qt
 import requests
 import json
 from PyQt5.QtCore import QTimer
@@ -139,6 +139,9 @@ class MainWindow(QMainWindow):
 
         # ------------------------ CENTER THE LABELS ---------------------------
         self.div_treshold_layout.setAlignment(Qt.AlignCenter) 
+
+        self.div_home_temp_layout.setAlignment(Qt.AlignCenter) 
+        self.div_home_hum_layout.setAlignment(Qt.AlignCenter)  
 
 
         self.initUI()
@@ -321,7 +324,7 @@ class MainWindow(QMainWindow):
                 print(f"Eroare ({response.status_code}): {response.text}")
 
             # print(self.button_status)
-            # print(self.test_status)    
+            # print(self.test_status)
 
 if __name__ == '__main__':
     
@@ -331,6 +334,5 @@ if __name__ == '__main__':
     window.fetch_dataSenzors()
     window.initUI()
     window.show()
-
 
     sys.exit(app.exec_())
