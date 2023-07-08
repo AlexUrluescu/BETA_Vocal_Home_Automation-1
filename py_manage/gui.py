@@ -5,7 +5,6 @@ import requests
 import json
 from PyQt5.QtCore import QTimer
 from senzor import dht_sensor
-from time import sleep
 
 app = QApplication(sys.argv)
 
@@ -17,7 +16,8 @@ class MainWindow(QMainWindow):
         self.setGeometry(100, 100, 1000, 600)
 
         self.status = ""
-        self.treshlod = ""
+        self.treshlod = 0
+        self.id_treshold = ""
         self.temperature = ""
         self.humidity = ""
         self.text_alert = "Temperatura a fost actualizata"
@@ -141,7 +141,7 @@ class MainWindow(QMainWindow):
         # -------------------------- LABELS -----------------------------------
         self.treshold_label = QLabel(treshold, self.div_treshold)
         self.treshold_label.setStyleSheet(" QLabel { font-size: 50px; border: none; }")
-        self.treshold_label.setText(str(self.val))
+        self.treshold_label.setText(str(self.treshlod))
 
         self.home_temp_label = QLabel(temperature, self.div_home_temp)
         self.home_temp_label.setStyleSheet(" QLabel { font-size: 40px; }")
@@ -210,9 +210,15 @@ class MainWindow(QMainWindow):
             data = response.json()
             print(data)
             print(data[0]["temperature"])
-            self.treshlod = str(data[0]["temperature"])
-            print(self.treshlod)
-            print(type(self.treshlod))
+            self.treshlod = int(data[0]["temperature"])
+            self.id_treshold = data[0]["_id"]
+            print(f"treshold = {self.treshlod}")
+            print(f"id_treshold: {self.id_treshold}")
+            self.treshold_label.setText(str(self.treshlod))
+
+
+            # print(self.treshlod)
+            # print(type(self.treshlod))
 
         else:
             print("eroare")
@@ -273,21 +279,34 @@ class MainWindow(QMainWindow):
 
         print("shoot")
         self.div_text_alert.show()
+
+        payload = {'temperature': self.treshlod}
+        json_payload = json.dumps(payload)
+        url = f"https://smarthome-dowt.onrender.com/changeheatingtemp/{self.id_treshold}"
+        headers = {'Content-Type': 'application/json'}
+        response = requests.put(url, headers=headers, data=json_payload)
+        
+        if response.status_code == 200:
+            print(response.text)
+        else:
+           print(f"Eroare ({response.status_code}): {response.text}")        
         
 
     def button_plus_clicked(self):
         print('plus')
+        # print(self.test_tresh)
+        print(type(self.treshlod))
+        print(self.treshlod)
   
         self.timer_alert.stop()
         self.timer_alert.start()
 
-        self.val = self.val + 0.5
-        self.treshold_label.setText(str(self.val))
+        self.treshlod = self.treshlod + 0.5
+        self.treshold_label.setText(str(self.treshlod))
 
-        print(type(self.val))
-        print(type(self.temperature))
+        # print(type(self.temperature))
 
-        if(self.val > int(self.temperature)):
+        if(self.treshlod > int(self.temperature)):
             print("Ai depasit valoarea din casa")
             self.div_treshold.setStyleSheet("QWidget { background-color: white; border-radius: 75%; font-family: 'Poppins', sans-serif; border: 8px solid gold; }")
 
@@ -298,11 +317,11 @@ class MainWindow(QMainWindow):
         self.timer_alert.stop()
         self.timer_alert.start()
 
-        self.val = self.val - 0.5
-        self.treshold_label.setText(str(self.val))
+        self.treshlod = self.treshlod - 0.5
+        self.treshold_label.setText(str(self.treshlod))
 
         
-        if(self.val < int(self.temperature)):
+        if(self.treshlod < int(self.temperature)):
             print("Ai depasit valoarea din casa")
             self.div_treshold.setStyleSheet("QWidget { background-color: white; border-radius: 75%; font-family: 'Poppins', sans-serif; border: none; }")
             
@@ -322,17 +341,6 @@ class MainWindow(QMainWindow):
         self.home_hum_label.setText(f"{self.hum_senzor} %")
         print(f"temp: {self.temp_senzor}")
         print(f"hum: {self.hum_senzor}")
-
-    # def text_alert_timer(self):
-    #     print("timer")
-    #     self.timer2 = QTimer()
-    #     # self.timer2.timeout.connect(self.hide_text_alert)
-    #     # self.timer2.start(5000)
-    #     self.timer2.singleShot(5000, self.hide_text_alert)
-
-
-    # # def hide_text_alert(self):
-    # #     self.div_text_alert.hide()
 
 
     def slider_value_changed(self, value):
