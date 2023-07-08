@@ -5,6 +5,7 @@ import requests
 import json
 from PyQt5.QtCore import QTimer
 from senzor import dht_sensor
+from time import sleep
 
 app = QApplication(sys.argv)
 
@@ -19,6 +20,7 @@ class MainWindow(QMainWindow):
         self.treshlod = ""
         self.temperature = ""
         self.humidity = ""
+        self.text_alert = "Temperatura a fost actualizata"
         self.val = 30
         self.button_status = True
         self.id_status = ""
@@ -26,6 +28,16 @@ class MainWindow(QMainWindow):
         self.senzor = dht_sensor()
         self.temp_senzor = ""
         self.hum_senzor = ""
+
+        self.timer_alert = QTimer()
+        self.timer_alert.setInterval(4000)
+        self.timer_alert.setSingleShot(True)
+        self.timer_alert.timeout.connect(self.activate_alert)
+
+        self.timer10 = QTimer()
+        self.timer10.setInterval(4000)
+        self.timer10.setSingleShot(True)
+        self.timer10.timeout.connect(self.hide_div)
 
         self.stil_on = """
             QSlider::groove:horizontal {
@@ -62,6 +74,7 @@ class MainWindow(QMainWindow):
         treshold = ""
         temperature = "Temp"
         humidity = "Hum"
+        text_alert = "Alert"
 
 
         print(f"status = {self.status}")
@@ -105,6 +118,12 @@ class MainWindow(QMainWindow):
         self.div_home_hum.setFixedSize(150, 150)
         self.div_home_hum.move(200, 330)
 
+        self.div_text_alert = QWidget(self)
+        self.div_text_alert.setStyleSheet("QWidget { background-color: green; border-radius: 20px; font-family: 'Poppins', sans-serif; font-size: 10px; }")
+        self.div_text_alert.setFixedSize(350, 50)
+        self.div_text_alert.move(500, 50)
+        self.div_text_alert.hide()
+
 
         # ------------------------- LAYOUT CONTAINERS -------------------------
         self.div_treshold_layout = QVBoxLayout(self.div_treshold)
@@ -115,6 +134,9 @@ class MainWindow(QMainWindow):
 
         self.div_home_hum_layout = QVBoxLayout(self.div_home_hum)
         self.div_home_hum.setLayout(self.div_home_hum_layout)
+
+        self.div_text_alert_layout = QVBoxLayout(self.div_text_alert)
+        self.div_text_alert.setLayout(self.div_text_alert_layout)
 
         # -------------------------- LABELS -----------------------------------
         self.treshold_label = QLabel(treshold, self.div_treshold)
@@ -128,20 +150,22 @@ class MainWindow(QMainWindow):
         self.home_hum_label = QLabel(humidity, self.div_home_hum)
         self.home_hum_label.setStyleSheet(" QLabel { font-size: 40px; }")
         self.home_hum_label.setText(f"{self.humidity} %")
-
+        
+        self.text_alert_label = QLabel(text_alert, self.div_text_alert)
+        self.text_alert_label.setStyleSheet(" QLabel { font-size: 20px; color: white; }")
+        self.text_alert_label.setText(f"{self.text_alert}")
 
         # ------------------------ LAYOUT ADDS ------------------------------
         self.div_treshold_layout.addWidget(self.treshold_label)
-
         self.div_home_temp_layout.addWidget(self.home_temp_label)
         self.div_home_hum_layout.addWidget(self.home_hum_label)
-
+        self.div_text_alert_layout.addWidget(self.text_alert_label)
 
         # ------------------------ CENTER THE LABELS ---------------------------
         self.div_treshold_layout.setAlignment(Qt.AlignCenter) 
-
         self.div_home_temp_layout.setAlignment(Qt.AlignCenter) 
         self.div_home_hum_layout.setAlignment(Qt.AlignCenter)  
+        self.div_text_alert_layout.setAlignment(Qt.AlignCenter)  
 
 
         self.initUI()
@@ -239,8 +263,24 @@ class MainWindow(QMainWindow):
         slider.move(300, 300)
 
 
+    def hide_div(self):
+        print("hide")
+        self.div_text_alert.hide()
+
+
+    def activate_alert(self):
+        self.timer10.start()
+
+        print("shoot")
+        self.div_text_alert.show()
+        
+
     def button_plus_clicked(self):
         print('plus')
+  
+        self.timer_alert.stop()
+        self.timer_alert.start()
+
         self.val = self.val + 0.5
         self.treshold_label.setText(str(self.val))
 
@@ -254,6 +294,10 @@ class MainWindow(QMainWindow):
 
     def button_minus_clicked(self):
         print("minus")
+
+        self.timer_alert.stop()
+        self.timer_alert.start()
+
         self.val = self.val - 0.5
         self.treshold_label.setText(str(self.val))
 
@@ -279,10 +323,23 @@ class MainWindow(QMainWindow):
         print(f"temp: {self.temp_senzor}")
         print(f"hum: {self.hum_senzor}")
 
+    # def text_alert_timer(self):
+    #     print("timer")
+    #     self.timer2 = QTimer()
+    #     # self.timer2.timeout.connect(self.hide_text_alert)
+    #     # self.timer2.start(5000)
+    #     self.timer2.singleShot(5000, self.hide_text_alert)
+
+
+    # # def hide_text_alert(self):
+    # #     self.div_text_alert.hide()
+
 
     def slider_value_changed(self, value):
         if(value == 0):
             print("off")
+            print(f"Value pe off: {value}")
+
             self.slider.setStyleSheet(self.stil_off)
             # print(self.button_status)
             self.button_status = False
@@ -306,6 +363,7 @@ class MainWindow(QMainWindow):
         
         else:
             print("on")
+            print(f"Value pe on: {value}")
             self.slider.setStyleSheet(self.stil_on)
             # print(self.button_status)
             self.button_status = True
@@ -325,6 +383,7 @@ class MainWindow(QMainWindow):
 
             # print(self.button_status)
             # print(self.test_status)
+
 
 if __name__ == '__main__':
     
