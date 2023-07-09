@@ -1,5 +1,5 @@
 import requests
-from senzor import dht_sensor
+from senzor import dht_sensor  
 from time import sleep
 
 def send_sensor_data_to_cloud(senzor_data):
