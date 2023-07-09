@@ -42,30 +42,30 @@ class MainWindow(QMainWindow):
         self.stil_on = """
             QSlider::groove:horizontal {
                 background-color: #ddd;
-                height: 20px;
-                border-radius: 10px;
+                height: 35px;
+                border-radius: 17px;
             }
             
                 QSlider::handle:horizontal {
                     background-color: green;
-                    width: 25px;
+                    width: 35px;
                     margin: -5px 0;
-                    border-radius: 12px;
+                    border-radius: 17px;
                 }
             """
         
         self.stil_off = """
             QSlider::groove:horizontal {
                 background-color: #ddd;
-                height: 20px;
-                border-radius: 10px;
+                height: 35px;
+                border-radius: 17px;
             }
             
                 QSlider::handle:horizontal {
                     background-color: red;
-                    width: 25px;
+                    width: 35px;
                     margin: -5px 0;
-                    border-radius: 12px;
+                    border-radius: 17px;
                 }
             """
 
@@ -84,20 +84,20 @@ class MainWindow(QMainWindow):
         self.slider.setOrientation(Qt.Horizontal)
         self.slider.setMinimum(0)
         self.slider.setMaximum(1)
-        self.slider.setGeometry(580,100, 100, 20) 
+        self.slider.setGeometry(550,100, 150, 20) 
         self.slider.setValue(self.val)
-        self.slider.setFixedSize(100, 50)
+        self.slider.setFixedSize(135, 60)
         self.slider.valueChanged.connect(self.slider_value_changed)
 
         # ------------------------- BUTTONS ----------------------------------------------------------------------
         self.button_plus = QPushButton('+', self)
-        self.button_plus.setGeometry(680, 140, 80, 80)
+        self.button_plus.setGeometry(690, 150, 80, 80)
         self.button_plus.setStyleSheet("QPushButton { width: 50px; height: 50px; border-radius: 40%; background-color: gold; font-size: 45px; font-family: 'Poppins', sans-serif;}")
         self.button_plus.setEnabled(self.button_status)
         self.button_plus.clicked.connect(self.button_plus_clicked)
 
         self.button_minus = QPushButton('-', self)
-        self.button_minus.setGeometry(680, 370, 80, 80)
+        self.button_minus.setGeometry(690, 370, 80, 80)
         self.button_minus.setStyleSheet("QPushButton { width: 50px; height: 50px; border-radius: 40%; background-color: gold; font-size: 45px; font-family: 'Poppins', sans-serif; }")
         self.button_minus.setEnabled(self.button_status)
         self.button_minus.clicked.connect(self.button_minus_clicked)
@@ -265,7 +265,7 @@ class MainWindow(QMainWindow):
         slider.setValue(30)
         slider.setTickInterval(1)
         slider.setTickPosition(QSlider.TicksBelow)
-        slider.setFixedSize(100, 50)
+        slider.setFixedSize(150, 100)
         slider.move(300, 300)
 
 
