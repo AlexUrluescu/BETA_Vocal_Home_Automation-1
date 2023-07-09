@@ -84,20 +84,20 @@ class MainWindow(QMainWindow):
         self.slider.setOrientation(Qt.Horizontal)
         self.slider.setMinimum(0)
         self.slider.setMaximum(1)
-        self.slider.setGeometry(550,100, 150, 20) 
+        self.slider.setGeometry(460,70, 150, 20) 
         self.slider.setValue(self.val)
         self.slider.setFixedSize(135, 60)
         self.slider.valueChanged.connect(self.slider_value_changed)
 
         # ------------------------- BUTTONS ----------------------------------------------------------------------
         self.button_plus = QPushButton('+', self)
-        self.button_plus.setGeometry(690, 150, 80, 80)
+        self.button_plus.setGeometry(605, 110, 80, 80)
         self.button_plus.setStyleSheet("QPushButton { width: 50px; height: 50px; border-radius: 40%; background-color: gold; font-size: 45px; font-family: 'Poppins', sans-serif;}")
         self.button_plus.setEnabled(self.button_status)
         self.button_plus.clicked.connect(self.button_plus_clicked)
 
         self.button_minus = QPushButton('-', self)
-        self.button_minus.setGeometry(690, 370, 80, 80)
+        self.button_minus.setGeometry(605, 270, 80, 80)
         self.button_minus.setStyleSheet("QPushButton { width: 50px; height: 50px; border-radius: 40%; background-color: gold; font-size: 45px; font-family: 'Poppins', sans-serif; }")
         self.button_minus.setEnabled(self.button_status)
         self.button_minus.clicked.connect(self.button_minus_clicked)
@@ -106,22 +106,22 @@ class MainWindow(QMainWindow):
         self.div_treshold = QWidget(self)
         self.div_treshold.setStyleSheet("QWidget { background-color: white; border-radius: 75%; font-family: 'Poppins', sans-serif; }")
         self.div_treshold.setFixedSize(150, 150)
-        self.div_treshold.move(550, 220)
+        self.div_treshold.move(450, 150)
 
         self.div_home_temp = QWidget(self)
         self.div_home_temp.setStyleSheet("QWidget { background-color: white; border-radius: 75%; font-family: 'Poppins', sans-serif; }")
         self.div_home_temp.setFixedSize(150, 150)
-        self.div_home_temp.move(200, 80)
+        self.div_home_temp.move(160, 50)
 
         self.div_home_hum = QWidget(self)
         self.div_home_hum.setStyleSheet("QWidget { background-color: white; border-radius: 75%; font-family: 'Poppins', sans-serif; }")
         self.div_home_hum.setFixedSize(150, 150)
-        self.div_home_hum.move(200, 330)
+        self.div_home_hum.move(160, 230)
 
         self.div_text_alert = QWidget(self)
         self.div_text_alert.setStyleSheet("QWidget { background-color: green; border-radius: 20px; font-family: 'Poppins', sans-serif; font-size: 10px; }")
-        self.div_text_alert.setFixedSize(350, 50)
-        self.div_text_alert.move(500, 50)
+        self.div_text_alert.setFixedSize(350, 40)
+        self.div_text_alert.move(400, 20)
         self.div_text_alert.hide()
 
 
