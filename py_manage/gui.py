@@ -39,6 +39,10 @@ class MainWindow(QMainWindow):
         self.timer10.setSingleShot(True)
         self.timer10.timeout.connect(self.hide_div)
 
+        self.timer_insert = QTimer()
+        self.timer_insert.setInterval(5000)
+        
+
         self.stil_on = """
             QSlider::groove:horizontal {
                 background-color: #ddd;
