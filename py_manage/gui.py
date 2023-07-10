@@ -340,14 +340,26 @@ class MainWindow(QMainWindow):
         self.hum_senzor = self.senzor.get_h()
         self.home_hum_label.setText(f"{self.hum_senzor} %")
 
-        if(self.treshlod > int(self.temp_senzor)):
+        print(f"STATUS = {self.status}")
+
+        if(self.treshlod > int(self.temp_senzor) and self.status == 1):
             print("Ai depasit valoarea din casa TEST")
             self.div_treshold.setStyleSheet("QWidget { background-color: white; border-radius: 75%; font-family: 'Poppins', sans-serif; border: 8px solid gold; }")
 
-        else:
-            print("Ai depasit valoarea din casa")
+        elif(self.treshlod < int(self.temp_senzor) and self.status == 1):
+            print("Ai depasit valoarea din casa TEST 2")
             self.div_treshold.setStyleSheet("QWidget { background-color: white; border-radius: 75%; font-family: 'Poppins', sans-serif; border: none; }")
             
+        elif(self.treshlod < int(self.temp_senzor) and self.status == 0):
+            print("centrala oprita")
+            print(self.status)
+            self.div_treshold.setStyleSheet("QWidget { background-color: white; border-radius: 75%; font-family: 'Poppins', sans-serif; border: none; }")
+
+        else:
+            print("centrala oprita 2")
+            print(self.status)
+            self.div_treshold.setStyleSheet("QWidget { background-color: white; border-radius: 75%; font-family: 'Poppins', sans-serif; border: none; }")
+
         print(f"temp: {self.temp_senzor}")
         print(f"hum: {self.hum_senzor}")
 
@@ -371,6 +383,8 @@ class MainWindow(QMainWindow):
             
             if response.status_code == 200:
                 print(response.text)
+                self.status = 0
+                print(f"Status s-a schimbat in {self.status}")
             else:
                 print(f"Eroare ({response.status_code}): {response.text}")
 
@@ -395,6 +409,8 @@ class MainWindow(QMainWindow):
             
             if response.status_code == 200:
                 print(response.text)
+                self.status = 1
+                print(f"Status s-a schimbat in {self.status}")
             else:
                 print(f"Eroare ({response.status_code}): {response.text}")
 
