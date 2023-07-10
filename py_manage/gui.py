@@ -339,6 +339,15 @@ class MainWindow(QMainWindow):
 
         self.hum_senzor = self.senzor.get_h()
         self.home_hum_label.setText(f"{self.hum_senzor} %")
+
+        if(self.treshlod > int(self.temp_senzor)):
+            print("Ai depasit valoarea din casa TEST")
+            self.div_treshold.setStyleSheet("QWidget { background-color: white; border-radius: 75%; font-family: 'Poppins', sans-serif; border: 8px solid gold; }")
+
+        else:
+            print("Ai depasit valoarea din casa")
+            self.div_treshold.setStyleSheet("QWidget { background-color: white; border-radius: 75%; font-family: 'Poppins', sans-serif; border: none; }")
+            
         print(f"temp: {self.temp_senzor}")
         print(f"hum: {self.hum_senzor}")
 
