@@ -41,6 +41,9 @@ class MainWindow(QMainWindow):
 
         self.timer_insert = QTimer()
         self.timer_insert.setInterval(5000)
+
+        self.timer_checker_status = QTimer()
+        self.timer_checker_status.setInterval(2000)
         
 
         self.stil_on = """
@@ -174,6 +177,84 @@ class MainWindow(QMainWindow):
 
         self.initUI()
         self.init_timer()
+        self.init_timer_checker_status()
+
+    
+    def slider_value_changed(self, value):
+        if(value == 0):
+            print("off")
+            print(f"Value pe off: {value}")
+
+            self.slider.setStyleSheet(self.stil_off)
+            # print(self.button_status)
+            self.button_status = False
+            self.button_plus.setEnabled(self.button_status)
+            self.button_minus.setEnabled(self.button_status)
+
+            payload = {'status': 0}
+            json_payload = json.dumps(payload)
+            url = f"https://smarthome-dowt.onrender.com/test/{self.id_status}"
+            headers = {'Content-Type': 'application/json'}
+            response = requests.put(url, headers=headers, data=json_payload)
+            
+            if response.status_code == 200:
+                print(response.text)
+                self.status = 0
+                print(f"Status s-a schimbat in {self.status}")
+            else:
+                print(f"Eroare ({response.status_code}): {response.text}")
+
+            # print(self.button_status)
+            # print(self.test_status)
+
+        
+        else:
+            print("on")
+            print(f"Value pe on: {value}")
+            self.slider.setStyleSheet(self.stil_on)
+            # print(self.button_status)
+            self.button_status = True
+            self.button_plus.setEnabled(self.button_status)
+            self.button_minus.setEnabled(self.button_status)
+
+            payload = {'status': 1}
+            json_payload = json.dumps(payload)
+            url = f"https://smarthome-dowt.onrender.com/test/{self.id_status}"
+            headers = {'Content-Type': 'application/json'}
+            response = requests.put(url, headers=headers, data=json_payload)
+            
+            if response.status_code == 200:
+                print(response.text)
+                self.status = 1
+                print(f"Status s-a schimbat in {self.status}")
+            else:
+                print(f"Eroare ({response.status_code}): {response.text}")
+
+            # print(self.button_status)
+            # print(self.test_status)
+
+    def change_status_slider(self, value):
+        if(value == 1):
+            print("on")
+            print(f"Value pe on: {value}")
+            self.slider.setStyleSheet(self.stil_on)
+            self.slider.setValue(1)
+            # print(self.button_status)
+            self.button_status = True
+            self.button_plus.setEnabled(self.button_status)
+            self.button_minus.setEnabled(self.button_status)
+        
+        elif(value == 0):
+            print("off")
+            print(f"Value pe off: {value}")
+
+            self.slider.setValue(0)
+            self.slider.setStyleSheet(self.stil_off)
+            # print(self.button_status)
+            self.button_status = False
+            self.button_plus.setEnabled(self.button_status)
+            self.button_minus.setEnabled(self.button_status)
+
 
     
     def fetch_status(self):
@@ -192,9 +273,11 @@ class MainWindow(QMainWindow):
 
             if self.status == 1:
                 self.button_status = True
+                self.change_status_slider(1)
             
             else:
                 self.button_status = False
+                self.change_status_slider(0)
 
             print(self.status)
             print(type(self.status))
@@ -337,6 +420,13 @@ class MainWindow(QMainWindow):
         self.timer.start(5000)
 
 
+    
+    def init_timer_checker_status(self):
+        print("check timer")
+        self.timer_checker_status.timeout.connect(self.fetch_status)
+        self.timer_checker_status.start()
+
+
     def get_data_senzors(self):
         self.temp_senzor = self.senzor.get_t()
         self.home_temp_label.setText(f"{self.temp_senzor} °C")
@@ -366,60 +456,6 @@ class MainWindow(QMainWindow):
 
         print(f"temp: {self.temp_senzor}")
         print(f"hum: {self.hum_senzor}")
-
-
-    def slider_value_changed(self, value):
-        if(value == 0):
-            print("off")
-            print(f"Value pe off: {value}")
-
-            self.slider.setStyleSheet(self.stil_off)
-            # print(self.button_status)
-            self.button_status = False
-            self.button_plus.setEnabled(self.button_status)
-            self.button_minus.setEnabled(self.button_status)
-
-            payload = {'status': 0}
-            json_payload = json.dumps(payload)
-            url = f"https://smarthome-dowt.onrender.com/test/{self.id_status}"
-            headers = {'Content-Type': 'application/json'}
-            response = requests.put(url, headers=headers, data=json_payload)
-            
-            if response.status_code == 200:
-                print(response.text)
-                self.status = 0
-                print(f"Status s-a schimbat in {self.status}")
-            else:
-                print(f"Eroare ({response.status_code}): {response.text}")
-
-            # print(self.button_status)
-            # print(self.test_status)
-
-        
-        else:
-            print("on")
-            print(f"Value pe on: {value}")
-            self.slider.setStyleSheet(self.stil_on)
-            # print(self.button_status)
-            self.button_status = True
-            self.button_plus.setEnabled(self.button_status)
-            self.button_minus.setEnabled(self.button_status)
-
-            payload = {'status': 1}
-            json_payload = json.dumps(payload)
-            url = f"https://smarthome-dowt.onrender.com/test/{self.id_status}"
-            headers = {'Content-Type': 'application/json'}
-            response = requests.put(url, headers=headers, data=json_payload)
-            
-            if response.status_code == 200:
-                print(response.text)
-                self.status = 1
-                print(f"Status s-a schimbat in {self.status}")
-            else:
-                print(f"Eroare ({response.status_code}): {response.text}")
-
-            # print(self.button_status)
-            # print(self.test_status)
 
 
 if __name__ == '__main__':
