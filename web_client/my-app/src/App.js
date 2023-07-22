@@ -12,9 +12,10 @@ import {
 
 import io from "socket.io-client";
 
-const socket = io.connect("http://localhost:5000")
 
 const url = "https://smarthome-dowt.onrender.com";
+
+const socket = io.connect(url)
 
 
 function App() {
