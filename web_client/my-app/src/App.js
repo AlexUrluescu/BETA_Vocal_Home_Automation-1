@@ -10,7 +10,13 @@ import {
   StatusHeating,
 } from "./components";
 
+import io from "socket.io-client";
+
+
 const url = "https://smarthome-dowt.onrender.com";
+
+const socket = io.connect(url)
+
 
 function App() {
   // eslint-disable-next-line
@@ -44,6 +50,16 @@ function App() {
       clearInterval(intervalId);
     };
   }, []);
+
+  useEffect(() => {
+
+    socket.on("serverMessage", (data) => {
+      console.log(data);
+      setStatusHeating(data[0])
+    });
+    
+  }, [])
+
 
   useEffect(() => {
     // get all the temperatures and humiditys
