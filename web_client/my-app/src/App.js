@@ -57,7 +57,7 @@ function App() {
       console.log(data);
       setStatusHeating(data[0])
     });
-    
+    console.log("teeeest iasa");
   }, [])
 
 
