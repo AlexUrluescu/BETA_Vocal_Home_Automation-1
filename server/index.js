@@ -13,7 +13,7 @@ const server = http.createServer(app);
 const io = new Server(server, {
     cors:{
         // origin: "https://smarthomeurluescu.go.ro/",
-        origin: "https://64be0762846f6e20a239588f--stalwart-eclair-182177.netlify.app/",
+        origin: "https://64be0762846f6e20a239588f--stalwart-eclair-182177.netlify.app",
         methods: ["GET", "POST"]
     }
 })
