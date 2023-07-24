@@ -5,7 +5,9 @@ import cors from "cors";
 
 const app = express();
 
-app.use(cors())
+app.use(cors({
+    origin: 'https://64be0762846f6e20a239588f--stalwart-eclair-182177.netlify.app'
+  }))
 
 // middlewares
 app.use(express.json());

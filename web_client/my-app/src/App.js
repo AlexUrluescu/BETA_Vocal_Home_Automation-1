@@ -52,7 +52,7 @@ function App() {
   }, []);
 
   useEffect(() => {
-
+    console.log("teeeeest");
     socket.on("serverMessage", (data) => {
       console.log(data);
       setStatusHeating(data[0])
