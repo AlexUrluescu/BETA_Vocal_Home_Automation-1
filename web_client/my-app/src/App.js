@@ -15,6 +15,7 @@ import io from "socket.io-client";
 
 const url = "https://smarthome-dowt.onrender.com";
 
+// eslint-disable-next-line
 const socket = io.connect(url)
 
 
@@ -53,10 +54,10 @@ function App() {
 
   useEffect(() => {
     console.log("teeeeest");
-    socket.on("serverMessage", (data) => {
-      console.log(data);
-      setStatusHeating(data[0])
-    });
+    // socket.on("serverMessage", (data) => {
+    //   console.log(data);
+    //   setStatusHeating(data[0])
+    // });
     
   }, [])
 
