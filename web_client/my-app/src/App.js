@@ -15,7 +15,12 @@ import io from "socket.io-client";
 
 const url = "https://smarthome-dowt.onrender.com";
 
-const socket = io.connect(url)
+const socket = io.connect(url);
+
+socket.on("serverMessage", (data) => {
+  console.log(data);
+  // setStatusHeating(data[0])
+});
 
 
 function App() {
