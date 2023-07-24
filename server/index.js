@@ -12,7 +12,8 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
     cors:{
-        origin: "https://smarthomeurluescu.go.ro/",
+        // origin: "https://smarthomeurluescu.go.ro/",
+        origin: "http://localhost:3000",
         methods: ["GET", "POST"]
     }
 })
