@@ -57,12 +57,19 @@ function App() {
   }, []);
 
   useEffect(() => {
-    console.log("teeeeest");
-    socket.on("serverMessage", (data) => {
-      console.log(data);
-      setStatusHeating(data[0])
-    });
-    console.log("teeeest iasa");
+    try {
+      console.log("teeeeest");
+      socket.on("serverMessage", (data) => {
+        console.log(data);
+        setStatusHeating(data[0])
+      });
+
+      console.log("teeeest iasa");
+
+    } catch (error) {
+      console.log(error);
+    }
+
   }, [])
 
 
