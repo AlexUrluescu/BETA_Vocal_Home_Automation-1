@@ -11,7 +11,7 @@ class connMongo():
         self.colection = colection
 
 
-    def insert_data_cloud(self, temperature, humidity):
+    def insert_data_cloud(self, temperature, humidity, current_date):
         try:
             client = pymongo.MongoClient(self.url)
 
@@ -29,7 +29,7 @@ class connMongo():
             doc = {
                 "temperature": temperature,
                 "humidity": humidity,
-                "date": "2023-06-25",
+                "date": current_date,
             }
 
             rezultat = colection.insert_one(doc)

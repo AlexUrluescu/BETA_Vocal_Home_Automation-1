@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 import os
 from senzor import dht_sensor
 from mongodb import connMongo
+import datetime
 
 class internet_checker():
     def __init__(self, timer):
@@ -101,6 +102,8 @@ class internet_checker():
 senzor = dht_sensor()
 temperature = senzor.get_t()
 humidity = senzor.get_h()
+current_date = datetime.datetime.now()
+data_ca_string = current_date.strftime('%Y-%m-%d %H:%M:%S')
         
 load_dotenv()
 URL_CONN = os.getenv("URL_CONNECTION")
@@ -125,7 +128,7 @@ while True:
         # data_list2 = []
         if len(data_list2) == 0:
             print("Nu exista date stocate in local")
-            mongo.insert_data_cloud(temperature=temperature, humidity=humidity)
+            mongo.insert_data_cloud(temperature=temperature, humidity=humidity, current_date="test")
 
         else:
             print("Exista date stocate local")
@@ -139,18 +142,21 @@ while True:
             checker.delete_local_data('data')
 
         temperature = senzor.get_t()
+        # current_date = datetime.datetime.now()
         humidity = senzor.get_h()
 
     else:
         print("Nu există conexiune la internet.")
         checker.create_local_database()
-        checker.insert_data_local(temperature, humidity, "12-07-2023")
+        checker.insert_data_local(temperature, humidity, data_ca_string)
         # checker.create_local_dbStatus()
         # checker.insert_status_local()
         print(f"temp: {temperature}")
         print(f"hum: {humidity}")
+        # print(f"current_date: {current_date}")
 
         temperature = senzor.get_t()
         humidity = senzor.get_h()
+        # current_date = datetime.datetime.now()
             
     time.sleep(checker.timer)  # Verifică conexiunea la internet la fiecare 5 secunde
