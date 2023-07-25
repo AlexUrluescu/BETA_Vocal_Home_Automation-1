@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 import os
 from senzor import dht_sensor
 from mongodb import connMongo
-import datetime
+from datetime import datetime
 
 class internet_checker():
     def __init__(self, timer):
@@ -22,26 +22,39 @@ class internet_checker():
 
 
     def create_local_database(self):
-        conn = sqlite3.connect("local_database.db")
-        c = conn.cursor()
-        c.execute("CREATE TABLE IF NOT EXISTS data (id INTEGER PRIMARY KEY, temperature NUMBER, humidity NUMBER, date DATETIME)")
-        conn.commit()
-        conn.close()
+        conn = sqlite3.connect('data.db') # Conexiunea la baza de date (se creează dacă nu există)
+        cursor = conn.cursor()
+
+        # Creează tabela 'weather' cu cele trei coloane: temperatura, umiditate și data
+        cursor.execute('''CREATE TABLE IF NOT EXISTS data (
+                            temperature REAL,
+                            humidity REAL,
+                            data TEXT
+                        )''')
+
+        conn.commit() # Salvează modificările
+        conn.close()  # Închide conexiunea
 
     def create_local_dbStatus(self):
-        conn = sqlite3.connect("local_database.db")
+        conn = sqlite3.connect("data.db")
         c = conn.cursor()
         c.execute("CREATE TABLE IF NOT EXISTS status_db (id INTEGER PRIMARY KEY, status NUMBER)")
         conn.commit()
         conn.close()
 
 
-    def insert_data_local(self, temperature, humidity, date):
+    def insert_data_local(self, temperature, humidity):
         try:
-            conn = sqlite3.connect("local_database.db")
-            c = conn.cursor()
+            conn = sqlite3.connect('data.db')
+            cursor = conn.cursor()
 
-            c.execute(f"INSERT INTO data (temperature, humidity, date) VALUES ({temperature}, {humidity}, {date})")
+            # Obține data curentă și convert-o la formatul dorit (YYYY-MM-DD)
+            data_curenta = datetime.now().strftime('%Y-%m-%d')
+
+
+            # Inserează datele în tabela 'weather'
+            cursor.execute('INSERT INTO data (temperature, humidity, data) VALUES (?, ?, ?)',
+                        (temperature, humidity, data_curenta))
 
             conn.commit()
             conn.close()
@@ -52,7 +65,7 @@ class internet_checker():
 
     def insert_status_local(self, status):
         try:
-            conn = sqlite3.connect("local_database.db")
+            conn = sqlite3.connect("data.db")
             c = conn.cursor()
 
             c.execute(f"INSERT INTO status_db (status) VALUES ({status})")
@@ -65,7 +78,7 @@ class internet_checker():
     
     def get_local_data(self, data_list):
         try:
-            conn = sqlite3.connect("local_database.db")
+            conn = sqlite3.connect("data.db")
             c = conn.cursor()
 
             c.execute("SELECT * FROM data")
@@ -86,7 +99,7 @@ class internet_checker():
 
     def delete_local_data(self, name_table):
         try:
-            conn = sqlite3.connect("local_database.db")
+            conn = sqlite3.connect("data.db")
             c = conn.cursor()
 
             c.execute(f"DELETE FROM {name_table}")
@@ -102,8 +115,7 @@ class internet_checker():
 senzor = dht_sensor()
 temperature = senzor.get_t()
 humidity = senzor.get_h()
-current_date = datetime.datetime.now()
-data_ca_string = current_date.strftime('%Y-%m-%d %H:%M:%S')
+# current_date = str(current_date)
         
 load_dotenv()
 URL_CONN = os.getenv("URL_CONNECTION")
@@ -120,6 +132,8 @@ while True:
         print(f"temperature: {temperature}")
         print(f"humidity: {humidity}")
 
+        # checker.create_local_database()
+
         data_list = []
 
         data_list2 = checker.get_local_data(data_list)
@@ -128,7 +142,7 @@ while True:
         # data_list2 = []
         if len(data_list2) == 0:
             print("Nu exista date stocate in local")
-            mongo.insert_data_cloud(temperature=temperature, humidity=humidity, current_date="test")
+            mongo.insert_data_cloud(temperature=temperature, humidity=humidity)
 
         else:
             print("Exista date stocate local")
@@ -148,12 +162,12 @@ while True:
     else:
         print("Nu există conexiune la internet.")
         checker.create_local_database()
-        checker.insert_data_local(temperature, humidity, data_ca_string)
+        checker.insert_data_local(temperature, humidity)
         # checker.create_local_dbStatus()
         # checker.insert_status_local()
         print(f"temp: {temperature}")
         print(f"hum: {humidity}")
-        # print(f"current_date: {current_date}")
+
 
         temperature = senzor.get_t()
         humidity = senzor.get_h()
