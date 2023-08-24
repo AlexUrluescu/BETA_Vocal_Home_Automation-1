@@ -13,7 +13,8 @@ import {
 import io from "socket.io-client";
 
 
-const url = "https://smarthome-dowt.onrender.com";
+// const url = "https://smarthome-dowt.onrender.com";
+const url = "http://localhost:5000";
 
 const socket = io.connect(url, {
   transports: ['websocket'],
@@ -38,26 +39,26 @@ function App() {
   const [finalTemp, setFinalTemp] = useState();
   const [styleHeating, setStyleHeating] = useState(0);
 
-  useEffect(() => {
-    const intervalId = setInterval(async () => {
-      try {
-        const res = await fetch(`${url}/senzor`);
-        const data = await res.json();
+  // useEffect(() => {
+  //   const intervalId = setInterval(async () => {
+  //     try {
+  //       const res = await fetch(`${url}/senzor`);
+  //       const data = await res.json();
 
-        setTempHome(data.temperature);
-        setHumHome(data.humidity);
+  //       setTempHome(data.temperature);
+  //       setHumHome(data.humidity);
 
-        console.log(data);
-      } catch (error) {
-        console.log(error);
-      }
-    }, 5000);
+  //       console.log(data);
+  //     } catch (error) {
+  //       console.log(error);
+  //     }
+  //   }, 5000);
 
-    // Cleanup: oprește timer-ul când componenta se demontează
-    return () => {
-      clearInterval(intervalId);
-    };
-  }, []);
+  //   // Cleanup: oprește timer-ul când componenta se demontează
+  //   return () => {
+  //     clearInterval(intervalId);
+  //   };
+  // }, []);
 
   useEffect(() => {
     try {

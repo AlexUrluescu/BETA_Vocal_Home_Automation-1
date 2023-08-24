@@ -6,8 +6,8 @@ import cors from "cors";
 const app = express();
 
 app.use(cors({
-    // origin: 'http://localhost:3000'
-    origin: 'https://stalwart-eclair-182177.netlify.app'
+    origin: 'http://localhost:3000'
+    // origin: 'https://stalwart-eclair-182177.netlify.app'
   }))
 
 // middlewares

@@ -8,9 +8,12 @@ from senzor import dht_sensor
 
 app = QApplication(sys.argv)
 
+# const url = "http://localhost:5000"
+
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
+        self.url = "http://localhost:5000"
 
         self.setWindowTitle("Exemplu PyQt5")
         self.setGeometry(100, 100, 1000, 600)
@@ -193,7 +196,7 @@ class MainWindow(QMainWindow):
 
             payload = {'status': 0}
             json_payload = json.dumps(payload)
-            url = f"https://smarthome-dowt.onrender.com/test/{self.id_status}"
+            url = f"{self.url}/test/{self.id_status}"
             headers = {'Content-Type': 'application/json'}
             response = requests.put(url, headers=headers, data=json_payload)
             
@@ -219,7 +222,7 @@ class MainWindow(QMainWindow):
 
             payload = {'status': 1}
             json_payload = json.dumps(payload)
-            url = f"https://smarthome-dowt.onrender.com/test/{self.id_status}"
+            url = f"{self.url}/test/{self.id_status}"
             headers = {'Content-Type': 'application/json'}
             response = requests.put(url, headers=headers, data=json_payload)
             
@@ -259,7 +262,7 @@ class MainWindow(QMainWindow):
     
     def fetch_status(self):
         print("intra")
-        url = "https://smarthome-dowt.onrender.com/heatingstatus"
+        url = f"{self.url}/heatingstatus"
         print("iasa")
 
         response = requests.get(url)
@@ -288,7 +291,7 @@ class MainWindow(QMainWindow):
     
     def fetch_heatingTemp(self):
         print("intra")
-        url = "https://smarthome-dowt.onrender.com/heatingtemp"
+        url = f"{self.url}/heatingtemp"
         print("iasa")
 
         response = requests.get(url)
@@ -313,7 +316,7 @@ class MainWindow(QMainWindow):
     
     def fetch_dataSenzors(self):
         print("intra")
-        url = "https://smarthome-dowt.onrender.com/datasenzors"
+        url = f"{self.url}/datasenzors"
         print("iasa")
 
         response = requests.get(url)
@@ -369,7 +372,7 @@ class MainWindow(QMainWindow):
 
         payload = {'temperature': self.treshlod}
         json_payload = json.dumps(payload)
-        url = f"https://smarthome-dowt.onrender.com/changeheatingtemp/{self.id_treshold}"
+        url = f"{self.url}/changeheatingtemp/{self.id_treshold}"
         headers = {'Content-Type': 'application/json'}
         response = requests.put(url, headers=headers, data=json_payload)
         
@@ -380,37 +383,37 @@ class MainWindow(QMainWindow):
         
 
     def button_plus_clicked(self):
-        print('plus')
+        print('s-a apasat plus')
         # print(self.test_tresh)
-        print(type(self.treshlod))
-        print(self.treshlod)
+        # print(type(self.treshlod))
+        # print(self.treshlod)
   
-        self.timer_alert.stop()
-        self.timer_alert.start()
+        # self.timer_alert.stop()
+        # self.timer_alert.start()
 
         self.treshlod = self.treshlod + 0.5
         self.treshold_label.setText(str(self.treshlod))
 
         # print(type(self.temperature))
 
-        if(self.treshlod > int(self.temperature)):
-            print("Ai depasit valoarea din casa")
-            self.div_treshold.setStyleSheet("QWidget { background-color: white; border-radius: 75%; font-family: 'Poppins', sans-serif; border: 8px solid gold; }")
+        # if(self.treshlod > int(self.temperature)):
+        #     print("Ai depasit valoarea din casa")
+        #     self.div_treshold.setStyleSheet("QWidget { background-color: white; border-radius: 75%; font-family: 'Poppins', sans-serif; border: 8px solid gold; }")
 
 
     def button_minus_clicked(self):
-        print("minus")
+        print("s-a apasat minus")
 
-        self.timer_alert.stop()
-        self.timer_alert.start()
+        # self.timer_alert.stop()
+        # self.timer_alert.start()
 
         self.treshlod = self.treshlod - 0.5
         self.treshold_label.setText(str(self.treshlod))
 
         
-        if(self.treshlod < int(self.temperature)):
-            print("Ai depasit valoarea din casa")
-            self.div_treshold.setStyleSheet("QWidget { background-color: white; border-radius: 75%; font-family: 'Poppins', sans-serif; border: none; }")
+        # if(self.treshlod < int(self.temperature)):
+        #     print("Ai depasit valoarea din casa")
+        #     self.div_treshold.setStyleSheet("QWidget { background-color: white; border-radius: 75%; font-family: 'Poppins', sans-serif; border: none; }")
             
 
     def init_timer(self):
@@ -463,7 +466,7 @@ if __name__ == '__main__':
     window = MainWindow()
     window.fetch_status()
     window.fetch_heatingTemp()
-    window.fetch_dataSenzors()
+    # window.fetch_dataSenzors()
     window.initUI()
     window.show()
 
