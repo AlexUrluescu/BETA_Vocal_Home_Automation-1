@@ -2,6 +2,7 @@ import pymongo
 from dotenv import load_dotenv
 import os
 from senzor import dht_sensor
+from datetime import datetime
 
 senzor = dht_sensor()
 
@@ -26,10 +27,12 @@ class connMongo():
             print(temperature)
             print(humidity)
 
+            current_date = datetime.now().strftime('%Y-%m-%d')
+
             doc = {
                 "temperature": temperature,
                 "humidity": humidity,
-                "date": "2023-06-25",
+                "date": current_date,
             }
 
             rezultat = colection.insert_one(doc)
@@ -54,9 +57,14 @@ class connMongo():
             print(list_data)
 
             formatted_data = [
-                {"temperature": item[1], "humidty": item[2], "date": "2023-10-23"}
+                {"temperature": item[0], "humidity": item[1], "date": item[2]}
                 for item in list_data
+            
             ]
+
+            for item in list_data:
+                print(item[1])
+                print(item[2])
 
             # Inserarea datelor în colecție
             colection.insert_many(formatted_data)

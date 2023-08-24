@@ -6,13 +6,15 @@ import http from "http"
 import router from "./routes/posts_routes.js";
 import HeatingStatus from "./models/HeatingStatus.js";
 
-connectDB();
+connectDB()
 
 const server = http.createServer(app);
 
 const io = new Server(server, {
     cors:{
-        origin: "http://localhost:3000",
+        // origin: "https://smarthomeurluescu.go.ro/",
+        origin: "https://stalwart-eclair-182177.netlify.app",
+        // origin: "http://localhost:3000",
         methods: ["GET", "POST"]
     }
 })
@@ -22,17 +24,20 @@ const io = new Server(server, {
         console.log("Conection socket");
 
         setInterval(async() => {
-            try {
-                const res = await fetch('https://smarthome-dowt.onrender.com/heatingstatus')
-                const data = await res.json()
-                console.log(data);
-                socket.emit("serverMessage", data)
 
-                
-            } catch (error) {
-                console.error(error);
-                // return res.status(500).json({message: error.message})
+            const test = async (req, res) => {
+                try {    
+                    const status = await HeatingStatus.find()
+                    console.log(status);
+                    socket.emit("serverMessage", status)   
+                } catch (error) {
+                    console.error(error);
+                    return res.status(500).json({message: error.message})
+                }
             }
+
+            test()
+         
         }, 5000)
     })
 

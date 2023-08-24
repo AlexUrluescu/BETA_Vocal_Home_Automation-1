@@ -15,7 +15,15 @@ import io from "socket.io-client";
 
 const url = "https://smarthome-dowt.onrender.com";
 
-const socket = io.connect(url)
+const socket = io.connect(url, {
+  transports: ['websocket'],
+});
+// const socket = io.connect("http://localhost:5000");
+
+socket.on("serverMessage", (data) => {
+  console.log(data);
+  // setStatusHeating(data[0])
+});
 
 
 function App() {
@@ -52,12 +60,19 @@ function App() {
   }, []);
 
   useEffect(() => {
+    try {
+      console.log("teeeeest");
+      socket.on("serverMessage", (data) => {
+        console.log(data);
+        setStatusHeating(data[0])
+      });
 
-    socket.on("serverMessage", (data) => {
-      console.log(data);
-      setStatusHeating(data[0])
-    });
-    
+      console.log("teeeest iasa");
+
+    } catch (error) {
+      console.log(error);
+    }
+
   }, [])
 
 
