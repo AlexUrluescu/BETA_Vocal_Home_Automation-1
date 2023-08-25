@@ -309,6 +309,7 @@ function App() {
                   heatingTemp={heatingTemp.temperature}
                   classStyle1="bg-gray-900 h-40 w-40 flex justify-center items-center rounded-full text-6xl border-8 border-yellow-300"
                   classStyle2="bg-gray-900 h-40 w-40 flex justify-center items-center rounded-full text-6xl border-4 border-white-300"
+                  // classStyle1="bg-gray-900 h-40 w-40 flex justify-center items-center rounded-full text-6xl border-4 border-white-300"
                   text="° C"
                 />
 

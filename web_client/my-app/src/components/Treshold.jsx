@@ -13,7 +13,7 @@ const Treshold = ({
       <div
         className={
           isToggled === true && tempHome < heatingTemp
-            ? { classStyle1 }
+            ? classStyle1 
             : classStyle2
         }
       >
