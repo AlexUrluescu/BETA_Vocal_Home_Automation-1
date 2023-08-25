@@ -388,8 +388,8 @@ class MainWindow(QMainWindow):
         # print(type(self.treshlod))
         # print(self.treshlod)
   
-        # self.timer_alert.stop()
-        # self.timer_alert.start()
+        self.timer_alert.stop()
+        self.timer_alert.start()
 
         self.treshlod = self.treshlod + 0.5
         self.treshold_label.setText(str(self.treshlod))
@@ -404,8 +404,8 @@ class MainWindow(QMainWindow):
     def button_minus_clicked(self):
         print("s-a apasat minus")
 
-        # self.timer_alert.stop()
-        # self.timer_alert.start()
+        self.timer_alert.stop()
+        self.timer_alert.start()
 
         self.treshlod = self.treshlod - 0.5
         self.treshold_label.setText(str(self.treshlod))
