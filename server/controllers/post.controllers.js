@@ -42,31 +42,32 @@ export const getHeatingTemp = async (req, res) => {
 
 };
 
-export const changeStatus = async (req, res) => {
+// export const changeStatus = async (req, res) => {
 
-    try {
-        const updateStatus = await HeatingStatus.findByIdAndUpdate(req.params.id, req.body, { new: true })
-        console.log(updateStatus);
+//     try {
+//         const updateStatus = await HeatingStatus.findByIdAndUpdate(req.params.id, req.body, { new: true })
+//         console.log(updateStatus);
 
-        if(req.body === "On"){
-            return res.json({"message": "On"});
-        }
+//         if(req.body === "On"){
+//             return res.json({"message": "On"});
+//         }
 
-        else{
-            return res.json({"message": "Off"});
-        }
+//         else{
+//             return res.json({"message": "Off"});
+//         }
 
-    } catch (error) {
-        return res.status(500).json({message: error.message})
+//     } catch (error) {
+//         return res.status(500).json({message: error.message})
         
-    }
-};   
+//     }
+// };   
 
 export const changeHeatingTemp = async (req, res) => {
 
     try {
         const updateHeatingTemp = await HeatingTemp.findByIdAndUpdate(req.params.id, req.body, { new: true })
         console.log(updateHeatingTemp);
+
         return res.json({"message": "ok"});
 
     } catch (error) {

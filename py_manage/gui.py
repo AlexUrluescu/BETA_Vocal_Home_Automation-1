@@ -6,6 +6,11 @@ import json
 from PyQt5.QtCore import QTimer
 from senzor import dht_sensor
 
+# web socket libraries -------------------
+import asyncio
+import websockets
+
+
 app = QApplication(sys.argv)
 
 # const url = "http://localhost:5000"
@@ -180,7 +185,7 @@ class MainWindow(QMainWindow):
 
         self.initUI()
         self.init_timer()
-        self.init_timer_checker_status()
+        # self.init_timer_checker_status()
 
     
     def slider_value_changed(self, value):
@@ -249,7 +254,7 @@ class MainWindow(QMainWindow):
         
         elif(value == 0):
             print("off")
-            print(f"Value pe off: {value}")
+            print(f"Value pe off2: {value}")
 
             self.slider.setValue(0)
             self.slider.setStyleSheet(self.stil_off)
@@ -424,10 +429,10 @@ class MainWindow(QMainWindow):
 
 
     
-    def init_timer_checker_status(self):
-        print("check timer")
-        self.timer_checker_status.timeout.connect(self.fetch_status)
-        self.timer_checker_status.start()
+    # def init_timer_checker_status(self):
+    #     print("check timer")
+    #     self.timer_checker_status.timeout.connect(self.fetch_status)
+    #     self.timer_checker_status.start()
 
 
     def get_data_senzors(self):
@@ -460,14 +465,28 @@ class MainWindow(QMainWindow):
         print(f"temp: {self.temp_senzor}")
         print(f"hum: {self.hum_senzor}")
 
+    
+    # async def connect_to_server(self):
+    #     uri = "ws://localhost:5000/socket.io/?EIO=4&transport=websocket"  # Replace with your server's WebSocket address
+    #     async with websockets.connect(uri) as websocket:
+    #         print("connected to server")
+    #         # You are now connected to the server
+    #         # You can send and receive messages here
+    #         while True:
+    #             message = await websocket.recv()
+    #             print(message)
+    #             # Handle the received message here
+
+
 
 if __name__ == '__main__':
-    
+
     window = MainWindow()
     window.fetch_status()
     window.fetch_heatingTemp()
     # window.fetch_dataSenzors()
     window.initUI()
     window.show()
+    # window.connect_to_server()
 
     sys.exit(app.exec_())

@@ -65,7 +65,7 @@ function App() {
       console.log("teeeeest");
       socket.on("serverMessage", (data) => {
         console.log(data);
-        setStatusHeating(data[0])
+        setStatusHeating(data)
       });
 
       console.log("teeeest iasa");
@@ -74,6 +74,19 @@ function App() {
       console.log(error);
     }
 
+  }, [])
+
+  // cod adaugat in idee_socket
+  useEffect(() => {
+    try {
+      socket.on("heating_temp_server", (data) => {
+        console.log(data);
+        setHeatingTemp(data);
+      })
+      
+    } catch (error) {
+      console.log(error);
+    }
   }, [])
 
 
@@ -99,8 +112,10 @@ function App() {
         const res = await fetch(`${url}/heatingstatus`);
         const data1 = await res.json();
 
-        setStatusHeating(data1[0]);
+        console.log(`status heating este: ${data1}`);
+        setStatusHeating(data1[0].status);
         console.log(data1);
+        console.log(data1[0].status);
       } catch (error) {
         console.log(error);
       }
@@ -113,7 +128,7 @@ function App() {
         const data1 = await res.json();
 
         // setFinalTemp(data1);
-        setHeatingTemp(data1[0]);
+        setHeatingTemp(data1[0].temperature);
         console.log(data1);
       } catch (error) {
         console.log(error);
@@ -137,8 +152,10 @@ function App() {
         try {
           const temperature = heatingTemp.temperature;
 
+          const id = "64889e83c192652234604219"
+
           const data = await fetch(
-            `${url}/changeheatingtemp/${heatingTemp._id}`,
+            `${url}/changeheatingtemp/${id}`,
             {
               method: "PUT",
               headers: {
@@ -153,6 +170,7 @@ function App() {
           console.log(res);
           if (res.message === "ok") {
             setFinalTemp({ ...heatingTemp, temperature: temperature });
+            // send the socket
           }
         } catch (error) {
           console.log(error);
@@ -171,25 +189,29 @@ function App() {
   }, [heatingTemp]);
 
   useEffect(() => {
-    if (statusHeating.status === 0) {
+    if (statusHeating === 0) {
       setIsToggled(false);
     }
 
-    if (statusHeating.status === 1) {
+    if (statusHeating === 1) {
       setIsToggled(true);
     }
   }, [statusHeating]);
 
   // increment the value of the temperature
   const handlePLus = () => {
-    const temperature = heatingTemp.temperature;
-    setHeatingTemp({ ...heatingTemp, temperature: temperature + 0.5 });
+    // let temperature = heatingTemp.temperature;
+    let temperature = heatingTemp + 0.5
+    setHeatingTemp(temperature)
+    // setHeatingTemp({ ...heatingTemp, temperature: temperature + 0.5 });
   };
 
   // decrement the value of the temperature
   const handleMinus = () => {
-    const temperature = heatingTemp.temperature;
-    setHeatingTemp({ ...heatingTemp, temperature: temperature - 0.5 });
+    // const temperature = heatingTemp.temperature;
+    // setHeatingTemp({ ...heatingTemp, temperature: temperature - 0.5 });
+    let temperature = heatingTemp - 0.5
+    setHeatingTemp(temperature)
   };
 
   const handleVoid = () => {
@@ -205,7 +227,9 @@ function App() {
         try {
           const status = 1;
 
-          const data = await fetch(`${url}/test/${statusHeating._id}`, {
+          const id = "64889d6ce1b6713667bf6c89"
+
+          const data = await fetch(`${url}/test/${id}`, {
             method: "PUT",
             headers: {
               "Content-Type": "application/json",
@@ -231,9 +255,11 @@ function App() {
     if (isToggled) {
       const statusOff = async () => {
         const status = 0;
+        
+        const id = "64889d6ce1b6713667bf6c89"
 
         try {
-          const data = await fetch(`${url}/test/${statusHeating._id}`, {
+          const data = await fetch(`${url}/test/${id}`, {
             method: "PUT",
             headers: {
               "Content-Type": "application/json",
@@ -306,14 +332,14 @@ function App() {
                 <Treshold
                   isToggled={isToggled}
                   tempHome={tempHome}
-                  heatingTemp={heatingTemp.temperature}
+                  heatingTemp={heatingTemp}
                   classStyle1="bg-gray-900 h-40 w-40 flex justify-center items-center rounded-full text-6xl border-8 border-yellow-300"
                   classStyle2="bg-gray-900 h-40 w-40 flex justify-center items-center rounded-full text-6xl border-4 border-white-300"
                   // classStyle1="bg-gray-900 h-40 w-40 flex justify-center items-center rounded-full text-6xl border-4 border-white-300"
                   text="° C"
                 />
 
-                {statusHeating.status === 1 ? (
+                {statusHeating === 1 ? (
                   <div className="flex flex-col h-full gap-20">
                     <CustomButton
                       functie={handlePLus}
