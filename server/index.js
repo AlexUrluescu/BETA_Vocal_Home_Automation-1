@@ -70,6 +70,7 @@ router.put("/test/:id", async (req, res) => {
 router.put('/changeheatingtemp/:id', async (req, res) => {
 
   try {
+    console.log(req.body);
       const updateHeatingTemp = await HeatingTemp.findByIdAndUpdate(req.params.id, req.body, { new: true })
       console.log(updateHeatingTemp.temperature);
 

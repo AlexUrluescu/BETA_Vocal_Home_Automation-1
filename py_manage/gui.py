@@ -33,6 +33,8 @@ class MainWindow(QMainWindow):
         self.button_status = True
         self.id_status = ""
 
+        self.change_treshold = 0
+
         self.senzor = dht_sensor()
         self.temp_senzor = ""
         self.hum_senzor = ""
@@ -185,7 +187,7 @@ class MainWindow(QMainWindow):
 
         self.initUI()
         self.init_timer()
-        # self.init_timer_checker_status()
+        self.init_timer_checker_status()
 
     
     def slider_value_changed(self, value):
@@ -383,11 +385,16 @@ class MainWindow(QMainWindow):
         
         if response.status_code == 200:
             print(response.text)
+            self.change_treshold = 0
         else:
            print(f"Eroare ({response.status_code}): {response.text}")        
         
 
     def button_plus_clicked(self):
+
+        # activate the change event of the treshold
+        self.change_treshold = 1
+
         print('s-a apasat plus')
         # print(self.test_tresh)
         # print(type(self.treshlod))
@@ -407,6 +414,10 @@ class MainWindow(QMainWindow):
 
 
     def button_minus_clicked(self):
+
+        # activate the change event of the treshold
+        self.change_treshold = 1
+
         print("s-a apasat minus")
 
         self.timer_alert.stop()
@@ -428,11 +439,45 @@ class MainWindow(QMainWindow):
         self.timer.start(5000)
 
 
+    def check_temperature(self):
+        print("check_temperature ON")
+        url = f"{self.url}/heatingtemp"
+        # print("iasa")
+
+        response = requests.get(url)
+
+        if response.status_code == 200:
+            if self.change_treshold == 1:
+                data = response.json()
+                print(data)
+                print("TRESHOLD IN CURS DE MODIFICARE")
+
+            else:
+                data = response.json()
+                print(data)
+
+                if self.treshlod == int(data[0]["temperature"]):
+                    print("same temperature")
+
+                else:
+                    # print(data[0]["temperature"])
+                    self.treshlod = int(data[0]["temperature"])
+                    self.id_treshold = data[0]["_id"]
+                    # print(f"treshold = {self.treshlod}")
+                    # print(f"id_treshold: {self.id_treshold}")
+                    self.treshold_label.setText(str(self.treshlod))
+
+
+            # print(data[0]["status"])
+            # self.status = int(data[0]["status"])
+            # self.id_status = data[0]["_id"]
+
+
     
-    # def init_timer_checker_status(self):
-    #     print("check timer")
-    #     self.timer_checker_status.timeout.connect(self.fetch_status)
-    #     self.timer_checker_status.start()
+    def init_timer_checker_status(self):
+        print("check timer")
+        self.timer_checker_status.timeout.connect(self.check_temperature)
+        self.timer_checker_status.start()
 
 
     def get_data_senzors(self):

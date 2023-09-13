@@ -150,7 +150,8 @@ function App() {
 
       setTimeout(async () => {
         try {
-          const temperature = heatingTemp.temperature;
+          const temperature = heatingTemp;
+          console.log(temperature);
 
           const id = "64889e83c192652234604219"
 
