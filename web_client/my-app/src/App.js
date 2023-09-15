@@ -288,12 +288,12 @@ function App() {
     <div className="App">
       <div>
         <div className="p-3 w-screen">
-          <Title title="Smart Heating" classStyle="text-6xl"/>
-          <div className="flex flex-col gap-8 sm:flex-row">
+          <Title title="Smart Heating" classStyle="text-6xl text-center"/>
+          <div className="mt-8 flex flex-col gap-8 sm:flex-row">
             <div className="w-full p-5 sm:w-2/4 flex flex-col items-center justify-center">
               <Title
                 title="Home's data"
-                classStyle="text-3xl font-semibold"
+                classStyle="text-3xl font-semibold mb-5"
               />
               <div className="flex flex-col items-center justify-center gap-10">
                 <CircleData
@@ -314,10 +314,10 @@ function App() {
               <InfoMessage
                 styleHeating={styleHeating}
                 classStyle="h-10 mb-5 flex justify-center"
-                textStyle="bg-green-500 text-xl rounded-md w-72 flex justify-center items-center ease-in-out duration-300"
+                textStyle="bg-green-500 text-white p-5 text-xl rounded-md w-90 flex justify-center items-center ease-in-out duration-300"
                 text="Temperatura este actualizata"
               />
-              <div>
+              <div className="text-center">
                 <StatusHeating
                   isToggled={isToggled}
                   textStyle="text-2xl"
@@ -331,7 +331,7 @@ function App() {
                   onToggle={handleSlider}
                 />
               </div>
-              <div className="flex justify-center items-center gap-4 mt-24">
+              <div className="flex justify-center items-center gap-4 mt-10">
                 <Treshold
                   isToggled={isToggled}
                   tempHome={tempHome}
