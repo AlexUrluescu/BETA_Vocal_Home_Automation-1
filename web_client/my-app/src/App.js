@@ -39,26 +39,26 @@ function App() {
   const [finalTemp, setFinalTemp] = useState();
   const [styleHeating, setStyleHeating] = useState(0);
 
-  useEffect(() => {
-    const intervalId = setInterval(async () => {
-      try {
-        const res = await fetch(`${url}/senzor`);
-        const data = await res.json();
+  // useEffect(() => {
+  //   const intervalId = setInterval(async () => {
+  //     try {
+  //       const res = await fetch(`${url}/senzor`);
+  //       const data = await res.json();
 
-        // setTempHome(data.temperature);
-        // setHumHome(data.humidity);
+  //       // setTempHome(data.temperature);
+  //       // setHumHome(data.humidity);
 
-        console.log(data);
-      } catch (error) {
-        console.log(error);
-      }
-    }, 5000);
+  //       console.log(data);
+  //     } catch (error) {
+  //       console.log(error);
+  //     }
+  //   }, 5000);
 
-    // Cleanup: oprește timer-ul când componenta se demontează
-    return () => {
-      clearInterval(intervalId);
-    };
-  }, []);
+  //   // Cleanup: oprește timer-ul când componenta se demontează
+  //   return () => {
+  //     clearInterval(intervalId);
+  //   };
+  // }, []);
 
   useEffect(() => {
     try {
@@ -242,7 +242,7 @@ function App() {
 
           console.log(res);
           if (res.message === "On") {
-            setStatusHeating({ ...statusHeating, status: 1 });
+            setStatusHeating(1);
           }
           // setStatus(data.status);
         } catch (error) {
@@ -272,7 +272,7 @@ function App() {
 
           console.log(res);
           if (res.message === "Off") {
-            setStatusHeating({ ...statusHeating, status: 0 });
+            setStatusHeating(0);
           }
           // setStatus(data.status);
         } catch (error) {
