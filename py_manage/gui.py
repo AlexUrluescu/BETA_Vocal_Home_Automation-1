@@ -460,12 +460,12 @@ class MainWindow(QMainWindow):
                 data = response.json()
                 print(data)
 
-                if self.treshlod == int(data[0]["temperature"]):
+                if self.treshlod == float(data[0]["temperature"]):
                     print("same temperature")
 
                 else:
                     # print(data[0]["temperature"])
-                    self.treshlod = int(data[0]["temperature"])
+                    self.treshlod = float(data[0]["temperature"])
                     self.id_treshold = data[0]["_id"]
                     # print(f"treshold = {self.treshlod}")
                     # print(f"id_treshold: {self.id_treshold}")
