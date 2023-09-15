@@ -422,7 +422,60 @@ class MainWindow(QMainWindow):
         # if(self.treshlod < int(self.temperature)):
         #     print("Ai depasit valoarea din casa")
         #     self.div_treshold.setStyleSheet("QWidget { background-color: white; border-radius: 75%; font-family: 'Poppins', sans-serif; border: none; }")
+
+    def get_data_senzors(self):
+        print("get_data_senzors ON")
+
+        # Varianta cu luat date de la senzori direct de la sursa -----------------------
+
+        # self.temp_senzor = self.senzor.get_t()
+        # self.home_temp_label.setText(f"{self.temp_senzor} °C")
+
+        # self.hum_senzor = self.senzor.get_h()
+        # self.home_hum_label.setText(f"{self.hum_senzor} %")
+
+        # Varianta cu luat date de la senzori direct de la API -----------------------
+        url = f"{self.url}/senzor"
+        print("iasa")
+
+        response = requests.get(url)
+
+        data = response.json()
+
+        # print(data)
+        print(f"Temp_Home: {data['temperature']}")
+        print(f"Hum_Home: {data['humidity']}")
+
+        self.temp_senzor = data['temperature']
+        self.home_temp_label.setText(f"{self.temp_senzor} °C")
+
+        self.hum_senzor = data['humidity']
+        self.home_hum_label.setText(f"{self.hum_senzor} %")
+
+        # print(f"STATUS = {self.status}")
+
+        if(self.treshlod > int(self.temp_senzor) and self.status == 1):
+            print("Ai depasit valoarea din casa TEST")
+            self.div_treshold.setStyleSheet("QWidget { background-color: white; border-radius: 75%; font-family: 'Poppins', sans-serif; border: 8px solid gold; }")
+
+        elif(self.treshlod < int(self.temp_senzor) and self.status == 1):
+            print("Ai depasit valoarea din casa TEST 2")
+            self.div_treshold.setStyleSheet("QWidget { background-color: white; border-radius: 75%; font-family: 'Poppins', sans-serif; border: none; }")
             
+        elif(self.treshlod < int(self.temp_senzor) and self.status == 0):
+            print("centrala oprita")
+            print(self.status)
+            self.div_treshold.setStyleSheet("QWidget { background-color: white; border-radius: 75%; font-family: 'Poppins', sans-serif; border: none; }")
+
+        else:
+            print("centrala oprita 2")
+            print(self.status)
+            self.div_treshold.setStyleSheet("QWidget { background-color: white; border-radius: 75%; font-family: 'Poppins', sans-serif; border: none; }")
+
+        # print(f"temp: {self.temp_senzor}")
+        # print(f"hum: {self.hum_senzor}") 
+
+
 
     def init_timer(self):
         print("timer")
@@ -484,35 +537,7 @@ class MainWindow(QMainWindow):
         self.timer_checker_treshold.timeout.connect(self.check_treshold)
         self.timer_checker_treshold.start()
 
-    def get_data_senzors(self):
-        self.temp_senzor = self.senzor.get_t()
-        self.home_temp_label.setText(f"{self.temp_senzor} °C")
 
-        self.hum_senzor = self.senzor.get_h()
-        self.home_hum_label.setText(f"{self.hum_senzor} %")
-
-        print(f"STATUS = {self.status}")
-
-        if(self.treshlod > int(self.temp_senzor) and self.status == 1):
-            print("Ai depasit valoarea din casa TEST")
-            self.div_treshold.setStyleSheet("QWidget { background-color: white; border-radius: 75%; font-family: 'Poppins', sans-serif; border: 8px solid gold; }")
-
-        elif(self.treshlod < int(self.temp_senzor) and self.status == 1):
-            print("Ai depasit valoarea din casa TEST 2")
-            self.div_treshold.setStyleSheet("QWidget { background-color: white; border-radius: 75%; font-family: 'Poppins', sans-serif; border: none; }")
-            
-        elif(self.treshlod < int(self.temp_senzor) and self.status == 0):
-            print("centrala oprita")
-            print(self.status)
-            self.div_treshold.setStyleSheet("QWidget { background-color: white; border-radius: 75%; font-family: 'Poppins', sans-serif; border: none; }")
-
-        else:
-            print("centrala oprita 2")
-            print(self.status)
-            self.div_treshold.setStyleSheet("QWidget { background-color: white; border-radius: 75%; font-family: 'Poppins', sans-serif; border: none; }")
-
-        print(f"temp: {self.temp_senzor}")
-        print(f"hum: {self.hum_senzor}")
 
 
 if __name__ == '__main__':
