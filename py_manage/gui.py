@@ -52,6 +52,9 @@ class MainWindow(QMainWindow):
         self.timer_insert = QTimer()
         self.timer_insert.setInterval(5000)
 
+        self.timer_checker_treshold = QTimer()
+        self.timer_checker_treshold.setInterval(2000)
+
         self.timer_checker_status = QTimer()
         self.timer_checker_status.setInterval(2000)
         
@@ -187,6 +190,7 @@ class MainWindow(QMainWindow):
 
         self.initUI()
         self.init_timer()
+        self.init_timer_checker_treshold()
         self.init_timer_checker_status()
 
     
@@ -439,8 +443,8 @@ class MainWindow(QMainWindow):
         self.timer.start(5000)
 
 
-    def check_temperature(self):
-        print("check_temperature ON")
+    def check_treshold(self):
+        print("check_treshold ON")
         url = f"{self.url}/heatingtemp"
         # print("iasa")
 
@@ -473,10 +477,59 @@ class MainWindow(QMainWindow):
             # self.id_status = data[0]["_id"]
 
 
+    def check_status(self):
+        print("check_status ON")
+        url = f"{self.url}/heatingstatus"
+        # print("iasa")
+
+        response = requests.get(url)
+
+        if response.status_code == 200:
+            data = response.json()
+            # print(data)
+            # print(data[0]["status"])
+            status_value = int(data[0]["status"])
+            
+            if self.status == status_value:
+                print("same status")
+            
+            else:
+                self.status = status_value
+                self.id_status = data[0]["_id"]
+                print(f"Status changed to {self.status}")
+
+                if self.status == 1:
+                    self.button_status = True
+                    self.change_status_slider(1)
+            
+                else:
+                    self.button_status = False
+                    self.change_status_slider(0)
+
+            # if self.status == 1:
+            #     self.button_status = True
+            #     self.change_status_slider(1)
+            
+            # else:
+            #     self.button_status = False
+            #     self.change_status_slider(0)
+
+            # print(self.status)
+            # print(type(self.status))
+
+        else:
+            print("nu s-a putut lua STATUS-UL")
+
     
+    def init_timer_checker_treshold(self):
+        print("check timer")
+        self.timer_checker_treshold.timeout.connect(self.check_treshold)
+        self.timer_checker_treshold.start()
+
+
     def init_timer_checker_status(self):
         print("check timer")
-        self.timer_checker_status.timeout.connect(self.check_temperature)
+        self.timer_checker_status.timeout.connect(self.check_status)
         self.timer_checker_status.start()
 
 
