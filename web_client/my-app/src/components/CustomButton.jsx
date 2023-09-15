@@ -1,9 +1,9 @@
 import React from "react";
 
-const CustomButton = ({ functie, classStyle, text }) => {
+const CustomButton = ({ functie, classStyle, text, textStyle }) => {
   return (
     <button onClick={functie} className={classStyle}>
-      {text}
+      <h1 className={textStyle}>{text}</h1>
     </button>
   );
 };

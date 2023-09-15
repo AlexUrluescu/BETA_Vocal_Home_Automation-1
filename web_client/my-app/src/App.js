@@ -29,8 +29,8 @@ socket.on("serverMessage", (data) => {
 
 function App() {
   // eslint-disable-next-line
-  const [tempHome, setTempHome] = useState(0);
-  const [humHome, setHumHome] = useState(0);
+  const [tempHome, setTempHome] = useState(23.0);
+  const [humHome, setHumHome] = useState(89);
   const [statusHeating, setStatusHeating] = useState(0);
   const [heatingTemp, setHeatingTemp] = useState(0);
 
@@ -45,8 +45,8 @@ function App() {
         const res = await fetch(`${url}/senzor`);
         const data = await res.json();
 
-        setTempHome(data.temperature);
-        setHumHome(data.humidity);
+        // setTempHome(data.temperature);
+        // setHumHome(data.humidity);
 
         console.log(data);
       } catch (error) {
@@ -286,25 +286,27 @@ function App() {
 
   return (
     <div className="App">
-      <div className="bg-slate-700 text-white flex justify-center items-center p-10 pb-20 sm:h-screen">
+      <div>
         <div className="p-3 w-screen">
-          <Title title="Smart Heating" classStyle="text-6xl" />
+          <Title title="Smart Heating" classStyle="text-6xl"/>
           <div className="flex flex-col gap-8 sm:flex-row">
             <div className="w-full p-5 sm:w-2/4 flex flex-col items-center justify-center">
               <Title
                 title="Home's data"
-                classStyle="mb-20 text-3xl font-semibold"
+                classStyle="text-3xl font-semibold"
               />
               <div className="flex flex-col items-center justify-center gap-10">
                 <CircleData
                   data={tempHome}
                   text="° C"
-                  classStyle="bg-gray-900 h-40 w-40 flex justify-center items-center rounded-full mb-4 text-6xl border-4 border-white-300"
+                  classStyle="drop"
+                  textStyle = "text_temp_home"
                 />
                 <CircleData
                   data={humHome}
                   text="%"
-                  classStyle="bg-gray-900 h-40 w-40 flex justify-center items-center rounded-full text-6xl border-4 border-white-300"
+                  classStyle="drop"
+                  textStyle = "text_hum_home"
                 />
               </div>
             </div>
@@ -329,13 +331,13 @@ function App() {
                   onToggle={handleSlider}
                 />
               </div>
-              <div className="flex justify-center items-center gap-4">
+              <div className="flex justify-center items-center gap-4 mt-24">
                 <Treshold
                   isToggled={isToggled}
                   tempHome={tempHome}
                   heatingTemp={heatingTemp}
-                  classStyle1="bg-gray-900 h-40 w-40 flex justify-center items-center rounded-full text-6xl border-8 border-yellow-300"
-                  classStyle2="bg-gray-900 h-40 w-40 flex justify-center items-center rounded-full text-6xl border-4 border-white-300"
+                  classStyle1="drop_btn_treshold_active"
+                  classStyle2="drop_btn_treshold"
                   // classStyle1="bg-gray-900 h-40 w-40 flex justify-center items-center rounded-full text-6xl border-4 border-white-300"
                   text="° C"
                 />
@@ -344,28 +346,32 @@ function App() {
                   <div className="flex flex-col h-full gap-20">
                     <CustomButton
                       functie={handlePLus}
-                      classStyle="btn"
+                      classStyle="drop_btn"
                       text="+"
+                      textStyle="text-7xl font-medium mt-2 ml-2"
                     />
 
                     <CustomButton
                       functie={handleMinus}
-                      classStyle="btn"
+                      classStyle="drop_btn"
                       text="-"
+                      textStyle="text-8xl font-medium mt-2 ml-2"
                     />
                   </div>
                 ) : (
                   <div className="flex flex-col h-full gap-20">
                     <CustomButton
                       functie={handleVoid}
-                      classStyle="btn"
+                      classStyle="drop_btn"
                       text="+"
+                      textStyle="text-7xl font-medium mt-2 ml-2"
                     />
 
                     <CustomButton
                       functie={handleVoid}
-                      classStyle="btn"
+                      classStyle="drop_btn"
                       text="-"
+                      textStyle="text-8xl font-medium mt-2 ml-2"
                     />
                   </div>
                 )}
