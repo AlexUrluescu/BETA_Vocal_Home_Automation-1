@@ -6,6 +6,11 @@ import json
 from PyQt5.QtCore import QTimer
 from senzor import dht_sensor
 
+# web socket libraries -------------------
+import asyncio
+import websockets
+
+
 app = QApplication(sys.argv)
 
 # const url = "http://localhost:5000"
@@ -28,6 +33,8 @@ class MainWindow(QMainWindow):
         self.button_status = True
         self.id_status = ""
 
+        self.change_treshold = 0
+
         self.senzor = dht_sensor()
         self.temp_senzor = ""
         self.hum_senzor = ""
@@ -44,6 +51,9 @@ class MainWindow(QMainWindow):
 
         self.timer_insert = QTimer()
         self.timer_insert.setInterval(5000)
+
+        self.timer_checker_treshold = QTimer()
+        self.timer_checker_treshold.setInterval(2000)
 
         self.timer_checker_status = QTimer()
         self.timer_checker_status.setInterval(2000)
@@ -180,6 +190,7 @@ class MainWindow(QMainWindow):
 
         self.initUI()
         self.init_timer()
+        self.init_timer_checker_treshold()
         self.init_timer_checker_status()
 
     
@@ -249,7 +260,7 @@ class MainWindow(QMainWindow):
         
         elif(value == 0):
             print("off")
-            print(f"Value pe off: {value}")
+            print(f"Value pe off2: {value}")
 
             self.slider.setValue(0)
             self.slider.setStyleSheet(self.stil_off)
@@ -378,11 +389,16 @@ class MainWindow(QMainWindow):
         
         if response.status_code == 200:
             print(response.text)
+            self.change_treshold = 0
         else:
            print(f"Eroare ({response.status_code}): {response.text}")        
         
 
     def button_plus_clicked(self):
+
+        # activate the change event of the treshold
+        self.change_treshold = 1
+
         print('s-a apasat plus')
         # print(self.test_tresh)
         # print(type(self.treshlod))
@@ -402,6 +418,10 @@ class MainWindow(QMainWindow):
 
 
     def button_minus_clicked(self):
+
+        # activate the change event of the treshold
+        self.change_treshold = 1
+
         print("s-a apasat minus")
 
         self.timer_alert.stop()
@@ -423,10 +443,93 @@ class MainWindow(QMainWindow):
         self.timer.start(5000)
 
 
+    def check_treshold(self):
+        print("check_treshold ON")
+        url = f"{self.url}/heatingtemp"
+        # print("iasa")
+
+        response = requests.get(url)
+
+        if response.status_code == 200:
+            if self.change_treshold == 1:
+                data = response.json()
+                print(data)
+                print("TRESHOLD IN CURS DE MODIFICARE")
+
+            else:
+                data = response.json()
+                print(data)
+
+                if self.treshlod == float(data[0]["temperature"]):
+                    print("same temperature")
+
+                else:
+                    # print(data[0]["temperature"])
+                    self.treshlod = float(data[0]["temperature"])
+                    self.id_treshold = data[0]["_id"]
+                    # print(f"treshold = {self.treshlod}")
+                    # print(f"id_treshold: {self.id_treshold}")
+                    self.treshold_label.setText(str(self.treshlod))
+
+
+            # print(data[0]["status"])
+            # self.status = int(data[0]["status"])
+            # self.id_status = data[0]["_id"]
+
+
+    def check_status(self):
+        print("check_status ON")
+        url = f"{self.url}/heatingstatus"
+        # print("iasa")
+
+        response = requests.get(url)
+
+        if response.status_code == 200:
+            data = response.json()
+            # print(data)
+            # print(data[0]["status"])
+            status_value = int(data[0]["status"])
+            
+            if self.status == status_value:
+                print("same status")
+            
+            else:
+                self.status = status_value
+                self.id_status = data[0]["_id"]
+                print(f"Status changed to {self.status}")
+
+                if self.status == 1:
+                    self.button_status = True
+                    self.change_status_slider(1)
+            
+                else:
+                    self.button_status = False
+                    self.change_status_slider(0)
+
+            # if self.status == 1:
+            #     self.button_status = True
+            #     self.change_status_slider(1)
+            
+            # else:
+            #     self.button_status = False
+            #     self.change_status_slider(0)
+
+            # print(self.status)
+            # print(type(self.status))
+
+        else:
+            print("nu s-a putut lua STATUS-UL")
+
     
+    def init_timer_checker_treshold(self):
+        print("check timer")
+        self.timer_checker_treshold.timeout.connect(self.check_treshold)
+        self.timer_checker_treshold.start()
+
+
     def init_timer_checker_status(self):
         print("check timer")
-        self.timer_checker_status.timeout.connect(self.fetch_status)
+        self.timer_checker_status.timeout.connect(self.check_status)
         self.timer_checker_status.start()
 
 
@@ -460,14 +563,28 @@ class MainWindow(QMainWindow):
         print(f"temp: {self.temp_senzor}")
         print(f"hum: {self.hum_senzor}")
 
+    
+    # async def connect_to_server(self):
+    #     uri = "ws://localhost:5000/socket.io/?EIO=4&transport=websocket"  # Replace with your server's WebSocket address
+    #     async with websockets.connect(uri) as websocket:
+    #         print("connected to server")
+    #         # You are now connected to the server
+    #         # You can send and receive messages here
+    #         while True:
+    #             message = await websocket.recv()
+    #             print(message)
+    #             # Handle the received message here
+
+
 
 if __name__ == '__main__':
-    
+
     window = MainWindow()
     window.fetch_status()
     window.fetch_heatingTemp()
     # window.fetch_dataSenzors()
     window.initUI()
     window.show()
+    # window.connect_to_server()
 
     sys.exit(app.exec_())
