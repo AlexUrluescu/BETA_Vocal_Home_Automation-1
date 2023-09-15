@@ -29,8 +29,8 @@ socket.on("serverMessage", (data) => {
 
 function App() {
   // eslint-disable-next-line
-  const [tempHome, setTempHome] = useState(23.0);
-  const [humHome, setHumHome] = useState(89);
+  const [tempHome, setTempHome] = useState(0);
+  const [humHome, setHumHome] = useState(0);
   const [statusHeating, setStatusHeating] = useState(0);
   const [heatingTemp, setHeatingTemp] = useState(0);
 
@@ -39,26 +39,28 @@ function App() {
   const [finalTemp, setFinalTemp] = useState();
   const [styleHeating, setStyleHeating] = useState(0);
 
-  // useEffect(() => {
-  //   const intervalId = setInterval(async () => {
-  //     try {
-  //       const res = await fetch(`${url}/senzor`);
-  //       const data = await res.json();
+  useEffect(() => {
+    const intervalId = setInterval(async () => {
+      try {
+        const res = await fetch(`${url}/senzor`);
+        const data = await res.json();
 
-  //       // setTempHome(data.temperature);
-  //       // setHumHome(data.humidity);
+        // setTempHome(data.temperature);
+        // setHumHome(data.humidity);
 
-  //       console.log(data);
-  //     } catch (error) {
-  //       console.log(error);
-  //     }
-  //   }, 5000);
+        console.log(data);
+        setTempHome(data.temperature);
+        setHumHome(data.humidity);
+      } catch (error) {
+        console.log(error);
+      }
+    }, 5000);
 
-  //   // Cleanup: oprește timer-ul când componenta se demontează
-  //   return () => {
-  //     clearInterval(intervalId);
-  //   };
-  // }, []);
+    // Cleanup: oprește timer-ul când componenta se demontează
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, []);
 
   useEffect(() => {
     try {
