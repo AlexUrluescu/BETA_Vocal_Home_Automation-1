@@ -5,6 +5,9 @@ import requests
 import json
 from PyQt5.QtCore import QTimer
 from senzor import dht_sensor
+import logging
+
+logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 
 app = QApplication(sys.argv)
 
@@ -28,12 +31,15 @@ class MainWindow(QMainWindow):
         self.button_status = True
         self.id_status = ""
 
+        # this variable stop the main timer when the treshold is changing
         self.change_treshold = 0
 
         self.senzor = dht_sensor()
         self.temp_senzor = ""
         self.hum_senzor = ""
 
+        # this timer controls when the user is changing the treshold with the buttons +/-
+        # when the timer is done, the function "active_alert" will be executed
         self.timer_alert = QTimer()
         self.timer_alert.setInterval(4000)
         self.timer_alert.setSingleShot(True)
@@ -53,6 +59,7 @@ class MainWindow(QMainWindow):
         self.timer_checker_treshold = QTimer()
         self.timer_checker_treshold.setInterval(2000)
 
+        # style for the slider when is ON
         self.stil_on = """
             QSlider::groove:horizontal {
                 background-color: #ddd;
@@ -67,7 +74,7 @@ class MainWindow(QMainWindow):
                     border-radius: 17px;
                 }
             """
-        
+        # style for the slider when is OFF
         self.stil_off = """
             QSlider::groove:horizontal {
                 background-color: #ddd;
@@ -90,16 +97,13 @@ class MainWindow(QMainWindow):
         humidity = "Hum"
         text_alert = "Alert"
 
-
-        print(f"status = {self.status}")
-
         # --------------- SLIDER -------------------------------------------
         self.slider = QSlider(self)
         self.slider.setOrientation(Qt.Horizontal)
         self.slider.setMinimum(0)
         self.slider.setMaximum(1)
         self.slider.setGeometry(460,70, 150, 20) 
-        self.slider.setValue(self.val)
+        # self.slider.setValue(self.val)
         self.slider.setFixedSize(135, 60)
         self.slider.valueChanged.connect(self.slider_value_changed)
 
@@ -183,18 +187,17 @@ class MainWindow(QMainWindow):
 
 
         self.initUI()
-        self.init_timer()
+        self.init_timer_data_senzors()
         self.init_timer_checker_status()
         self.init_timer_checker_treshold()
 
-    
+    # this function control the slider's value, when he is changing
     def slider_value_changed(self, value):
+        
         if(value == 0):
-            print("off")
-            print(f"Value pe off: {value}")
+            logging.debug(f"The slider is OFF with the value: {value}")
 
             self.slider.setStyleSheet(self.stil_off)
-            # print(self.button_status)
             self.button_status = False
             self.button_plus.setEnabled(self.button_status)
             self.button_minus.setEnabled(self.button_status)
@@ -206,21 +209,16 @@ class MainWindow(QMainWindow):
             response = requests.put(url, headers=headers, data=json_payload)
             
             if response.status_code == 200:
-                print(response.text)
                 self.status = 0
-                print(f"Status s-a schimbat in {self.status}")
+                logging.info(f"The STATUS changed to: {self.status}")
             else:
-                print(f"Eroare ({response.status_code}): {response.text}")
-
-            # print(self.button_status)
-            # print(self.test_status)
+                logging.info(f"Error ({response.status_code}): {response.text}")
 
         
         else:
-            print("on")
-            print(f"Value pe on: {value}")
+            logging.debug(f"The slider is ON with the value: {value}")
+
             self.slider.setStyleSheet(self.stil_on)
-            # print(self.button_status)
             self.button_status = True
             self.button_plus.setEnabled(self.button_status)
             self.button_minus.setEnabled(self.button_status)
@@ -234,49 +232,48 @@ class MainWindow(QMainWindow):
             if response.status_code == 200:
                 print(response.text)
                 self.status = 1
-                print(f"Status s-a schimbat in {self.status}")
+                logging.info(f"The STATUS changed to: {self.status}")
+
             else:
-                print(f"Eroare ({response.status_code}): {response.text}")
+                logging.info(f"Error ({response.status_code}): {response.text}")
 
-            # print(self.button_status)
-            # print(self.test_status)
 
+    # when we fetch the status, we use this function to update the slider status
     def change_status_slider(self, value):
         if(value == 1):
-            print("on")
-            print(f"Value pe on: {value}")
+            logging.debug(f"The slider is ON with the value: {value}")
+
             self.slider.setStyleSheet(self.stil_on)
             self.slider.setValue(1)
-            # print(self.button_status)
             self.button_status = True
             self.button_plus.setEnabled(self.button_status)
             self.button_minus.setEnabled(self.button_status)
         
         elif(value == 0):
-            print("off")
-            print(f"Value pe off: {value}")
+            logging.debug(f"The slider is ON with the value: {value}")
 
             self.slider.setValue(0)
             self.slider.setStyleSheet(self.stil_off)
-            # print(self.button_status)
             self.button_status = False
             self.button_plus.setEnabled(self.button_status)
             self.button_minus.setEnabled(self.button_status)
 
 
-    
+    # this function fetch the status when the app opens
     def fetch_status(self):
-        print("intra")
+        logging.debug("Fetching the endpoint heatingstatus ...")
         url = f"{self.url}/heatingstatus"
-        print("iasa")
 
         response = requests.get(url)
 
         if response.status_code == 200:
             data = response.json()
-            print(data)
-            print(data[0]["status"])
-            self.status = int(data[0]["status"])
+            logging.debug(f"heatingstatus: {data}")
+            logging.debug("Fetched the endpoint heatingstatus successfully")
+
+            status_value = int(data[0]["status"])
+            self.status = status_value
+            self.val = status_value
             self.id_status = data[0]["_id"]
 
             if self.status == 1:
@@ -287,56 +284,56 @@ class MainWindow(QMainWindow):
                 self.button_status = False
                 self.change_status_slider(0)
 
-            print(self.status)
-            print(type(self.status))
+            logging.info(f"Slider STATUS: {self.status}")
 
         else:
-            print("eroare")
+            logging.info("Error to fetching the endpoint heatingstatus")
 
     
+    # this function fecth the treshold value when the app opens
     def fetch_heatingTemp(self):
-        print("intra")
+        logging.debug("Fetching the endpoint heatingtemp ...")
         url = f"{self.url}/heatingtemp"
-        print("iasa")
-
+   
         response = requests.get(url)
 
         if response.status_code == 200:
             data = response.json()
-            print(data)
-            print(data[0]["temperature"])
-            self.treshlod = int(data[0]["temperature"])
+
+            logging.debug("Fetched the endpoint heatingtemp successfully")
+            logging.debug(f"heatingtemp: {data}")
+
+            treshold_value = int(data[0]["temperature"])
+            self.treshlod = treshold_value
             self.id_treshold = data[0]["_id"]
-            print(f"treshold = {self.treshlod}")
-            print(f"id_treshold: {self.id_treshold}")
+
+            logging.info(f"Treshold value: {self.treshlod}")
             self.treshold_label.setText(str(self.treshlod))
 
-
-            # print(self.treshlod)
-            # print(type(self.treshlod))
-
         else:
-            print("eroare")
+            logging.info("Error to fetching the endpoint heatingtemp")
+            
 
-    
-    def fetch_dataSenzors(self):
-        print("intra")
-        url = f"{self.url}/datasenzors"
-        print("iasa")
+# THIS FUNCTION FETCH THE SENZOR'S DATA FROM MONGO DB
 
-        response = requests.get(url)
+    # def fetch_dataSenzors(self):
+    #     print("intra")
+    #     url = f"{self.url}/datasenzors"
+    #     print("iasa")
 
-        if response.status_code == 200:
-            data = response.json()
-            print(data)
-            print(data[-1])
-            print(data[-1]["temperature"])
-            print(data[-1]["humidity"])
-            self.temperature = str(data[-1]["temperature"])
-            self.humidity = str(data[-1]["humidity"])
+    #     response = requests.get(url)
 
-        else:
-            print("eroare")
+    #     if response.status_code == 200:
+    #         data = response.json()
+    #         print(data)
+    #         print(data[-1])
+    #         print(data[-1]["temperature"])
+    #         print(data[-1]["humidity"])
+    #         self.temperature = str(data[-1]["temperature"])
+    #         self.humidity = str(data[-1]["humidity"])
+
+    #     else:
+    #         print("eroare")
 
 
     def initUI(self):
@@ -369,10 +366,11 @@ class MainWindow(QMainWindow):
         self.div_text_alert.hide()
 
 
+    # this function insert the treshold's value to Mongo DB
     def activate_alert(self):
         self.timer10.start()
 
-        print("shoot")
+        logging.debug("The function active_alert is running ...")
         self.div_text_alert.show()
 
         payload = {'temperature': self.treshlod}
@@ -382,18 +380,21 @@ class MainWindow(QMainWindow):
         response = requests.put(url, headers=headers, data=json_payload)
         
         if response.status_code == 200:
-            print(response.text)
+            logging.info(f"The activate_alert function was successfull, message: {response.text}")
+
+            # this variable controls when the treshold is changing, to not have timers conflict
             self.change_treshold = 0
+
+            logging.debug("The function active_alert is done successfully ...")
+
         else:
-           print(f"Eroare ({response.status_code}): {response.text}")        
+           logging.info(f"Error at activate_alert ({response.status_code}): {response.text}")       
         
 
+    # this function is for the + button
     def button_plus_clicked(self):
-        print('s-a apasat plus')
+        logging.debug("The + button was pressed")
         self.change_treshold = 1
-        # print(self.test_tresh)
-        # print(type(self.treshlod))
-        # print(self.treshlod)
   
         self.timer_alert.stop()
         self.timer_alert.start()
@@ -401,15 +402,10 @@ class MainWindow(QMainWindow):
         self.treshlod = self.treshlod + 0.5
         self.treshold_label.setText(str(self.treshlod))
 
-        # print(type(self.temperature))
 
-        # if(self.treshlod > int(self.temperature)):
-        #     print("Ai depasit valoarea din casa")
-        #     self.div_treshold.setStyleSheet("QWidget { background-color: white; border-radius: 75%; font-family: 'Poppins', sans-serif; border: 8px solid gold; }")
-
-
+    # this function is for the - button
     def button_minus_clicked(self):
-        print("s-a apasat minus")
+        logging.debug("The - button was pressed")
         self.change_treshold = 1
 
         self.timer_alert.stop()
@@ -418,91 +414,46 @@ class MainWindow(QMainWindow):
         self.treshlod = self.treshlod - 0.5
         self.treshold_label.setText(str(self.treshlod))
 
-        
-        # if(self.treshlod < int(self.temperature)):
-        #     print("Ai depasit valoarea din casa")
-        #     self.div_treshold.setStyleSheet("QWidget { background-color: white; border-radius: 75%; font-family: 'Poppins', sans-serif; border: none; }")
-            
 
-    def init_timer(self):
-        print("timer")
-        self.timer = QTimer()
-        self.timer.timeout.connect(self.get_data_senzors)
-        self.timer.start(5000)
-
-
-    
-    def init_timer_checker_status(self):
-        print("check timer")
-        self.timer_checker_status.timeout.connect(self.fetch_status)
-        self.timer_checker_status.start()
-
-
-    def check_treshold(self):
-        print("intra")
-        url = f"{self.url}/heatingtemp"
-        print("iasa")
-
-        response = requests.get(url)
-
-        if response.status_code == 200:
-            data = response.json()
-            treshold_value = float(data[0]["temperature"])
-
-            if self.change_treshold == 1:
-                print("the treshold is changing now")
-
-            
-            else:
-                print("check_treshold ON")
-                # data = response.json()
-
-                if treshold_value == self.treshlod:
-                    print("same treshold")
-
-                else:
-                    print("new value for treshold")
-                    # print(data)
-                    # print(data[0]["temperature"])
-                    self.treshlod = treshold_value
-                    # self.id_treshold = data[0]["_id"]
-                    print(f"treshold = {self.treshlod}")
-                    # print(f"id_treshold: {self.id_treshold}")
-                    self.treshold_label.setText(str(self.treshlod))
-
-
-                    # print(self.treshlod)
-                    # print(type(self.treshlod))
-
-        else:
-            print("nu s-a putut lua Treshold-ul")
-
-
-
-    def init_timer_checker_treshold(self):
-        print("check timer")
-        self.timer_checker_treshold.timeout.connect(self.check_treshold)
-        self.timer_checker_treshold.start()
-
+    # this function get senzor's data from the API (remote) or senzor class (local)
     def get_data_senzors(self):
+        print("get_data_senzors ON")
+
+        # Varianta cu luat date de la senzori direct de la sursa -----------------------
+
         self.temp_senzor = self.senzor.get_t()
         self.home_temp_label.setText(f"{self.temp_senzor} °C")
 
         self.hum_senzor = self.senzor.get_h()
         self.home_hum_label.setText(f"{self.hum_senzor} %")
 
-        print(f"STATUS = {self.status}")
+        # Varianta cu luat date de la senzori direct de la API -----------------------
+        # url = f"{self.url}/senzor"
+        # print("iasa")
+
+        # response = requests.get(url)
+
+        # data = response.json()
+
+        # print(f"Temp_Home: {data['temperature']}")
+        # print(f"Hum_Home: {data['humidity']}")
+
+        # self.temp_senzor = data['temperature']
+        # self.home_temp_label.setText(f"{self.temp_senzor} °C")
+
+        # self.hum_senzor = data['humidity']
+        # self.home_hum_label.setText(f"{self.hum_senzor} %")
 
         if(self.treshlod > int(self.temp_senzor) and self.status == 1):
-            print("Ai depasit valoarea din casa TEST")
+            logging.info("Heating fire mode is ON")
             self.div_treshold.setStyleSheet("QWidget { background-color: white; border-radius: 75%; font-family: 'Poppins', sans-serif; border: 8px solid gold; }")
 
         elif(self.treshlod < int(self.temp_senzor) and self.status == 1):
-            print("Ai depasit valoarea din casa TEST 2")
+            print("Heating fire mode is OFF")
             self.div_treshold.setStyleSheet("QWidget { background-color: white; border-radius: 75%; font-family: 'Poppins', sans-serif; border: none; }")
             
         elif(self.treshlod < int(self.temp_senzor) and self.status == 0):
-            print("centrala oprita")
+            print("Heating is OFF")
             print(self.status)
             self.div_treshold.setStyleSheet("QWidget { background-color: white; border-radius: 75%; font-family: 'Poppins', sans-serif; border: none; }")
 
@@ -511,8 +462,111 @@ class MainWindow(QMainWindow):
             print(self.status)
             self.div_treshold.setStyleSheet("QWidget { background-color: white; border-radius: 75%; font-family: 'Poppins', sans-serif; border: none; }")
 
-        print(f"temp: {self.temp_senzor}")
-        print(f"hum: {self.hum_senzor}")
+        logging.info(f"Temp: {self.temp_senzor}")
+        logging.info(f"Hum: {self.hum_senzor}")
+
+
+    # this timer calls every 5 sec the get_data_senzors function
+    def init_timer_data_senzors(self):
+        self.timer = QTimer()
+        self.timer.timeout.connect(self.get_data_senzors)
+        self.timer.start(5000)
+
+
+    def check_status(self):
+        logging.debug("The function check_status is running ...")
+
+        url = f"{self.url}/heatingstatus"
+
+        response = requests.get(url)
+
+        if response.status_code == 200:
+            data = response.json()
+
+            logging.debug("Fetched the endpoint heatingstatus successfully")
+            logging.debug(f"heatingstatus: {data}")
+
+            status_value = int(data[0]["status"])
+
+            logging.debug(f"Actual treshold value: {self.treshlod}")
+            logging.debug(f"Server treshold value: {status_value}")
+  
+            if status_value == self.status:
+                logging.info("Same status")
+
+            else:
+                self.status = status_value
+                self.id_status = data[0]["_id"]
+
+                if self.status == 1:
+                    self.button_status = True
+                    self.change_status_slider(1)
+                
+                else:
+                    self.button_status = False
+                    self.change_status_slider(0)
+
+                logging.info(f"Status value: {self.status}")
+
+        else:
+            logging.info("Error to fetching the heatingstatus endpoint at check_status function")
+
+
+    # this timer checks the slider status
+    def init_timer_checker_status(self):
+        self.timer_checker_status.timeout.connect(self.check_status)
+        self.timer_checker_status.start()
+
+
+    def check_treshold(self):
+        logging.debug("The function check_treshold is running ...")
+
+        url = f"{self.url}/heatingtemp"
+
+        response = requests.get(url)
+
+        if response.status_code == 200:
+            data = response.json()
+
+            logging.debug("Fetched the endpoint heatingstatus successfully")
+            logging.debug(f"heatingstatus: {data}")
+
+            treshold_value = float(data[0]["temperature"])
+
+            # if self.change_treshold is 1, means that the user is making changes with the +/- buttons
+            if self.change_treshold == 1:
+                logging.debug("The treshold is changing now")
+
+            
+            else:
+                logging.debug(f"Actual treshold value: {self.treshlod}")
+                logging.debug(f"Server treshold value: {treshold_value}")
+
+                if treshold_value == self.treshlod:
+                    logging.info("Same treshold")
+
+                else:
+                    logging.info("New treshold value")
+                    logging.debug(f"Old treshod value: {self.treshlod}")
+                    logging.debug(f"New treshod value: {treshold_value}")
+ 
+                    self.treshlod = treshold_value
+                    logging.info(f"Treshold: {self.treshlod}")
+       
+                    self.treshold_label.setText(str(self.treshlod))
+
+
+        else:
+            logging.info("Error to fetching the heatingstemp endpoint at check_treshold function")
+
+
+    # this timer check the treshold's value
+    def init_timer_checker_treshold(self):
+        print("check timer")
+        self.timer_checker_treshold.timeout.connect(self.check_treshold)
+        self.timer_checker_treshold.start()
+
+
 
 
 if __name__ == '__main__':
