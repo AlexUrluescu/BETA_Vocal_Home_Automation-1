@@ -1,4 +1,4 @@
-# import Adafruit_DHT
+import Adafruit_DHT
 import random
 class dht_sensor:
     def __init__(self):
