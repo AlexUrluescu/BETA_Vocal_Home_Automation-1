@@ -6,6 +6,7 @@ import json
 from PyQt5.QtCore import QTimer
 from senzor import dht_sensor
 import logging
+import time
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 
@@ -420,12 +421,15 @@ class MainWindow(QMainWindow):
         print("get_data_senzors ON")
 
         # Varianta cu luat date de la senzori direct de la sursa -----------------------
-
+        logging.info(f"Start time temp {time.time()}")
         self.temp_senzor = self.senzor.get_t()
         self.home_temp_label.setText(f"{self.temp_senzor} °C")
+        logging.info(f"Stop time temp {time.time()}")
 
+        logging.info(f"Start time hum {time.time()}")
         self.hum_senzor = self.senzor.get_h()
         self.home_hum_label.setText(f"{self.hum_senzor} %")
+        logging.info(f"Stop time hum {time.time()}")
 
         # Varianta cu luat date de la senzori direct de la API -----------------------
         # url = f"{self.url}/senzor"

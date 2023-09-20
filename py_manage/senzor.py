@@ -12,9 +12,10 @@ class dht_sensor:
         # return self.temperature
         humidity, temperature = Adafruit_DHT.read_retry(self.dht_sensor22, self.dht_pin)
         if humidity is not None and temperature is not None:
-            return str(round(temperature, 2))
+            return int(round(temperature, 2))
         else:
             print("Failed to retreive data from temperature sensor")
+            return 0
 
     def get_h(self):
         # self.humidity = random.randint(40,99)
@@ -24,3 +25,4 @@ class dht_sensor:
             return int(round(humidity, 2))
         else:
             print("Failed to retreive data from humidity sensor")
+            return 0
