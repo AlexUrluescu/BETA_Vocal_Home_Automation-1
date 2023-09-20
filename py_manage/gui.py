@@ -110,13 +110,13 @@ class MainWindow(QMainWindow):
         # ------------------------- BUTTONS ----------------------------------------------------------------------
         self.button_plus = QPushButton('+', self)
         self.button_plus.setGeometry(605, 110, 80, 80)
-        self.button_plus.setStyleSheet("QPushButton { width: 50px; height: 50px; border-radius: 40%; background-color: gold; font-size: 45px; font-family: 'Poppins', sans-serif;}")
+        self.button_plus.setStyleSheet("QPushButton { width: 50px; height: 50px; border-radius: 40%; background-color: #D8D9DA; font-size: 45px; font-family: 'Poppins', sans-serif;}")
         self.button_plus.setEnabled(self.button_status)
         self.button_plus.clicked.connect(self.button_plus_clicked)
 
         self.button_minus = QPushButton('-', self)
         self.button_minus.setGeometry(605, 270, 80, 80)
-        self.button_minus.setStyleSheet("QPushButton { width: 50px; height: 50px; border-radius: 40%; background-color: gold; font-size: 45px; font-family: 'Poppins', sans-serif; }")
+        self.button_minus.setStyleSheet("QPushButton { width: 50px; height: 50px; border-radius: 40%; background-color: #D8D9DA; font-size: 45px; font-family: 'Poppins', sans-serif; }")
         self.button_minus.setEnabled(self.button_status)
         self.button_minus.clicked.connect(self.button_minus_clicked)
 
@@ -338,7 +338,7 @@ class MainWindow(QMainWindow):
 
     def initUI(self):
         print("intra imagine")
-        self.setStyleSheet("background-color: rgb(12, 74, 110);")
+        self.setStyleSheet("background-color: #F0F0F0;")
 
         # ------------------------ VARIABLES --------------------------------------------------------------------
 
