@@ -446,7 +446,7 @@ class MainWindow(QMainWindow):
 
         # if the senzor fetch a real humidity we will update the value in the interface
         else:
-            self.hum_senzor = self.senzor.get_h()
+            self.hum_senzor = hum_senzor_return
             self.home_hum_label.setText(f"{self.hum_senzor} %")
 
         # Varianta cu luat date de la senzori direct de la API -----------------------
