@@ -62,7 +62,8 @@ class MainWindow(QMainWindow):
         self.timer_checker_treshold.setInterval(2000)
 
         # error counters
-        self.error_senzor_counter = 50
+        self.error_senzor_counter = 0
+
 
         # style for the slider when is ON
         self.stil_on = """
@@ -495,8 +496,12 @@ class MainWindow(QMainWindow):
             self.error_senzor_counter = 0
 
         
-        if self.error_senzor_counter == 50:
-            self.div_error_hardware.show()
+        if self.error_senzor_counter >= 50:
+            if(self.div_error_hardware.isVisible()):
+                logging.info("The hardware error is already on screen")
+            
+            else:  
+                self.div_error_hardware.show()
 
 
         # Varianta cu luat date de la senzori direct de la API -----------------------
