@@ -424,6 +424,8 @@ class MainWindow(QMainWindow):
 
         # first we fetch what the senzor returns, if he returns 0 means that he doesn't fetch the temperature
         temp_senzor_return = self.senzor.get_t()
+        logging.info(f"Temp return: {temp_senzor_return}")
+        logging.info(f"Temp return type: {type(temp_senzor_return)}")
 
         if temp_senzor_return == 0:
             logging.info("The senzor doesn't fetch the temperature")
@@ -436,6 +438,8 @@ class MainWindow(QMainWindow):
 
         # first we fetch what the senzor returns, if he returns 0 means that he doesn't fetch the humidity
         hum_senzor_return = self.senzor.get_h()
+        logging.info(f"Hum return: {hum_senzor_return}")
+        logging.info(f"Hum return type: {type(hum_senzor_return)}")
 
         if hum_senzor_return == 0:
             logging.info("The senzor doesn't fetch the humidity")
