@@ -28,6 +28,7 @@ class MainWindow(QMainWindow):
         self.temperature = ""
         self.humidity = ""
         self.text_alert = "Temperatura a fost actualizata"
+        self.text_error_hardware = "Check your hardware"
         self.val = 30
         self.button_status = True
         self.id_status = ""
@@ -59,6 +60,9 @@ class MainWindow(QMainWindow):
         
         self.timer_checker_treshold = QTimer()
         self.timer_checker_treshold.setInterval(2000)
+
+        # error counters
+        self.error_senzor_counter = 50
 
         # style for the slider when is ON
         self.stil_on = """
@@ -97,6 +101,7 @@ class MainWindow(QMainWindow):
         temperature = "Temp"
         humidity = "Hum"
         text_alert = "Alert"
+        text_error_hardware = "The hardware has an error"
 
         # --------------- SLIDER -------------------------------------------
         self.slider = QSlider(self)
@@ -143,6 +148,12 @@ class MainWindow(QMainWindow):
         self.div_text_alert.move(400, 20)
         self.div_text_alert.hide()
 
+        self.div_error_hardware = QWidget(self)
+        self.div_error_hardware.setStyleSheet("QWidget { font-family: 'Poppins', sans-serif; }")
+        self.div_error_hardware.setFixedSize(250, 40)
+        self.div_error_hardware.move(110, 7)
+        self.div_error_hardware.hide()
+
 
         # ------------------------- LAYOUT CONTAINERS -------------------------
         self.div_treshold_layout = QVBoxLayout(self.div_treshold)
@@ -156,6 +167,9 @@ class MainWindow(QMainWindow):
 
         self.div_text_alert_layout = QVBoxLayout(self.div_text_alert)
         self.div_text_alert.setLayout(self.div_text_alert_layout)
+
+        self.div_error_hardware_layout = QVBoxLayout(self.div_error_hardware)
+        self.div_error_hardware.setLayout(self.div_error_hardware_layout)
 
         # -------------------------- LABELS -----------------------------------
         self.treshold_label = QLabel(treshold, self.div_treshold)
@@ -174,17 +188,23 @@ class MainWindow(QMainWindow):
         self.text_alert_label.setStyleSheet(" QLabel { font-size: 20px; color: white; }")
         self.text_alert_label.setText(f"{self.text_alert}")
 
+        self.text_error_hardware_label = QLabel(text_error_hardware, self.div_error_hardware)
+        self.text_error_hardware_label.setStyleSheet(" QLabel { color: red; font-family: 'Arial'; font-size: 15px;}")
+        self.text_error_hardware_label.setText(f"{self.text_error_hardware}")
+
         # ------------------------ LAYOUT ADDS ------------------------------
         self.div_treshold_layout.addWidget(self.treshold_label)
         self.div_home_temp_layout.addWidget(self.home_temp_label)
         self.div_home_hum_layout.addWidget(self.home_hum_label)
         self.div_text_alert_layout.addWidget(self.text_alert_label)
+        self.div_error_hardware_layout.addWidget(self.text_error_hardware_label)
 
         # ------------------------ CENTER THE LABELS ---------------------------
         self.div_treshold_layout.setAlignment(Qt.AlignCenter) 
         self.div_home_temp_layout.setAlignment(Qt.AlignCenter) 
         self.div_home_hum_layout.setAlignment(Qt.AlignCenter)  
         self.div_text_alert_layout.setAlignment(Qt.AlignCenter)  
+        self.div_error_hardware_layout.setAlignment(Qt.AlignCenter)  
 
 
         self.initUI()
@@ -416,9 +436,21 @@ class MainWindow(QMainWindow):
         self.treshold_label.setText(str(self.treshlod))
 
 
+
     # this function get senzor's data from the API (remote) or senzor class (local)
     def get_data_senzors(self):
         logging.info("get_data_senzors ON")
+
+        # for testing local ------------------------------
+        # self.temp_senzor = 20
+        # self.home_temp_label.setText(f"{self.temp_senzor} °C")
+
+        # self.hum_senzor = 80
+        # self.home_hum_label.setText(f"{self.hum_senzor} %")
+
+        # if self.error_senzor_counter >= 50:
+        #     self.div_error_hardware.show()
+
 
         # Varianta cu luat date de la senzori direct de la sursa -----------------------
 
@@ -430,10 +462,16 @@ class MainWindow(QMainWindow):
         if temp_senzor_return == 0:
             logging.info("The senzor doesn't fetch the temperature")
 
+            # increment the variable error_senzor_counter every time the senzor doesn't fetch the temperature
+            self.error_senzor_counter = self.error_senzor_counter + 1
+
         # if the senzor fetch a real temperature we will update the value in the interface
         else:
             self.temp_senzor = temp_senzor_return
             self.home_temp_label.setText(f"{self.temp_senzor} °C")
+
+            # reset the error_senzor_counter to 0, because he returned a correct value
+            self.error_senzor_counter = 0
 
 
         # first we fetch what the senzor returns, if he returns 0 means that he doesn't fetch the humidity
@@ -444,10 +482,22 @@ class MainWindow(QMainWindow):
         if hum_senzor_return == 0:
             logging.info("The senzor doesn't fetch the humidity")
 
+            # increment the variable error_senzor_counter every time the senzor doesn't fetch the humidity
+            self.error_senzor_counter = self.error_senzor_counter + 1
+
+
         # if the senzor fetch a real humidity we will update the value in the interface
         else:
             self.hum_senzor = hum_senzor_return
             self.home_hum_label.setText(f"{self.hum_senzor} %")
+
+            # reset the error_senzor_counter to 0, because he returned a correct value
+            self.error_senzor_counter = 0
+
+        
+        if self.error_senzor_counter == 50:
+            self.div_error_hardware.show()
+
 
         # Varianta cu luat date de la senzori direct de la API -----------------------
         # url = f"{self.url}/senzor"
