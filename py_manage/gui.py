@@ -418,18 +418,32 @@ class MainWindow(QMainWindow):
 
     # this function get senzor's data from the API (remote) or senzor class (local)
     def get_data_senzors(self):
-        print("get_data_senzors ON")
+        logging.info("get_data_senzors ON")
 
         # Varianta cu luat date de la senzori direct de la sursa -----------------------
-        logging.info(f"Start time temp {time.time()}")
-        self.temp_senzor = self.senzor.get_t()
-        self.home_temp_label.setText(f"{self.temp_senzor} °C")
-        logging.info(f"Stop time temp {time.time()}")
 
-        logging.info(f"Start time hum {time.time()}")
-        self.hum_senzor = self.senzor.get_h()
-        self.home_hum_label.setText(f"{self.hum_senzor} %")
-        logging.info(f"Stop time hum {time.time()}")
+        # first we fetch what the senzor returns, if he returns 0 means that he doesn't fetch the temperature
+        temp_senzor_return = self.senzor.get_t()
+
+        if temp_senzor_return == 0:
+            logging.info("The senzor doesn't fetch the temperature")
+
+        # if the senzor fetch a real temperature we will update the value in the interface
+        else:
+            self.temp_senzor = temp_senzor_return
+            self.home_temp_label.setText(f"{self.temp_senzor} °C")
+
+
+        # first we fetch what the senzor returns, if he returns 0 means that he doesn't fetch the humidity
+        hum_senzor_return = self.senzor.get_h()
+
+        if hum_senzor_return == 0:
+            logging.info("The senzor doesn't fetch the humidity")
+
+        # if the senzor fetch a real humidity we will update the value in the interface
+        else:
+            self.hum_senzor = self.senzor.get_h()
+            self.home_hum_label.setText(f"{self.hum_senzor} %")
 
         # Varianta cu luat date de la senzori direct de la API -----------------------
         # url = f"{self.url}/senzor"
