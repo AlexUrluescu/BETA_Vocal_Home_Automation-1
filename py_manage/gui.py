@@ -5,8 +5,11 @@ import requests
 import json
 from PyQt5.QtCore import QTimer
 from senzor import dht_sensor
+import heating_control
 import logging
 import time
+import check_internet_connection
+from threading import Thread
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 
@@ -26,6 +29,7 @@ class MainWindow(QMainWindow):
         self.treshlod = 0
         self.id_treshold = ""
         self.temperature = ""
+        self.hysteresis = 0.5
         self.humidity = ""
         self.text_alert = "Temperatura a fost actualizata"
         self.text_error_hardware = "Check your hardware"
@@ -37,6 +41,7 @@ class MainWindow(QMainWindow):
         self.change_treshold = 0
 
         self.senzor = dht_sensor()
+        self.heating_system = heating_control.heating_system(False)
         self.temp_senzor = ""
         self.hum_senzor = ""
 
@@ -209,13 +214,21 @@ class MainWindow(QMainWindow):
 
 
         self.initUI()
+        self.infinite_loop_for_internet_access_check()
         self.init_timer_data_senzors()
         self.init_timer_checker_status()
         self.init_timer_checker_treshold()
 
+    def infinite_loop_for_internet_access_check():
+        """ Create a thread with an infinite loop where internet connection is checked"""
+        internet_check = check_internet_connection.internet_checker()
+        
+
+        
+        
+
     # this function control the slider's value, when he is changing
     def slider_value_changed(self, value):
-        
         if(value == 0):
             logging.debug(f"The slider is OFF with the value: {value}")
 
@@ -520,25 +533,20 @@ class MainWindow(QMainWindow):
 
         # self.hum_senzor = data['humidity']
         # self.home_hum_label.setText(f"{self.hum_senzor} %")
-
-        if(self.treshlod > int(self.temp_senzor) and self.status == 1):
-            logging.info("Heating fire mode is ON")
-            self.div_treshold.setStyleSheet("QWidget { background-color: white; border-radius: 75%; font-family: 'Poppins', sans-serif; border: 8px solid gold; }")
-
-        elif(self.treshlod < int(self.temp_senzor) and self.status == 1):
-            print("Heating fire mode is OFF")
-            self.div_treshold.setStyleSheet("QWidget { background-color: white; border-radius: 75%; font-family: 'Poppins', sans-serif; border: none; }")
-            
-        elif(self.treshlod < int(self.temp_senzor) and self.status == 0):
-            print("Heating is OFF")
-            print(self.status)
-            self.div_treshold.setStyleSheet("QWidget { background-color: white; border-radius: 75%; font-family: 'Poppins', sans-serif; border: none; }")
-
+        if self.status == 0:
+            logging.info("Heating system is OFF")
+            self.heating_system.heating_off()
+            self.div_treshold.setStyleSheet("QWidget { background-color: white; border-radius: 75%; font-family: 'Poppins', sans-serif; border: none; }")    
         else:
-            print("centrala oprita 2")
-            print(self.status)
-            self.div_treshold.setStyleSheet("QWidget { background-color: white; border-radius: 75%; font-family: 'Poppins', sans-serif; border: none; }")
-
+            if(self.treshlod >= (int(self.temp_senzor) + self.hysteresis)):
+                logging.info("Heating system is ON")
+                self.heating_system.heating_on()
+                self.div_treshold.setStyleSheet("QWidget { background-color: white; border-radius: 75%; font-family: 'Poppins', sans-serif; border: 8px solid gold; }")
+            else:
+                logging.info("Heating system is OFF")
+                self.heating_system.heating_off()
+                self.div_treshold.setStyleSheet("QWidget { background-color: white; border-radius: 75%; font-family: 'Poppins', sans-serif; border: none; }")
+            
         logging.info(f"Temp: {self.temp_senzor}")
         logging.info(f"Hum: {self.hum_senzor}")
 
@@ -639,7 +647,7 @@ class MainWindow(QMainWindow):
 
     # this timer check the treshold's value
     def init_timer_checker_treshold(self):
-        print("check timer")
+        logging.debug("check timer")
         self.timer_checker_treshold.timeout.connect(self.check_treshold)
         self.timer_checker_treshold.start()
 
