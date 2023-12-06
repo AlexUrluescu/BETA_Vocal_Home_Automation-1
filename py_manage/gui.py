@@ -8,14 +8,32 @@ from senzor import dht_sensor
 import heating_control
 import logging
 import time
-import check_internet_connection
+from check_internet_connection import internet_checker
 from threading import Thread
+from PyQt5.QtCore import QThread, pyqtSignal, QObject
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 
 app = QApplication(sys.argv)
 
 # const url = "http://localhost:5000"
+
+class MyThread(QThread):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.internet_checker = internet_checker()
+        self.finished = pyqtSignal()
+
+    def run(self):
+        internet_connection = self.internet_checker.check_internet_connection()
+        if(internet_connection):
+            logging.info("Exists internet")
+        
+        else:
+            logging.info("Doesn't exists internet")
+
+        self.finished.emit()
+
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -44,6 +62,11 @@ class MainWindow(QMainWindow):
         self.heating_system = heating_control.heating_system(False)
         self.temp_senzor = ""
         self.hum_senzor = ""
+
+        self.internet_checker = internet_checker()
+
+        # initialize the heating system class
+        # self.heating_system = heating_system()
 
         # this timer controls when the user is changing the treshold with the buttons +/-
         # when the timer is done, the function "active_alert" will be executed
@@ -100,8 +123,17 @@ class MainWindow(QMainWindow):
                     border-radius: 17px;
                 }
             """
+        
 
-        self.status_test = 0
+    # def start_task(self):
+    #     self.thread = MyThread()
+    #     self.thread.finished.connect(self.task_finished)
+    #     self.thread.start()
+
+    # def task_finished(self):
+    #     self.label.setText("Task finished!")
+
+    #     self.status_test = 0
 
         treshold = ""
         temperature = "Temp"
@@ -214,14 +246,14 @@ class MainWindow(QMainWindow):
 
 
         self.initUI()
-        self.infinite_loop_for_internet_access_check()
+        # self.infinite_loop_for_internet_access_check()
         self.init_timer_data_senzors()
         self.init_timer_checker_status()
         self.init_timer_checker_treshold()
 
-    def infinite_loop_for_internet_access_check():
-        """ Create a thread with an infinite loop where internet connection is checked"""
-        internet_check = check_internet_connection.internet_checker()
+    # def infinite_loop_for_internet_access_check():
+    #     """ Create a thread with an infinite loop where internet connection is checked"""
+    #     internet_check = check_internet_connection.internet_checker()
         
 
         
@@ -497,7 +529,7 @@ class MainWindow(QMainWindow):
             logging.info("The senzor doesn't fetch the humidity")
 
             # increment the variable error_senzor_counter every time the senzor doesn't fetch the humidity
-            self.error_senzor_counter = self.error_senzor_counter + 1
+            self.error_senzor_counter: int = self.error_senzor_counter + 1
 
 
         # if the senzor fetch a real humidity we will update the value in the interface
@@ -506,7 +538,7 @@ class MainWindow(QMainWindow):
             self.home_hum_label.setText(f"{self.hum_senzor} %")
 
             # reset the error_senzor_counter to 0, because he returned a correct value
-            self.error_senzor_counter = 0
+            self.error_senzor_counter: int = 0
 
         
         if self.error_senzor_counter >= 50:
@@ -515,6 +547,13 @@ class MainWindow(QMainWindow):
             
             else:  
                 self.div_error_hardware.show()
+
+        if(self.hum_senzor != 0 and self.temp_senzor!=0):
+            internet_connection: bool = self.internet_checker.check_internet_connection()
+            if internet_connection:
+                logging.info("exists connection")
+            else:
+                logging.info("doesn't exist connection")
 
 
         # Varianta cu luat date de la senzori direct de la API -----------------------
