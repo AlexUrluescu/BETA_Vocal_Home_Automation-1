@@ -1,18 +1,24 @@
+import sqlite3
 import pymongo
 from dotenv import load_dotenv
 import os
 from senzor import dht_sensor
 from datetime import datetime
+import logging
 
 senzor = dht_sensor()
+logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 
-class connMongo():
+class MongoDatabase():
     def __init__(self, url, colection):
         self.url = url
         self.colection = colection
 
+        self.connection: sqlite3.Connection = sqlite3.connect('data.db')
+        self.cursor: sqlite3.Cursor = self.connection.cursor()
 
-    def insert_data_cloud(self, temperature, humidity):
+
+    def insert(self, temperature, humidity):
         try:
             client = pymongo.MongoClient(self.url)
 
@@ -24,8 +30,8 @@ class connMongo():
             for document in documents:
                 data = document
 
-            print(temperature)
-            print(humidity)
+            logging.info(temperature)
+            logging.info(humidity)
 
             current_date = datetime.now().strftime('%Y-%m-%d')
 
@@ -37,12 +43,12 @@ class connMongo():
 
             rezultat = colection.insert_one(doc)
 
-            print("ID-ul documentului inserat:", rezultat.inserted_id)
+            logging.info("ID-ul documentului inserat:", rezultat.inserted_id)
 
             client.close()
 
         except Exception:
-            print("Error " + Exception)
+            logging.info("Error " + Exception)
 
     
     def insert_data(self, list_data):
@@ -53,8 +59,8 @@ class connMongo():
             db = client.mongodb
             colection = db[self.colection]
 
-            print("urmeaza date")
-            print(list_data)
+            logging.info("urmeaza date")
+            logging.info(list_data)
 
             formatted_data = [
                 {"temperature": item[0], "humidity": item[1], "date": item[2]}
@@ -63,18 +69,18 @@ class connMongo():
             ]
 
             for item in list_data:
-                print(item[1])
-                print(item[2])
+                logging.info(item[1])
+                logging.info(item[2])
 
             # Inserarea datelor în colecție
             colection.insert_many(formatted_data)
 
             # rezultat = colection.insert_one(list_data)
 
-            print("Datele s-au insertat cu succes")
+            logging.info("Datele s-au insertat cu succes")
 
             client.close()
 
         except Exception:
-            print("Error " + str(Exception))
+            logging.info("Error " + str(Exception))
 

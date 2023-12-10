@@ -4,113 +4,27 @@ import sqlite3
 from dotenv import load_dotenv
 import os
 from senzor import dht_sensor
-from mongodb import connMongo
+from mongodb import MongoDatabase
 from datetime import datetime
+import logging
+
+logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 
 class internet_checker():
-    def __init__(self):
-        pass
+    def __init__(self, databaseName):
+        self.connection: sqlite3.Connection = sqlite3.connect(databaseName)
+        self.cursor: sqlite3.Cursor = self.connection.cursor()
         # self.timer = timer
 
-    def check_internet_connection(self):
-        url = "http://www.google.com"
-        timeout = 5
+    def check_internet_connection(self) -> bool:
+        url: str = "http://www.google.com"
+        timeout: int = 5
         try:
             urllib.request.urlopen(url, timeout=timeout)
             return True
         except urllib.request.URLError:
             return False
 
-
-    def create_local_database(self):
-        conn = sqlite3.connect('data.db') # Conexiunea la baza de date (se creează dacă nu există)
-        cursor = conn.cursor()
-
-        # Creează tabela 'weather' cu cele trei coloane: temperatura, umiditate și data
-        cursor.execute('''CREATE TABLE IF NOT EXISTS data (
-                            temperature REAL,
-                            humidity REAL,
-                            data TEXT
-                        )''')
-
-        conn.commit() # Salvează modificările
-        conn.close()  # Închide conexiunea
-
-    def create_local_dbStatus(self):
-        conn = sqlite3.connect("data.db")
-        c = conn.cursor()
-        c.execute("CREATE TABLE IF NOT EXISTS status_db (id INTEGER PRIMARY KEY, status NUMBER)")
-        conn.commit()
-        conn.close()
-
-
-    def insert_data_local(self, temperature, humidity):
-        try:
-            conn = sqlite3.connect('data.db')
-            cursor = conn.cursor()
-
-            # Obține data curentă și convert-o la formatul dorit (YYYY-MM-DD)
-            data_curenta = datetime.now().strftime('%Y-%m-%d')
-
-
-            # Inserează datele în tabela 'weather'
-            cursor.execute('INSERT INTO data (temperature, humidity, data) VALUES (?, ?, ?)',
-                        (temperature, humidity, data_curenta))
-
-            conn.commit()
-            conn.close()
-        
-        except sqlite3.Error as err:
-            print("Eroare de inserare:", err)
-
-
-    def insert_status_local(self, status):
-        try:
-            conn = sqlite3.connect("data.db")
-            c = conn.cursor()
-
-            c.execute(f"INSERT INTO status_db (status) VALUES ({status})")
-
-            conn.commit()
-            conn.close()
-        except sqlite3.Error as err:
-            print("Eroare de inserare:", err)
-
-    
-    def get_local_data(self, data_list):
-        try:
-            conn = sqlite3.connect("data.db")
-            c = conn.cursor()
-
-            c.execute("SELECT * FROM data")
-
-            data = c.fetchall()
-            print(data)
-
-            data_list = data
-
-            conn.commit()
-            conn.close()
-
-            return data
-        
-        except sqlite3.Error as err:
-            print("Eroare de inserare:", err)
-
-
-    def delete_local_data(self, name_table):
-        try:
-            conn = sqlite3.connect("data.db")
-            c = conn.cursor()
-
-            c.execute(f"DELETE FROM {name_table}")
-
-            print("datele s-au sters")
-
-            conn.commit()
-            conn.close()
-        except sqlite3.Error as err:
-            print("Eroare de inserare:", err)
 
 
 # senzor = dht_sensor()
@@ -124,7 +38,7 @@ class internet_checker():
 
 # checker = internet_checker(5)
 
-# mongo =  connMongo(URL_CONN, COLECTION)
+# mongo =  Database(URL_CONN, COLECTION)
 
 
 # while True:
