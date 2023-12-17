@@ -15,6 +15,8 @@ logging.info(f"URL_CONN: {URL_CONNECTION_DB}")
 logging.info(f"COLLECTION_NAME: {COLLECTION_NAME}")
 
 
+
+
 class GuiFlow():
 
     def __init__(self):
@@ -29,14 +31,33 @@ class GuiFlow():
             try:
                 logging.info("intra in net")
 
-                MongoDatabase.insert(temperature=temperature, humidity=humidity)
+                data: list[str] =  self.localDatabase.getData();
+                logging.info(f"data from local: {data}")
+
+                if(len(data) != 0):
+                     logging.info(f"Exist local data: {data}")
+
+                     self.mongoDatabase.insert_data(data)
+                     self.localDatabase.delete()
+                
+                else:
+                     logging.info(f"dont exist local data")
+
+                self.mongoDatabase.insert(temperature=temperature, humidity=humidity)
         
-            except:
-                pass
+
+            except Exception:
+                logging.info(Exception)
         
         else:
                 logging.info("intra in fara net")
-                success: bool = LocalDatabase.create()
+                success: bool = self.localDatabase.create()
+                self.localDatabase.insert(temperature=temperature, humidity=humidity)
+
+
+                data =  self.localDatabase.getData();
+                logging.info(f"data from local: {data}")
+
                 return success
 
 
@@ -44,6 +65,7 @@ class GuiFlow():
 
 guiFlow = GuiFlow()
 
-result: str = guiFlow.insertDataIntoDB(temperature=23, humidity=99)
+result: str = guiFlow.insertDataIntoDB(temperature=99, humidity=105)
+
 
 logging.info(f"result: {result}")

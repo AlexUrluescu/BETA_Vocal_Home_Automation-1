@@ -17,20 +17,18 @@ class LocalDatabase():
 
     
     def getData(self) -> list[str]:
-        self.cursor.execute("SELECT * FROM data")
 
-        data: list[str] = self.cursor.fetchall()
-
-        self.connection.commit()
-        self.connection.close()
+        connection = sqlite3.connect(self.databaseName)
+        cursor = connection.cursor()
+        cursor.execute('SELECT * FROM data;')
+        data = cursor.fetchall()
+        cursor.close()
+        connection.close()
 
         return data
 
     
-    def create():
-        # conn: sqlite3.Connection = sqlite3.connect('data.db') # Conexiunea la baza de date (se creează dacă nu există)
-        # cursor: sqlite3.Cursor = conn.cursor()
-
+    def create(self):
         # Creează tabela 'weather' cu cele trei coloane: temperatura, umiditate și data
         try:    
             connection = sqlite3.connect("data.db")
@@ -84,8 +82,6 @@ class LocalDatabase():
 
     def insertStatus(self, status: str):
         try:
-            # conn = sqlite3.connect("data.db")
-            # c = conn.cursor()
 
             self.cursor.execute(f"INSERT INTO status_db (status) VALUES ({status})")
 
@@ -95,15 +91,15 @@ class LocalDatabase():
             logging.info(f"Eroare into the insert_status_local method: {error}")
 
 
-    def delete(self, name_table):
+    def delete(self):
         try:
-            # conn = sqlite3.connect("data.db")
-            # c = conn.cursor()
-            self.cursor.execute(f"DELETE FROM {name_table}")
-
+            connection = sqlite3.connect('data.db')
+            cursor = connection.cursor()
+            cursor.execute("DELETE FROM data;")
             logging.info("the local data was deleted successfully")
 
-            self.connection.commit()
-            self.connection.close()
+            connection.commit()
+            connection.close()
+
         except sqlite3.Error as error:
             logging.info(f"Error into the delete_local_data method: {error}")

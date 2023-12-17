@@ -14,24 +14,14 @@ class MongoDatabase():
         self.url = url
         self.colection = colection
 
-        self.connection: sqlite3.Connection = sqlite3.connect('data.db')
-        self.cursor: sqlite3.Cursor = self.connection.cursor()
-
-
     def insert(self, temperature, humidity):
         try:
+            logging.info(f"temp: {temperature}")
+            logging.info(f"hum: {humidity}")
             client = pymongo.MongoClient(self.url)
 
             db = client.mongodb
             colection = db[self.colection]
-
-            documents = colection.find()
-
-            for document in documents:
-                data = document
-
-            logging.info(temperature)
-            logging.info(humidity)
 
             current_date = datetime.now().strftime('%Y-%m-%d')
 
@@ -41,9 +31,9 @@ class MongoDatabase():
                 "date": current_date,
             }
 
-            rezultat = colection.insert_one(doc)
+            logging.info(f"doc: ${doc}")
 
-            logging.info("ID-ul documentului inserat:", rezultat.inserted_id)
+            colection.insert_one(doc)
 
             client.close()
 
@@ -51,7 +41,8 @@ class MongoDatabase():
             logging.info("Error " + Exception)
 
     
-    def insert_data(self, list_data):
+    # this method is for insert data from localDB to MongoDb, when the network was down and now is up
+    def insert_data(self, list_data: list[str]):
 
         try:
             client = pymongo.MongoClient(self.url)
