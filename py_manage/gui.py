@@ -5,6 +5,7 @@ import requests
 import json
 from PyQt5.QtCore import QTimer
 from senzor import dht_sensor
+from guiFlow import GuiFlow
 import heating_control
 import logging
 import time
@@ -59,11 +60,12 @@ class MainWindow(QMainWindow):
         self.change_treshold = 0
 
         self.senzor = dht_sensor()
+        self.GuiFlow = GuiFlow()
         self.heating_system = heating_control.heating_system(False)
         self.temp_senzor = ""
         self.hum_senzor = ""
 
-        self.internet_checker = internet_checker()
+        # self.internet_checker = internet_checker()
 
         # initialize the heating system class
         # self.heating_system = heating_system()
@@ -85,6 +87,9 @@ class MainWindow(QMainWindow):
 
         self.timer_checker_status = QTimer()
         self.timer_checker_status.setInterval(2000)
+
+        self.timer_test = QTimer()
+        self.timer_test.setInterval(5000)
         
         self.timer_checker_treshold = QTimer()
         self.timer_checker_treshold.setInterval(2000)
@@ -250,6 +255,7 @@ class MainWindow(QMainWindow):
         self.init_timer_data_senzors()
         self.init_timer_checker_status()
         self.init_timer_checker_treshold()
+        self.init_timer_test()
 
     # def infinite_loop_for_internet_access_check():
     #     """ Create a thread with an infinite loop where internet connection is checked"""
@@ -277,7 +283,7 @@ class MainWindow(QMainWindow):
             
             if response.status_code == 200:
                 self.status = 0
-                logging.info(f"The STATUS changed to: {self.status}")
+                # logging.info(f"The STATUS changed to: {self.status}")
             else:
                 logging.info(f"Error ({response.status_code}): {response.text}")
 
@@ -299,7 +305,7 @@ class MainWindow(QMainWindow):
             if response.status_code == 200:
                 print(response.text)
                 self.status = 1
-                logging.info(f"The STATUS changed to: {self.status}")
+                # logging.info(f"The STATUS changed to: {self.status}")
 
             else:
                 logging.info(f"Error ({response.status_code}): {response.text}")
@@ -328,6 +334,8 @@ class MainWindow(QMainWindow):
 
     # this function fetch the status when the app opens
     def fetch_status(self):
+        # i have to check the internet connection, and then fetch the endpoints
+        
         logging.debug("Fetching the endpoint heatingstatus ...")
         url = f"{self.url}/heatingstatus"
 
@@ -351,7 +359,7 @@ class MainWindow(QMainWindow):
                 self.button_status = False
                 self.change_status_slider(0)
 
-            logging.info(f"Slider STATUS: {self.status}")
+            # logging.info(f"Slider STATUS: {self.status}")
 
         else:
             logging.info("Error to fetching the endpoint heatingstatus")
@@ -374,7 +382,7 @@ class MainWindow(QMainWindow):
             self.treshlod = treshold_value
             self.id_treshold = data[0]["_id"]
 
-            logging.info(f"Treshold value: {self.treshlod}")
+            # logging.info(f"Treshold value: {self.treshlod}")
             self.treshold_label.setText(str(self.treshlod))
 
         else:
@@ -447,7 +455,7 @@ class MainWindow(QMainWindow):
         response = requests.put(url, headers=headers, data=json_payload)
         
         if response.status_code == 200:
-            logging.info(f"The activate_alert function was successfull, message: {response.text}")
+            # logging.info(f"The activate_alert function was successfull, message: {response.text}")
 
             # this variable controls when the treshold is changing, to not have timers conflict
             self.change_treshold = 0
@@ -485,7 +493,7 @@ class MainWindow(QMainWindow):
 
     # this function get senzor's data from the API (remote) or senzor class (local)
     def get_data_senzors(self):
-        logging.info("get_data_senzors ON")
+        # logging.info("get_data_senzors ON")
 
         # for testing local ------------------------------
         # self.temp_senzor = 20
@@ -502,11 +510,11 @@ class MainWindow(QMainWindow):
 
         # first we fetch what the senzor returns, if he returns 0 means that he doesn't fetch the temperature
         temp_senzor_return = self.senzor.get_t()
-        logging.info(f"Temp return: {temp_senzor_return}")
-        logging.info(f"Temp return type: {type(temp_senzor_return)}")
+        # logging.info(f"Temp return: {temp_senzor_return}")
+        # logging.info(f"Temp return type: {type(temp_senzor_return)}")
 
         if temp_senzor_return == 0:
-            logging.info("The senzor doesn't fetch the temperature")
+            # logging.info("The senzor doesn't fetch the temperature")
 
             # increment the variable error_senzor_counter every time the senzor doesn't fetch the temperature
             self.error_senzor_counter = self.error_senzor_counter + 1
@@ -522,11 +530,11 @@ class MainWindow(QMainWindow):
 
         # first we fetch what the senzor returns, if he returns 0 means that he doesn't fetch the humidity
         hum_senzor_return = self.senzor.get_h()
-        logging.info(f"Hum return: {hum_senzor_return}")
-        logging.info(f"Hum return type: {type(hum_senzor_return)}")
+        # logging.info(f"Hum return: {hum_senzor_return}")
+        # logging.info(f"Hum return type: {type(hum_senzor_return)}")
 
         if hum_senzor_return == 0:
-            logging.info("The senzor doesn't fetch the humidity")
+            # logging.info("The senzor doesn't fetch the humidity")
 
             # increment the variable error_senzor_counter every time the senzor doesn't fetch the humidity
             self.error_senzor_counter: int = self.error_senzor_counter + 1
@@ -548,12 +556,19 @@ class MainWindow(QMainWindow):
             else:  
                 self.div_error_hardware.show()
 
-        if(self.hum_senzor != 0 and self.temp_senzor!=0):
-            internet_connection: bool = self.internet_checker.check_internet_connection()
-            if internet_connection:
-                logging.info("exists connection")
-            else:
-                logging.info("doesn't exist connection")
+        # hereeeee 
+
+        if(temp_senzor_return != 0 and hum_senzor_return != 0):
+            self.GuiFlow.insertDataIntoDB(temp_senzor_return, hum_senzor_return)
+
+
+        # BUG -------
+        # if(self.hum_senzor != 0 and self.temp_senzor!=0):
+        #     internet_connection: bool = self.internet_checker.check_internet_connection()
+        #     if internet_connection:
+        #         logging.info("exists connection")
+        #     else:
+        #         logging.info("doesn't exist connection")
 
 
         # Varianta cu luat date de la senzori direct de la API -----------------------
@@ -573,21 +588,21 @@ class MainWindow(QMainWindow):
         # self.hum_senzor = data['humidity']
         # self.home_hum_label.setText(f"{self.hum_senzor} %")
         if self.status == 0:
-            logging.info("Heating system is OFF")
+            # logging.info("Heating system is OFF")
             self.heating_system.heating_off()
             self.div_treshold.setStyleSheet("QWidget { background-color: white; border-radius: 75%; font-family: 'Poppins', sans-serif; border: none; }")    
         else:
             if(self.treshlod >= (int(self.temp_senzor) + self.hysteresis)):
-                logging.info("Heating system is ON")
+                # logging.info("Heating system is ON")
                 self.heating_system.heating_on()
                 self.div_treshold.setStyleSheet("QWidget { background-color: white; border-radius: 75%; font-family: 'Poppins', sans-serif; border: 8px solid gold; }")
             else:
-                logging.info("Heating system is OFF")
+                # logging.info("Heating system is OFF")
                 self.heating_system.heating_off()
                 self.div_treshold.setStyleSheet("QWidget { background-color: white; border-radius: 75%; font-family: 'Poppins', sans-serif; border: none; }")
             
-        logging.info(f"Temp: {self.temp_senzor}")
-        logging.info(f"Hum: {self.hum_senzor}")
+        # logging.info(f"Temp: {self.temp_senzor}")
+        # logging.info(f"Hum: {self.hum_senzor}")
 
 
     # this timer calls every 5 sec the get_data_senzors function
@@ -596,9 +611,13 @@ class MainWindow(QMainWindow):
         self.timer.timeout.connect(self.get_data_senzors)
         self.timer.start(5000)
 
+    
+    def check_test(self):
+        logging.info("test merge")
+
 
     def check_status(self):
-        logging.debug("The function check_status is running ...")
+        # logging.debug("The function check_status is running ...")
 
         url = f"{self.url}/heatingstatus"
 
@@ -607,8 +626,8 @@ class MainWindow(QMainWindow):
         if response.status_code == 200:
             data = response.json()
 
-            logging.debug("Fetched the endpoint heatingstatus successfully")
-            logging.debug(f"heatingstatus: {data}")
+            # logging.debug("Fetched the endpoint heatingstatus successfully")
+            # logging.debug(f"heatingstatus: {data}")
 
             status_value = int(data[0]["status"])
 
@@ -630,7 +649,7 @@ class MainWindow(QMainWindow):
                     self.button_status = False
                     self.change_status_slider(0)
 
-                logging.info(f"Status value: {self.status}")
+                # logging.info(f"Status value: {self.status}")
 
         else:
             logging.info("Error to fetching the heatingstatus endpoint at check_status function")
@@ -640,6 +659,10 @@ class MainWindow(QMainWindow):
     def init_timer_checker_status(self):
         self.timer_checker_status.timeout.connect(self.check_status)
         self.timer_checker_status.start()
+
+    def init_timer_test(self):
+        self.timer_test.timeout.connect(self.check_test)
+        self.timer_test.start()
 
 
     def check_treshold(self):
@@ -670,12 +693,12 @@ class MainWindow(QMainWindow):
                     logging.info("Same treshold")
 
                 else:
-                    logging.info("New treshold value")
+                    # logging.info("New treshold value")
                     logging.debug(f"Old treshod value: {self.treshlod}")
                     logging.debug(f"New treshod value: {treshold_value}")
  
                     self.treshlod = treshold_value
-                    logging.info(f"Treshold: {self.treshlod}")
+                    # logging.info(f"Treshold: {self.treshlod}")
        
                     self.treshold_label.setText(str(self.treshlod))
 
@@ -698,7 +721,6 @@ if __name__ == '__main__':
     window = MainWindow()
     window.fetch_status()
     window.fetch_heatingTemp()
-    # window.fetch_dataSenzors()
     window.initUI()
     window.show()
 

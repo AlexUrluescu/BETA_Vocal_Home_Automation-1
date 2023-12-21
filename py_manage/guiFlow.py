@@ -44,6 +44,7 @@ class GuiFlow():
                      logging.info(f"dont exist local data")
 
                 self.mongoDatabase.insert(temperature=temperature, humidity=humidity)
+                logging.info(f'insert into mongo temp: {temperature} and hum: {humidity}')
         
 
             except Exception:
@@ -63,9 +64,9 @@ class GuiFlow():
 
     
 
-guiFlow = GuiFlow()
+# guiFlow = GuiFlow()
 
-result: str = guiFlow.insertDataIntoDB(temperature=99, humidity=105)
+# result: str = guiFlow.insertDataIntoDB(temperature=89, humidity=23)
 
 
-logging.info(f"result: {result}")
+# logging.info(f"result: {result}")
