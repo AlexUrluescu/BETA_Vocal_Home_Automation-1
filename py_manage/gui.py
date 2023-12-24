@@ -9,33 +9,11 @@ from guiFlow import GuiFlow
 from check_internet_connection import internet_checker
 import heating_control
 import logging
-import time
 from check_internet_connection import internet_checker
-from threading import Thread
-from PyQt5.QtCore import QThread, pyqtSignal, QObject
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 
 app = QApplication(sys.argv)
-
-# const url = "http://localhost:5000"
-
-# class MyThread(QThread):
-#     def __init__(self, parent=None):
-#         super().__init__(parent)
-#         self.internet_checker = internet_checker()
-#         self.finished = pyqtSignal()
-
-#     def run(self):
-#         internet_connection = self.internet_checker.check_internet_connection()
-#         if(internet_connection):
-#             logging.info("Exists internet")
-        
-#         else:
-#             logging.info("Doesn't exists internet")
-
-#         self.finished.emit()
-
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -66,11 +44,6 @@ class MainWindow(QMainWindow):
         self.heating_system = heating_control.heating_system(False)
         self.temp_senzor = ""
         self.hum_senzor = ""
-
-        # self.internet_checker = internet_checker()
-
-        # initialize the heating system class
-        # self.heating_system = heating_system()
 
         # this timer controls when the user is changing the treshold with the buttons +/-
         # when the timer is done, the function "active_alert" will be executed
@@ -130,17 +103,6 @@ class MainWindow(QMainWindow):
                     border-radius: 17px;
                 }
             """
-        
-
-    # def start_task(self):
-    #     self.thread = MyThread()
-    #     self.thread.finished.connect(self.task_finished)
-    #     self.thread.start()
-
-    # def task_finished(self):
-    #     self.label.setText("Task finished!")
-
-    #     self.status_test = 0
 
         treshold = ""
         temperature = "Temp"
@@ -258,13 +220,6 @@ class MainWindow(QMainWindow):
         self.init_timer_checker_status()
         self.init_timer_checker_treshold()
         self.init_timer_test()
-
-    # def infinite_loop_for_internet_access_check():
-    #     """ Create a thread with an infinite loop where internet connection is checked"""
-    #     internet_check = check_internet_connection.internet_checker()
-        
-
-        
         
 
     # this function control the slider's value, when he is changing
@@ -336,10 +291,8 @@ class MainWindow(QMainWindow):
 
     # this function fetch the status when the app opens
     def fetch_status(self):
-        # i have to check the internet connection, and then fetch the endpoints
 
         internet: bool = self.internet_checker.check_internet_connection()
-        # internet = True
 
         if(internet):
 
@@ -377,11 +330,11 @@ class MainWindow(QMainWindow):
             self.button_status = False
             self.change_status_slider(0)
     
+
     # this function fecth the treshold value when the app opens
     def fetch_heatingTemp(self):
 
         internet: bool = self.internet_checker.check_internet_connection()
-        # internet = True
 
         if(internet):
             logging.debug("Fetching the endpoint heatingtemp ...")

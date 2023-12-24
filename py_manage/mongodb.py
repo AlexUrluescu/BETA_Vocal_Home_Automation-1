@@ -1,7 +1,4 @@
-import sqlite3
 import pymongo
-from dotenv import load_dotenv
-import os
 from senzor import dht_sensor
 from datetime import datetime
 import logging

@@ -6,16 +6,9 @@ import os
 import logging
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
-
 load_dotenv()
 URL_CONNECTION_DB = os.getenv("URL_CONNECTION_DB")
 COLLECTION_NAME = os.getenv("COLLECTION_NAME")
-
-logging.info(f"URL_CONN: {URL_CONNECTION_DB}")
-logging.info(f"COLLECTION_NAME: {COLLECTION_NAME}")
-
-
-import time
 
 class GuiFlow():
 
@@ -60,21 +53,3 @@ class GuiFlow():
                 data =  self.localDatabase.getData();
                 logging.info(f"data from local: {data}")
 
-
-
-    
-
-# guiFlow = GuiFlow()
-
-# temp = 20
-# hum = 80
-
-# while(True):
-
-     
-#     guiFlow.insertDataIntoDB(temperature=temp, humidity=hum)
-
-#     temp = temp + 1
-#     hum = hum + 1
-    
-#     time.sleep(5)
