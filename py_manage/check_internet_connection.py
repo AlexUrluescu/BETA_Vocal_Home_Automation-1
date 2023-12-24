@@ -11,10 +11,6 @@ import logging
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 
 class internet_checker():
-    def __init__(self, databaseName):
-        self.connection: sqlite3.Connection = sqlite3.connect(databaseName)
-        self.cursor: sqlite3.Cursor = self.connection.cursor()
-        # self.timer = timer
 
     def check_internet_connection(self) -> bool:
         url: str = "http://www.google.com"

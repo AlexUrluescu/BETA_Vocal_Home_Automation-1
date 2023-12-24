@@ -6,6 +6,7 @@ import json
 from PyQt5.QtCore import QTimer
 from senzor import dht_sensor
 from guiFlow import GuiFlow
+from check_internet_connection import internet_checker
 import heating_control
 import logging
 import time
@@ -19,21 +20,21 @@ app = QApplication(sys.argv)
 
 # const url = "http://localhost:5000"
 
-class MyThread(QThread):
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        self.internet_checker = internet_checker()
-        self.finished = pyqtSignal()
+# class MyThread(QThread):
+#     def __init__(self, parent=None):
+#         super().__init__(parent)
+#         self.internet_checker = internet_checker()
+#         self.finished = pyqtSignal()
 
-    def run(self):
-        internet_connection = self.internet_checker.check_internet_connection()
-        if(internet_connection):
-            logging.info("Exists internet")
+#     def run(self):
+#         internet_connection = self.internet_checker.check_internet_connection()
+#         if(internet_connection):
+#             logging.info("Exists internet")
         
-        else:
-            logging.info("Doesn't exists internet")
+#         else:
+#             logging.info("Doesn't exists internet")
 
-        self.finished.emit()
+#         self.finished.emit()
 
 
 class MainWindow(QMainWindow):
@@ -61,6 +62,7 @@ class MainWindow(QMainWindow):
 
         self.senzor = dht_sensor()
         self.GuiFlow = GuiFlow()
+        self.internet_checker = internet_checker()
         self.heating_system = heating_control.heating_system(False)
         self.temp_senzor = ""
         self.hum_senzor = ""
@@ -335,58 +337,78 @@ class MainWindow(QMainWindow):
     # this function fetch the status when the app opens
     def fetch_status(self):
         # i have to check the internet connection, and then fetch the endpoints
-        
-        logging.debug("Fetching the endpoint heatingstatus ...")
-        url = f"{self.url}/heatingstatus"
 
-        response = requests.get(url)
+        internet: bool = self.internet_checker.check_internet_connection()
+        # internet = True
 
-        if response.status_code == 200:
-            data = response.json()
-            logging.debug(f"heatingstatus: {data}")
-            logging.debug("Fetched the endpoint heatingstatus successfully")
+        if(internet):
 
-            status_value = int(data[0]["status"])
-            self.status = status_value
-            self.val = status_value
-            self.id_status = data[0]["_id"]
+            logging.debug("Fetching the endpoint heatingstatus ...")
+            url = f"{self.url}/heatingstatus"
 
-            if self.status == 1:
-                self.button_status = True
-                self.change_status_slider(1)
-            
+            response = requests.get(url)
+
+            if response.status_code == 200:
+                data = response.json()
+                logging.debug(f"heatingstatus: {data}")
+                logging.debug("Fetched the endpoint heatingstatus successfully")
+
+                status_value = int(data[0]["status"])
+                self.status = status_value
+                self.val = status_value
+                self.id_status = data[0]["_id"]
+
+                if self.status == 1:
+                    self.button_status = True
+                    self.change_status_slider(1)
+                
+                else:
+                    self.button_status = False
+                    self.change_status_slider(0)
+
+                # logging.info(f"Slider STATUS: {self.status}")
+
             else:
-                self.button_status = False
-                self.change_status_slider(0)
-
-            # logging.info(f"Slider STATUS: {self.status}")
+                logging.info("Error to fetching the endpoint heatingstatus")
 
         else:
-            logging.info("Error to fetching the endpoint heatingstatus")
-
+            logging.info("there is no internet for the status")
+            self.status = 0
+            self.button_status = False
+            self.change_status_slider(0)
     
     # this function fecth the treshold value when the app opens
     def fetch_heatingTemp(self):
-        logging.debug("Fetching the endpoint heatingtemp ...")
-        url = f"{self.url}/heatingtemp"
-   
-        response = requests.get(url)
 
-        if response.status_code == 200:
-            data = response.json()
+        internet: bool = self.internet_checker.check_internet_connection()
+        # internet = True
 
-            logging.debug("Fetched the endpoint heatingtemp successfully")
-            logging.debug(f"heatingtemp: {data}")
+        if(internet):
+            logging.debug("Fetching the endpoint heatingtemp ...")
+            url = f"{self.url}/heatingtemp"
+    
+            response = requests.get(url)
 
-            treshold_value = int(data[0]["temperature"])
-            self.treshlod = treshold_value
-            self.id_treshold = data[0]["_id"]
+            if response.status_code == 200:
+                data = response.json()
 
-            # logging.info(f"Treshold value: {self.treshlod}")
+                logging.debug("Fetched the endpoint heatingtemp successfully")
+                logging.debug(f"heatingtemp: {data}")
+
+                treshold_value = int(data[0]["temperature"])
+                self.treshlod = treshold_value
+                self.id_treshold = data[0]["_id"]
+
+                # logging.info(f"Treshold value: {self.treshlod}")
+                self.treshold_label.setText(str(self.treshlod))
+
+            else:
+                logging.info("Error to fetching the endpoint heatingtemp")
+        
+        else:
+            self.treshlod = 18
             self.treshold_label.setText(str(self.treshlod))
 
-        else:
-            logging.info("Error to fetching the endpoint heatingtemp")
             
 
 # THIS FUNCTION FETCH THE SENZOR'S DATA FROM MONGO DB
@@ -618,41 +640,46 @@ class MainWindow(QMainWindow):
 
     def check_status(self):
         # logging.debug("The function check_status is running ...")
+        internet: bool = self.internet_checker.check_internet_connection()
 
-        url = f"{self.url}/heatingstatus"
+        if(internet):
+            url = f"{self.url}/heatingstatus"
 
-        response = requests.get(url)
+            response = requests.get(url)
 
-        if response.status_code == 200:
-            data = response.json()
+            if response.status_code == 200:
+                data = response.json()
 
-            # logging.debug("Fetched the endpoint heatingstatus successfully")
-            # logging.debug(f"heatingstatus: {data}")
+                # logging.debug("Fetched the endpoint heatingstatus successfully")
+                # logging.debug(f"heatingstatus: {data}")
 
-            status_value = int(data[0]["status"])
+                status_value = int(data[0]["status"])
 
-            logging.debug(f"Actual treshold value: {self.treshlod}")
-            logging.debug(f"Server treshold value: {status_value}")
-  
-            if status_value == self.status:
-                logging.info("Same status")
+                logging.debug(f"Actual treshold value: {self.treshlod}")
+                logging.debug(f"Server treshold value: {status_value}")
+    
+                if status_value == self.status:
+                    logging.info("Same status")
+
+                else:
+                    self.status = status_value
+                    self.id_status = data[0]["_id"]
+
+                    if self.status == 1:
+                        self.button_status = True
+                        self.change_status_slider(1)
+                    
+                    else:
+                        self.button_status = False
+                        self.change_status_slider(0)
+
+                    # logging.info(f"Status value: {self.status}")
 
             else:
-                self.status = status_value
-                self.id_status = data[0]["_id"]
-
-                if self.status == 1:
-                    self.button_status = True
-                    self.change_status_slider(1)
-                
-                else:
-                    self.button_status = False
-                    self.change_status_slider(0)
-
-                # logging.info(f"Status value: {self.status}")
-
+                logging.info("Error to fetching the heatingstatus endpoint at check_status function")
+        
         else:
-            logging.info("Error to fetching the heatingstatus endpoint at check_status function")
+            logging.info("No data for status, because is no internet")
 
 
     # this timer checks the slider status
@@ -668,43 +695,50 @@ class MainWindow(QMainWindow):
     def check_treshold(self):
         logging.debug("The function check_treshold is running ...")
 
-        url = f"{self.url}/heatingtemp"
+        internet: bool = self.internet_checker.check_internet_connection()
 
-        response = requests.get(url)
+        if(internet):
 
-        if response.status_code == 200:
-            data = response.json()
+            url = f"{self.url}/heatingtemp"
 
-            logging.debug("Fetched the endpoint heatingstatus successfully")
-            logging.debug(f"heatingstatus: {data}")
+            response = requests.get(url)
 
-            treshold_value = float(data[0]["temperature"])
+            if response.status_code == 200:
+                data = response.json()
 
-            # if self.change_treshold is 1, means that the user is making changes with the +/- buttons
-            if self.change_treshold == 1:
-                logging.debug("The treshold is changing now")
+                logging.debug("Fetched the endpoint heatingstatus successfully")
+                logging.debug(f"heatingstatus: {data}")
 
-            
-            else:
-                logging.debug(f"Actual treshold value: {self.treshlod}")
-                logging.debug(f"Server treshold value: {treshold_value}")
+                treshold_value = float(data[0]["temperature"])
 
-                if treshold_value == self.treshlod:
-                    logging.info("Same treshold")
+                # if self.change_treshold is 1, means that the user is making changes with the +/- buttons
+                if self.change_treshold == 1:
+                    logging.debug("The treshold is changing now")
 
+                
                 else:
-                    # logging.info("New treshold value")
-                    logging.debug(f"Old treshod value: {self.treshlod}")
-                    logging.debug(f"New treshod value: {treshold_value}")
- 
-                    self.treshlod = treshold_value
-                    # logging.info(f"Treshold: {self.treshlod}")
-       
-                    self.treshold_label.setText(str(self.treshlod))
+                    logging.debug(f"Actual treshold value: {self.treshlod}")
+                    logging.debug(f"Server treshold value: {treshold_value}")
 
+                    if treshold_value == self.treshlod:
+                        logging.info("Same treshold")
+
+                    else:
+                        # logging.info("New treshold value")
+                        logging.debug(f"Old treshod value: {self.treshlod}")
+                        logging.debug(f"New treshod value: {treshold_value}")
+    
+                        self.treshlod = treshold_value
+                        # logging.info(f"Treshold: {self.treshlod}")
+        
+                        self.treshold_label.setText(str(self.treshlod))
+
+
+            else:
+                logging.info("Error to fetching the heatingstemp endpoint at check_treshold function")
 
         else:
-            logging.info("Error to fetching the heatingstemp endpoint at check_treshold function")
+            logging.info("No info for treshold, no internet connection")
 
 
     # this timer check the treshold's value

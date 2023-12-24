@@ -15,14 +15,14 @@ logging.info(f"URL_CONN: {URL_CONNECTION_DB}")
 logging.info(f"COLLECTION_NAME: {COLLECTION_NAME}")
 
 
-
+import time
 
 class GuiFlow():
 
     def __init__(self):
         self.mongoDatabase = MongoDatabase(URL_CONNECTION_DB, COLLECTION_NAME)
         self.localDatabase = LocalDatabase()
-        self.internet_checker = internet_checker('data.db')
+        self.internet_checker = internet_checker()
     
     def insertDataIntoDB(self, temperature, humidity) -> bool:
         exist_internet: bool = self.internet_checker.check_internet_connection()
@@ -53,20 +53,28 @@ class GuiFlow():
         else:
                 logging.info("intra in fara net")
                 success: bool = self.localDatabase.create()
-                self.localDatabase.insert(temperature=temperature, humidity=humidity)
 
+                if(success):
+                    self.localDatabase.insert(temperature=temperature, humidity=humidity)
 
                 data =  self.localDatabase.getData();
                 logging.info(f"data from local: {data}")
 
-                return success
 
 
     
 
 # guiFlow = GuiFlow()
 
-# result: str = guiFlow.insertDataIntoDB(temperature=89, humidity=23)
+# temp = 20
+# hum = 80
 
+# while(True):
 
-# logging.info(f"result: {result}")
+     
+#     guiFlow.insertDataIntoDB(temperature=temp, humidity=hum)
+
+#     temp = temp + 1
+#     hum = hum + 1
+    
+#     time.sleep(5)

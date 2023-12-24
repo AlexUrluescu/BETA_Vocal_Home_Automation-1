@@ -59,19 +59,19 @@ class LocalDatabase():
 
     def insert(self, temperature: str, humidity: str) -> bool:
         try:
-            # conn = sqlite3.connect('data.db')
-            # cursor = conn.cursor()
+            connection = sqlite3.connect('data.db')
+            cursor = connection.cursor()
 
             # Obține data curentă și convert-o la formatul dorit (YYYY-MM-DD)
             data_curenta: str = datetime.now().strftime('%Y-%m-%d')
 
 
             # Inserează datele în tabela 'weather'
-            self.cursor.execute('INSERT INTO data (temperature, humidity, data) VALUES (?, ?, ?)',
+            cursor.execute('INSERT INTO data (temperature, humidity, data) VALUES (?, ?, ?)',
                         (temperature, humidity, data_curenta))
 
-            self.connection.commit()
-            self.connection.close()
+            connection.commit()
+            connection.close()
 
             return True
         
