@@ -67,23 +67,23 @@ router.put("/test/:id", async (req, res) => {
   }
 });
 
-router.put('/changeheatingtemp/:id', async (req, res) => {
-
+router.put("/changeheatingtemp/:id", async (req, res) => {
   try {
     console.log(req.body);
-      const updateHeatingTemp = await HeatingTemp.findByIdAndUpdate(req.params.id, req.body, { new: true })
-      console.log(updateHeatingTemp.temperature);
+    const updateHeatingTemp = await HeatingTemp.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true }
+    );
+    console.log(updateHeatingTemp.temperature);
 
-      io.emit("heating_temp_server", updateHeatingTemp.temperature)
+    io.emit("heating_temp_server", updateHeatingTemp.temperature);
 
-      return res.json({"message": "ok"});
-
+    return res.json({ message: "ok" });
   } catch (error) {
-      return res.status(500).json({message: error.message})
-      
+    return res.status(500).json({ message: error.message });
   }
 });
-
 
 // io.on("connection", (socket) => {
 //   console.log("Conection socket");

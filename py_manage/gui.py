@@ -18,7 +18,7 @@ app = QApplication(sys.argv)
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.url = "http://localhost:5000"
+        self.url = "http://localhost:3001"
 
         self.setWindowTitle("Exemplu PyQt5")
         self.setGeometry(100, 100, 1000, 600)
@@ -135,7 +135,7 @@ class MainWindow(QMainWindow):
 
         # ------------------------ CONTAINERS ---------------------------------
         self.div_treshold = QWidget(self)
-        self.div_treshold.setStyleSheet("QWidget { background-color: white; border-radius: 75%; font-family: 'Poppins', sans-serif; }")
+        self.div_treshold.setStyleSheet("QWidget { background-color: white; color: black; border-radius: 75%; font-family: 'Poppins', sans-serif; }")
         self.div_treshold.setFixedSize(150, 150)
         self.div_treshold.move(450, 150)
 
@@ -292,12 +292,16 @@ class MainWindow(QMainWindow):
     # this function fetch the status when the app opens
     def fetch_status(self):
 
+        logging.info("intraaaa")
+
         internet: bool = self.internet_checker.check_internet_connection()
 
         if(internet):
 
             logging.debug("Fetching the endpoint heatingstatus ...")
             url = f"{self.url}/heatingstatus"
+
+            logging.info("iasa")
 
             response = requests.get(url)
 
@@ -336,6 +340,8 @@ class MainWindow(QMainWindow):
 
         internet: bool = self.internet_checker.check_internet_connection()
 
+        logging.info("intra in heating status fecth")
+
         if(internet):
             logging.debug("Fetching the endpoint heatingtemp ...")
             url = f"{self.url}/heatingtemp"
@@ -346,10 +352,15 @@ class MainWindow(QMainWindow):
                 data = response.json()
 
                 logging.debug("Fetched the endpoint heatingtemp successfully")
-                logging.debug(f"heatingtemp: {data}")
+                logging.info(f"heatingtemp: {data}")
+                value = data[0]["temperature"]
+                logging.info(f"heatingtemp2: {data[0]["temperature"]}")
+
+
 
                 treshold_value = int(data[0]["temperature"])
-                self.treshlod = treshold_value
+                # logging.info("value", treshold_value)
+                self.treshlod = value
                 self.id_treshold = data[0]["_id"]
 
                 # logging.info(f"Treshold value: {self.treshlod}")
@@ -565,16 +576,16 @@ class MainWindow(QMainWindow):
         if self.status == 0:
             # logging.info("Heating system is OFF")
             self.heating_system.heating_off()
-            self.div_treshold.setStyleSheet("QWidget { background-color: white; border-radius: 75%; font-family: 'Poppins', sans-serif; border: none; }")    
+            self.div_treshold.setStyleSheet("QWidget { background-color: white;color: black; border-radius: 75%; font-family: 'Poppins', sans-serif; border: none; }")    
         else:
             if(self.treshlod >= (int(self.temp_senzor) + self.hysteresis)):
                 # logging.info("Heating system is ON")
                 self.heating_system.heating_on()
-                self.div_treshold.setStyleSheet("QWidget { background-color: white; border-radius: 75%; font-family: 'Poppins', sans-serif; border: 8px solid gold; }")
+                self.div_treshold.setStyleSheet("QWidget { background-color: white; color: black; border-radius: 75%; font-family: 'Poppins', sans-serif; border: 8px solid gold; }")
             else:
                 # logging.info("Heating system is OFF")
                 self.heating_system.heating_off()
-                self.div_treshold.setStyleSheet("QWidget { background-color: white; border-radius: 75%; font-family: 'Poppins', sans-serif; border: none; }")
+                self.div_treshold.setStyleSheet("QWidget { background-color: white; color: black; border-radius: 75%; font-family: 'Poppins', sans-serif; border: none; }")
             
         # logging.info(f"Temp: {self.temp_senzor}")
         # logging.info(f"Hum: {self.hum_senzor}")
@@ -603,9 +614,6 @@ class MainWindow(QMainWindow):
             if response.status_code == 200:
                 data = response.json()
 
-                # logging.debug("Fetched the endpoint heatingstatus successfully")
-                # logging.debug(f"heatingstatus: {data}")
-
                 status_value = int(data[0]["status"])
 
                 logging.debug(f"Actual treshold value: {self.treshlod}")
@@ -625,8 +633,6 @@ class MainWindow(QMainWindow):
                     else:
                         self.button_status = False
                         self.change_status_slider(0)
-
-                    # logging.info(f"Status value: {self.status}")
 
             else:
                 logging.info("Error to fetching the heatingstatus endpoint at check_status function")
