@@ -12,12 +12,11 @@ import {
 
 import io from "socket.io-client";
 
-
 // const url = "https://smarthome-dowt.onrender.com";
-const url = "http://localhost:5000";
+const url = "http://localhost:3001";
 
 const socket = io.connect(url, {
-  transports: ['websocket'],
+  transports: ["websocket"],
 });
 // const socket = io.connect("http://localhost:5000");
 
@@ -25,7 +24,6 @@ socket.on("serverMessage", (data) => {
   console.log(data);
   // setStatusHeating(data[0])
 });
-
 
 function App() {
   // eslint-disable-next-line
@@ -35,6 +33,10 @@ function App() {
   const [heatingTemp, setHeatingTemp] = useState(0);
 
   const [isToggled, setIsToggled] = useState(false);
+
+  useEffect(() => {
+    console.log(isToggled);
+  }, [isToggled]);
   // eslint-disable-next-line
   const [finalTemp, setFinalTemp] = useState();
   const [styleHeating, setStyleHeating] = useState(0);
@@ -48,7 +50,7 @@ function App() {
         // setTempHome(data.temperature);
         // setHumHome(data.humidity);
 
-        console.log(data);
+        // console.log(data);
         setTempHome(data.temperature);
         setHumHome(data.humidity);
       } catch (error) {
@@ -66,31 +68,27 @@ function App() {
     try {
       console.log("teeeeest");
       socket.on("serverMessage", (data) => {
-        console.log(data);
-        setStatusHeating(data)
+        // console.log(data);
+        setStatusHeating(data);
       });
 
-      console.log("teeeest iasa");
-
+      // console.log("teeeest iasa");
     } catch (error) {
       console.log(error);
     }
-
-  }, [])
+  }, []);
 
   // cod adaugat in idee_socket
   useEffect(() => {
     try {
       socket.on("heating_temp_server", (data) => {
-        console.log(data);
+        // console.log(data);
         setHeatingTemp(data);
-      })
-      
+      });
     } catch (error) {
       console.log(error);
     }
-  }, [])
-
+  }, []);
 
   useEffect(() => {
     // get all the temperatures and humiditys
@@ -102,7 +100,7 @@ function App() {
 
         setTempHome(data1[0].temperature);
         setHumHome(data1[0].humidity);
-        console.log(data1);
+        // console.log(data1);
       } catch (error) {
         console.log(error);
       }
@@ -114,10 +112,10 @@ function App() {
         const res = await fetch(`${url}/heatingstatus`);
         const data1 = await res.json();
 
-        console.log(`status heating este: ${data1}`);
+        // console.log(`status heating este: ${data1}`);
         setStatusHeating(data1[0].status);
-        console.log(data1);
-        console.log(data1[0].status);
+        // console.log(data1);
+        // console.log(data1[0].status);
       } catch (error) {
         console.log(error);
       }
@@ -131,7 +129,7 @@ function App() {
 
         // setFinalTemp(data1);
         setHeatingTemp(data1[0].temperature);
-        console.log(data1);
+        // console.log(data1);
       } catch (error) {
         console.log(error);
       }
@@ -146,8 +144,8 @@ function App() {
     const timer = setTimeout(async () => {
       setFinalTemp(heatingTemp);
 
-      console.log("salvat");
-      console.log("inceput mesaj");
+      // console.log("salvat");
+      // console.log("inceput mesaj");
       setStyleHeating(1);
 
       setTimeout(async () => {
@@ -155,18 +153,15 @@ function App() {
           const temperature = heatingTemp;
           console.log(temperature);
 
-          const id = "64889e83c192652234604219"
+          const id = "64889e83c192652234604219";
 
-          const data = await fetch(
-            `${url}/changeheatingtemp/${id}`,
-            {
-              method: "PUT",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({ temperature }),
-            }
-          );
+          const data = await fetch(`${url}/changeheatingtemp/${id}`, {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ temperature }),
+          });
 
           const res = await data.json();
 
@@ -178,15 +173,12 @@ function App() {
         } catch (error) {
           console.log(error);
         }
-        console.log("sfarsit mesaj");
+
         setStyleHeating(0);
       }, 3000);
-
-      console.log("iasa");
     }, 5000);
 
     return () => {
-      console.log("intra");
       clearTimeout(timer);
     };
   }, [heatingTemp]);
@@ -203,18 +195,14 @@ function App() {
 
   // increment the value of the temperature
   const handlePLus = () => {
-    // let temperature = heatingTemp.temperature;
-    let temperature = heatingTemp + 0.5
-    setHeatingTemp(temperature)
-    // setHeatingTemp({ ...heatingTemp, temperature: temperature + 0.5 });
+    let temperature = heatingTemp + 0.5;
+    setHeatingTemp(temperature);
   };
 
   // decrement the value of the temperature
   const handleMinus = () => {
-    // const temperature = heatingTemp.temperature;
-    // setHeatingTemp({ ...heatingTemp, temperature: temperature - 0.5 });
-    let temperature = heatingTemp - 0.5
-    setHeatingTemp(temperature)
+    let temperature = heatingTemp - 0.5;
+    setHeatingTemp(temperature);
   };
 
   const handleVoid = () => {
@@ -222,7 +210,6 @@ function App() {
   };
 
   const handleSlider = () => {
-    console.log(isToggled);
     setIsToggled(!isToggled);
 
     if (isToggled === false) {
@@ -230,7 +217,7 @@ function App() {
         try {
           const status = 1;
 
-          const id = "64889d6ce1b6713667bf6c89"
+          const id = "64889d6ce1b6713667bf6c89";
 
           const data = await fetch(`${url}/test/${id}`, {
             method: "PUT",
@@ -246,7 +233,6 @@ function App() {
           if (res.message === "On") {
             setStatusHeating(1);
           }
-          // setStatus(data.status);
         } catch (error) {
           console.log(error);
         }
@@ -258,8 +244,8 @@ function App() {
     if (isToggled) {
       const statusOff = async () => {
         const status = 0;
-        
-        const id = "64889d6ce1b6713667bf6c89"
+
+        const id = "64889d6ce1b6713667bf6c89";
 
         try {
           const data = await fetch(`${url}/test/${id}`, {
@@ -290,7 +276,7 @@ function App() {
     <div className="App">
       <div>
         <div className="p-3 w-screen">
-          <Title title="Smart Heating" classStyle="text-6xl text-center"/>
+          <Title title="Smart Heating" classStyle="text-6xl text-center" />
           <div className="mt-8 flex flex-col gap-8 sm:flex-row">
             <div className="w-full p-5 sm:w-2/4 flex flex-col items-center justify-center">
               <Title
@@ -302,13 +288,13 @@ function App() {
                   data={tempHome}
                   text="° C"
                   classStyle="drop"
-                  textStyle = "text_temp_home"
+                  textStyle="text_temp_home"
                 />
                 <CircleData
                   data={humHome}
                   text="%"
                   classStyle="drop"
-                  textStyle = "text_hum_home"
+                  textStyle="text_hum_home"
                 />
               </div>
             </div>
@@ -344,39 +330,23 @@ function App() {
                   text="° C"
                 />
 
-                {statusHeating === 1 ? (
-                  <div className="flex flex-col h-full gap-20">
-                    <CustomButton
-                      functie={handlePLus}
-                      classStyle="drop_btn"
-                      text="+"
-                      textStyle="text-7xl font-medium mt-2 ml-2"
-                    />
+                <div className="flex flex-col h-full gap-20">
+                  <CustomButton
+                    functie={handlePLus}
+                    classStyle="drop_btn"
+                    text="+"
+                    textStyle="text-7xl font-medium mt-2 ml-2"
+                    disabled={isToggled}
+                  />
 
-                    <CustomButton
-                      functie={handleMinus}
-                      classStyle="drop_btn"
-                      text="-"
-                      textStyle="text-8xl font-medium mt-2 ml-2"
-                    />
-                  </div>
-                ) : (
-                  <div className="flex flex-col h-full gap-20">
-                    <CustomButton
-                      functie={handleVoid}
-                      classStyle="drop_btn"
-                      text="+"
-                      textStyle="text-7xl font-medium mt-2 ml-2"
-                    />
-
-                    <CustomButton
-                      functie={handleVoid}
-                      classStyle="drop_btn"
-                      text="-"
-                      textStyle="text-8xl font-medium mt-2 ml-2"
-                    />
-                  </div>
-                )}
+                  <CustomButton
+                    functie={handleMinus}
+                    classStyle="drop_btn"
+                    text="-"
+                    textStyle="text-8xl font-medium mt-2 ml-2"
+                    disabled={isToggled}
+                  />
+                </div>
               </div>
             </div>
           </div>
