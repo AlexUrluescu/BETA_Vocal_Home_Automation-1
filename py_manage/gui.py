@@ -496,12 +496,8 @@ class MainWindow(QMainWindow):
 
         # first we fetch what the senzor returns, if he returns 0 means that he doesn't fetch the temperature
         temp_senzor_return = self.senzor.get_t()
-        # logging.info(f"Temp return: {temp_senzor_return}")
-        # logging.info(f"Temp return type: {type(temp_senzor_return)}")
 
         if temp_senzor_return == 0:
-            # logging.info("The senzor doesn't fetch the temperature")
-
             # increment the variable error_senzor_counter every time the senzor doesn't fetch the temperature
             self.error_senzor_counter = self.error_senzor_counter + 1
 
@@ -516,12 +512,8 @@ class MainWindow(QMainWindow):
 
         # first we fetch what the senzor returns, if he returns 0 means that he doesn't fetch the humidity
         hum_senzor_return = self.senzor.get_h()
-        # logging.info(f"Hum return: {hum_senzor_return}")
-        # logging.info(f"Hum return type: {type(hum_senzor_return)}")
 
         if hum_senzor_return == 0:
-            # logging.info("The senzor doesn't fetch the humidity")
-
             # increment the variable error_senzor_counter every time the senzor doesn't fetch the humidity
             self.error_senzor_counter: int = self.error_senzor_counter + 1
 
@@ -541,8 +533,6 @@ class MainWindow(QMainWindow):
             
             else:  
                 self.div_error_hardware.show()
-
-        # hereeeee 
 
         if(temp_senzor_return != 0 and hum_senzor_return != 0):
             self.GuiFlow.insertDataIntoDB(temp_senzor_return, hum_senzor_return)
@@ -586,9 +576,6 @@ class MainWindow(QMainWindow):
                 # logging.info("Heating system is OFF")
                 self.heating_system.heating_off()
                 self.div_treshold.setStyleSheet("QWidget { background-color: white; color: black; border-radius: 75%; font-family: 'Poppins', sans-serif; border: none; }")
-            
-        # logging.info(f"Temp: {self.temp_senzor}")
-        # logging.info(f"Hum: {self.hum_senzor}")
 
 
     # this timer calls every 5 sec the get_data_senzors function
