@@ -4,11 +4,19 @@ from check_internet_connection import internet_checker
 from dotenv import load_dotenv
 import os
 import logging
+import requests
+import json
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 load_dotenv()
 URL_CONNECTION_DB = os.getenv("URL_CONNECTION_DB")
 COLLECTION_NAME = os.getenv("COLLECTION_NAME")
+
+# // DEV
+# self.url = "https://beta-vocal-home-automation-1.onrender.com"
+
+# LOCAL
+url_local = "http://localhost:3001"
 
 class GuiFlow():
 
@@ -50,6 +58,26 @@ class GuiFlow():
                 if(success):
                     self.localDatabase.insert(temperature=temperature, humidity=humidity)
 
-                data =  self.localDatabase.getData();
+                data =  self.localDatabase.getData()
                 logging.info(f"data from local: {data}")
+
+
+    def sendSenzorTemperature(self, temperature):
+        url = f"{url_local}/datasenzor"
+
+        payload = {'temperature': temperature}
+        json_payload = json.dumps(payload)
+        headers = {'Content-Type': 'application/json'}
+        response = requests.post(url, headers=headers, data=json_payload)
+
+
+
+    def sendSenzorHumidity(self, humidity):
+        url = f"{url_local}/home-humidity"
+
+        payload = {'humidity': humidity}
+        json_payload = json.dumps(payload)
+        headers = {'Content-Type': 'application/json'}
+        response = requests.post(url, headers=headers, data=json_payload)
+
 

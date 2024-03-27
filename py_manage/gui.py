@@ -18,6 +18,11 @@ app = QApplication(sys.argv)
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
+
+        # // DEV
+        # self.url = "https://beta-vocal-home-automation-1.onrender.com"
+
+        # LOCAL
         self.url = "http://localhost:3001"
 
         self.setWindowTitle("Exemplu PyQt5")
@@ -26,9 +31,9 @@ class MainWindow(QMainWindow):
         self.status = ""
         self.treshlod = 0
         self.id_treshold = ""
-        self.temperature = ""
+        self.temperature = "0"
         self.hysteresis = 0.5
-        self.humidity = ""
+        self.humidity = "0"
         self.text_alert = "Temperatura a fost actualizata"
         self.text_error_hardware = "Check your hardware"
         self.val = 30
@@ -140,12 +145,12 @@ class MainWindow(QMainWindow):
         self.div_treshold.move(450, 150)
 
         self.div_home_temp = QWidget(self)
-        self.div_home_temp.setStyleSheet("QWidget { background-color: white; border-radius: 75%; font-family: 'Poppins', sans-serif; }")
+        self.div_home_temp.setStyleSheet("QWidget { background-color: white; color: black; border-radius: 75%; font-family: 'Poppins', sans-serif; }")
         self.div_home_temp.setFixedSize(150, 150)
         self.div_home_temp.move(160, 50)
 
         self.div_home_hum = QWidget(self)
-        self.div_home_hum.setStyleSheet("QWidget { background-color: white; border-radius: 75%; font-family: 'Poppins', sans-serif; }")
+        self.div_home_hum.setStyleSheet("QWidget { background-color: white; color: black; border-radius: 75%; font-family: 'Poppins', sans-serif; }")
         self.div_home_hum.setFixedSize(150, 150)
         self.div_home_hum.move(160, 230)
 
@@ -506,6 +511,10 @@ class MainWindow(QMainWindow):
             self.temp_senzor = temp_senzor_return
             self.home_temp_label.setText(f"{self.temp_senzor} °C")
 
+            # AICI AR TREBUI SA TRIMITEM TEMPERATURA LA -> BACKEND -> WEB SOCKET -> WEB APP 
+
+            self.GuiFlow.sendSenzorTemperature(self.temp_senzor)
+
             # reset the error_senzor_counter to 0, because he returned a correct value
             self.error_senzor_counter = 0
 
@@ -522,6 +531,9 @@ class MainWindow(QMainWindow):
         else:
             self.hum_senzor = hum_senzor_return
             self.home_hum_label.setText(f"{self.hum_senzor} %")
+
+            # AICI AR TREBUI SA TRIMITEM HUMIDITATEA LA -> BACKEND -> WEB SOCKET -> WEB APP 
+            self.GuiFlow.sendSenzorHumidity(self.hum_senzor)
 
             # reset the error_senzor_counter to 0, because he returned a correct value
             self.error_senzor_counter: int = 0
