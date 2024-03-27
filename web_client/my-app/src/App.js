@@ -33,11 +33,6 @@ function App() {
   const [finalTemp, setFinalTemp] = useState();
   const [styleHeating, setStyleHeating] = useState(0);
 
-  socket.on("serverMessage", (data) => {
-    console.log(data);
-    setStatusHeating(data[0].status);
-  });
-
   socket.on("heating_temp_server", (data) => {
     console.log("heating_temp_server", data);
     setHeatingTemp(data[0].temperature);
@@ -69,12 +64,8 @@ function App() {
     try {
       socket.on("serverMessage", (data) => {
         console.log("socket status", data);
-        setStatusHeating(data[0].status);
+        setStatusHeating(data);
       });
-
-      return () => {
-        socket.disconnect();
-      };
     } catch (error) {
       console.log(error);
     }
@@ -86,12 +77,8 @@ function App() {
       console.log("intra");
       socket.on("heatingTempFromServer", (data) => {
         console.log("heatingTempFromServer", data);
-        // setHeatingTemp(data);
+        setHeatingTemp(data);
       });
-
-      // return () => {
-      //   socket.disconnect();
-      // };
     } catch (error) {
       console.log(error);
     }
