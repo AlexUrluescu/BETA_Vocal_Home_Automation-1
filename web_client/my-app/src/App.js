@@ -12,13 +12,18 @@ import {
 
 import io from "socket.io-client";
 
+// PROD
 // const url = "https://smarthome-dowt.onrender.com";
+
+// DEV
+// const url = "https://beta-vocal-home-automation-1.onrender.com";
+
+// LOCAL
 const url = "http://localhost:3001";
 
 const socket = io.connect(url, {
   transports: ["websocket"],
 });
-// const socket = io.connect("http://localhost:5000");
 
 function App() {
   // eslint-disable-next-line
@@ -33,38 +38,52 @@ function App() {
   const [finalTemp, setFinalTemp] = useState();
   const [styleHeating, setStyleHeating] = useState(0);
 
-  socket.on("heating_temp_server", (data) => {
-    console.log("heating_temp_server", data);
-    setHeatingTemp(data[0].temperature);
-  });
+  // useEffect(() => {
+  //   const intervalId = setInterval(async () => {
+  //     try {
+  //       const res = await fetch(`${url}/senzor`);
+  //       const senzorsLiveData = await res.json();
+
+  //       console.log(`senzorsLiveData: ${senzorsLiveData}`);
+
+  //       // MOMENTAN SENZORII NU SUNT CONECTATI
+  //       setTempHome(senzorsLiveData.temperature);
+  //       setHumHome(senzorsLiveData.humidity);
+  //     } catch (error) {
+  //       console.log(error);
+  //     }
+  //   }, 5000);
+
+  //   // Cleanup: oprește timer-ul când componenta se demontează
+  //   return () => {
+  //     clearInterval(intervalId);
+  //   };
+  // }, []);
 
   useEffect(() => {
-    const intervalId = setInterval(async () => {
-      try {
-        const res = await fetch(`${url}/senzor`);
-        const senzorsLiveData = await res.json();
-
-        // console.log(`senzorsLiveData: ${senzorsLiveData}`);
-
-        // MOMENTAN SENZORII NU SUNT CONECTATI
-        // setTempHome(senzorsLiveData.temperature);
-        // setHumHome(senzorsLiveData.humidity);
-      } catch (error) {
-        console.log(error);
-      }
-    }, 5000);
-
-    // Cleanup: oprește timer-ul când componenta se demontează
-    return () => {
-      clearInterval(intervalId);
-    };
+    try {
+      socket.on("serverMessage", (status) => {
+        setStatusHeating(status);
+      });
+    } catch (error) {
+      console.log(error);
+    }
   }, []);
 
   useEffect(() => {
     try {
-      socket.on("serverMessage", (data) => {
-        console.log("socket status", data);
-        setStatusHeating(data);
+      socket.on("senzorTemperature", (senzorTemperature) => {
+        setTempHome(senzorTemperature);
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  }, []);
+
+  useEffect(() => {
+    try {
+      socket.on("senzorHumidity", (senzorHumidity) => {
+        setHumHome(senzorHumidity);
       });
     } catch (error) {
       console.log(error);
@@ -74,9 +93,7 @@ function App() {
   // cod adaugat in idee_socket
   useEffect(() => {
     try {
-      console.log("intra");
       socket.on("heatingTempFromServer", (data) => {
-        console.log("heatingTempFromServer", data);
         setHeatingTemp(data);
       });
     } catch (error) {
@@ -94,7 +111,6 @@ function App() {
 
         setTempHome(data1[0].temperature);
         setHumHome(data1[0].humidity);
-        // console.log(data1);
       } catch (error) {
         console.log(error);
       }
@@ -106,10 +122,7 @@ function App() {
         const res = await fetch(`${url}/heatingstatus`);
         const data1 = await res.json();
 
-        // console.log(`status heating este: ${data1}`);
         setStatusHeating(data1[0].status);
-        // console.log(data1);
-        // console.log(data1[0].status);
       } catch (error) {
         console.log(error);
       }
@@ -119,11 +132,9 @@ function App() {
     const fetchHeatingTemp = async () => {
       try {
         const res = await fetch(`${url}/heatingtemp`);
-        const data1 = await res.json();
+        const data = await res.json();
 
-        // setFinalTemp(data1);
-        setHeatingTemp(data1[0].temperature);
-        // console.log(data1);
+        setHeatingTemp(data[0].temperature);
       } catch (error) {
         console.log(error);
       }
@@ -138,18 +149,15 @@ function App() {
     const timer = setTimeout(async () => {
       setFinalTemp(heatingTemp);
 
-      // console.log("salvat");
-      // console.log("inceput mesaj");
       setStyleHeating(1);
 
       setTimeout(async () => {
         try {
           const temperature = heatingTemp;
-          console.log(temperature);
 
           const id = "64889e83c192652234604219";
 
-          const data = await fetch(`${url}/changeheatingtemp/${id}`, {
+          const data = await fetch(`${url}/changeheatingtemp-from-web/${id}`, {
             method: "PUT",
             headers: {
               "Content-Type": "application/json",
@@ -159,7 +167,6 @@ function App() {
 
           const res = await data.json();
 
-          console.log(res);
           if (res.message === "ok") {
             setFinalTemp({ ...heatingTemp, temperature: temperature });
             // send the socket
@@ -189,7 +196,6 @@ function App() {
 
   // increment the value of the temperature
   const handlePLus = () => {
-    console.log("plus");
     let temperature = heatingTemp + 0.5;
     setHeatingTemp(temperature);
   };
@@ -220,7 +226,6 @@ function App() {
 
           const res = await data.json();
 
-          console.log(res);
           if (res.message === "On") {
             setStatusHeating(1);
           }
@@ -249,11 +254,9 @@ function App() {
 
           const res = await data.json();
 
-          console.log(res);
           if (res.message === "Off") {
             setStatusHeating(0);
           }
-          // setStatus(data.status);
         } catch (error) {
           console.log(error);
         }
