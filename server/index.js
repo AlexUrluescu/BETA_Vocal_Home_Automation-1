@@ -23,10 +23,8 @@ const io = new Server(server, {
 router.put("/test/:id", async (req, res) => {
   try {
     const status = req.body.status;
-    // console.log(status);
 
     const _id = req.params.id;
-    // console.log(_id);
 
     if (status == 1) {
       try {
@@ -35,8 +33,7 @@ router.put("/test/:id", async (req, res) => {
           req.body,
           { new: true }
         );
-        console.log(updateStatus);
-        console.log("trimis status 1");
+
         io.emit("serverMessage", 1);
         return res.json({ message: "On" });
       } catch (error) {
@@ -50,8 +47,7 @@ router.put("/test/:id", async (req, res) => {
           req.body,
           { new: true }
         );
-        console.log(updateStatus);
-        console.log("trimis status 0");
+
         io.emit("serverMessage", 0);
         return res.json({ message: "Off" });
       } catch (error) {
@@ -63,25 +59,71 @@ router.put("/test/:id", async (req, res) => {
   }
 });
 
+router.post("/datasenzor", (req, res) => {
+  const data = req.body;
+
+  console.log("received data: ", data);
+
+  io.emit("senzorTemperature", data.temperature);
+
+  // Procesați datele primite cum doriți
+  // Exemplu: Salvare într-o bază de date, trimitere notificări, etc.
+
+  // Răspuns către scriptul de pe Raspberry Pi pentru a indica succesul preluării datelor
+  const response = {
+    message: "Datele de la senzori au fost primite cu succes!",
+    body: data,
+  };
+
+  res.json(response);
+});
+
+router.post("/home-humidity", (req, res) => {
+  const data = req.body;
+
+  console.log("received data: ", data);
+
+  io.emit("senzorHumidity", data.humidity);
+
+  // Procesați datele primite cum doriți
+  // Exemplu: Salvare într-o bază de date, trimitere notificări, etc.
+
+  // Răspuns către scriptul de pe Raspberry Pi pentru a indica succesul preluării datelor
+  const response = {
+    message: "Datele de la senzori au fost primite cu succes!",
+    body: data,
+  };
+
+  res.json(response);
+});
+
 router.put("/changeheatingtemp/:id", async (req, res) => {
   try {
-    console.log(req.body);
     const updateHeatingTemp = await HeatingTemp.findByIdAndUpdate(
       req.params.id,
       req.body,
       { new: true }
     );
-    console.log(updateHeatingTemp.temperature);
-
-    console.log("intra");
-
-    console.log("updateHeatingTemp.temperature", updateHeatingTemp.temperature);
 
     io.emit("heatingTempFromServer", updateHeatingTemp.temperature);
 
-    console.log("iasa");
-
     return res.json({ message: "ok" });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+});
+
+router.put("/changeheatingtemp-from-web/:id", async (req, res) => {
+  try {
+    const updateHeatingTemp = await HeatingTemp.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true }
+    );
+
+    if (updateHeatingTemp) {
+      return res.json({ message: "ok" });
+    }
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
