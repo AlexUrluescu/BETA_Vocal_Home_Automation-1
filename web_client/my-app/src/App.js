@@ -20,11 +20,6 @@ const socket = io.connect(url, {
 });
 // const socket = io.connect("http://localhost:5000");
 
-socket.on("serverMessage", (data) => {
-  console.log(data);
-  // setStatusHeating(data[0])
-});
-
 function App() {
   // eslint-disable-next-line
   const [tempHome, setTempHome] = useState(0);
@@ -34,25 +29,31 @@ function App() {
 
   const [isToggled, setIsToggled] = useState(false);
 
-  useEffect(() => {
-    console.log(isToggled);
-  }, [isToggled]);
   // eslint-disable-next-line
   const [finalTemp, setFinalTemp] = useState();
   const [styleHeating, setStyleHeating] = useState(0);
+
+  socket.on("serverMessage", (data) => {
+    console.log(data);
+    setStatusHeating(data[0].status);
+  });
+
+  socket.on("heating_temp_server", (data) => {
+    console.log("heating_temp_server", data);
+    setHeatingTemp(data[0].temperature);
+  });
 
   useEffect(() => {
     const intervalId = setInterval(async () => {
       try {
         const res = await fetch(`${url}/senzor`);
-        const data = await res.json();
+        const senzorsLiveData = await res.json();
 
-        // setTempHome(data.temperature);
-        // setHumHome(data.humidity);
+        // console.log(`senzorsLiveData: ${senzorsLiveData}`);
 
-        // console.log(data);
-        setTempHome(data.temperature);
-        setHumHome(data.humidity);
+        // MOMENTAN SENZORII NU SUNT CONECTATI
+        // setTempHome(senzorsLiveData.temperature);
+        // setHumHome(senzorsLiveData.humidity);
       } catch (error) {
         console.log(error);
       }
@@ -66,13 +67,14 @@ function App() {
 
   useEffect(() => {
     try {
-      console.log("teeeeest");
       socket.on("serverMessage", (data) => {
-        // console.log(data);
-        setStatusHeating(data);
+        console.log("socket status", data);
+        setStatusHeating(data[0].status);
       });
 
-      // console.log("teeeest iasa");
+      return () => {
+        socket.disconnect();
+      };
     } catch (error) {
       console.log(error);
     }
@@ -81,10 +83,15 @@ function App() {
   // cod adaugat in idee_socket
   useEffect(() => {
     try {
-      socket.on("heating_temp_server", (data) => {
-        // console.log(data);
-        setHeatingTemp(data);
+      console.log("intra");
+      socket.on("heatingTempFromServer", (data) => {
+        console.log("heatingTempFromServer", data);
+        // setHeatingTemp(data);
       });
+
+      // return () => {
+      //   socket.disconnect();
+      // };
     } catch (error) {
       console.log(error);
     }
@@ -195,6 +202,7 @@ function App() {
 
   // increment the value of the temperature
   const handlePLus = () => {
+    console.log("plus");
     let temperature = heatingTemp + 0.5;
     setHeatingTemp(temperature);
   };
@@ -203,10 +211,6 @@ function App() {
   const handleMinus = () => {
     let temperature = heatingTemp - 0.5;
     setHeatingTemp(temperature);
-  };
-
-  const handleVoid = () => {
-    return "";
   };
 
   const handleSlider = () => {
