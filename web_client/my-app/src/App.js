@@ -16,10 +16,10 @@ import io from "socket.io-client";
 // const url = "https://smarthome-dowt.onrender.com";
 
 // DEV
-// const url = "https://beta-vocal-home-automation-1.onrender.com";
+const url = "https://beta-vocal-home-automation-1.onrender.com";
 
 // LOCAL
-const url = "http://localhost:3001";
+// const url = "http://localhost:3001";
 
 const socket = io.connect(url, {
   transports: ["websocket"],
