@@ -16,12 +16,8 @@ const io = new Server(server, {
     // origin: "https://smarthomeurluescu.go.ro/",
     // origin: "https://stalwart-eclair-182177.netlify.app",
     origin: "http://localhost:3000",
-    methods: ["GET", "POST"],
+    methods: ["GET", "POST", "PUT"],
   },
-});
-
-io.on("connection", (socket) => {
-  console.log("Conection socket");
 });
 
 router.put("/test/:id", async (req, res) => {
@@ -77,7 +73,13 @@ router.put("/changeheatingtemp/:id", async (req, res) => {
     );
     console.log(updateHeatingTemp.temperature);
 
-    io.emit("heating_temp_server", updateHeatingTemp.temperature);
+    console.log("intra");
+
+    console.log("updateHeatingTemp.temperature", updateHeatingTemp.temperature);
+
+    io.emit("heatingTempFromServer", updateHeatingTemp.temperature);
+
+    console.log("iasa");
 
     return res.json({ message: "ok" });
   } catch (error) {
@@ -122,6 +124,10 @@ router.put("/changeheatingtemp/:id", async (req, res) => {
 
 //   // }, 15000)
 // });
+
+io.on("connection", (socket) => {
+  console.log("a user connected");
+});
 
 server.listen(PORT);
 console.log(`Server is running port ${PORT}`);
