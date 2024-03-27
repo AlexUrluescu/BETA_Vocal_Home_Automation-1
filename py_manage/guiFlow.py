@@ -12,18 +12,13 @@ load_dotenv()
 URL_CONNECTION_DB = os.getenv("URL_CONNECTION_DB")
 COLLECTION_NAME = os.getenv("COLLECTION_NAME")
 
-# // DEV
-# self.url = "https://beta-vocal-home-automation-1.onrender.com"
-
-# LOCAL
-url_local = "http://localhost:3001"
-
 class GuiFlow():
 
-    def __init__(self):
+    def __init__(self, urlPath):
         self.mongoDatabase = MongoDatabase(URL_CONNECTION_DB, COLLECTION_NAME)
         self.localDatabase = LocalDatabase()
         self.internet_checker = internet_checker()
+        self.url_path = urlPath
     
     def insertDataIntoDB(self, temperature, humidity) -> bool:
         exist_internet: bool = self.internet_checker.check_internet_connection()
@@ -63,7 +58,7 @@ class GuiFlow():
 
 
     def sendSenzorTemperature(self, temperature):
-        url = f"{url_local}/datasenzor"
+        url = f"{self.url_path}/datasenzor"
 
         payload = {'temperature': temperature}
         json_payload = json.dumps(payload)
@@ -73,7 +68,7 @@ class GuiFlow():
 
 
     def sendSenzorHumidity(self, humidity):
-        url = f"{url_local}/home-humidity"
+        url = f"{self.url_path}/home-humidity"
 
         payload = {'humidity': humidity}
         json_payload = json.dumps(payload)

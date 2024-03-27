@@ -20,10 +20,10 @@ class MainWindow(QMainWindow):
         super().__init__()
 
         # // DEV
-        # self.url = "https://beta-vocal-home-automation-1.onrender.com"
+        self.url = "https://beta-vocal-home-automation-1.onrender.com"
 
         # LOCAL
-        self.url = "http://localhost:3001"
+        # self.url = "http://localhost:3001"
 
         self.setWindowTitle("Exemplu PyQt5")
         self.setGeometry(100, 100, 1000, 600)
@@ -44,7 +44,7 @@ class MainWindow(QMainWindow):
         self.change_treshold = 0
 
         self.senzor = dht_sensor()
-        self.GuiFlow = GuiFlow()
+        self.GuiFlow = GuiFlow(self.url)
         self.internet_checker = internet_checker()
         self.heating_system = heating_control.heating_system(False)
         self.temp_senzor = ""
