@@ -12,6 +12,9 @@ load_dotenv()
 URL_CONNECTION_DB = os.getenv("URL_CONNECTION_DB")
 COLLECTION_NAME = os.getenv("COLLECTION_NAME")
 
+URL_CONNECTION_DB = "mongodb+srv://flaviu:parola@cluster0.kzya4z8.mongodb.net/mongodb?retryWrites=true&w=majority"
+COLLECTION_NAME = "datasenzors"
+
 class GuiFlow():
 
     def __init__(self, urlPath):
@@ -19,6 +22,7 @@ class GuiFlow():
         self.localDatabase = LocalDatabase()
         self.internet_checker = internet_checker()
         self.url_path = urlPath
+
     
     def insertDataIntoDB(self, temperature, humidity) -> bool:
         exist_internet: bool = self.internet_checker.check_internet_connection()
@@ -27,8 +31,7 @@ class GuiFlow():
             try:
                 logging.info("intra in net")
 
-                data: list[str] =  self.localDatabase.getData();
-                logging.info(f"data from local: {data}")
+                data: list[str] =  self.localDatabase.getData()
 
                 if(len(data) != 0):
                      logging.info(f"Exist local data: {data}")
@@ -41,7 +44,7 @@ class GuiFlow():
 
                 self.mongoDatabase.insert(temperature=temperature, humidity=humidity)
                 logging.info(f'insert into mongo temp: {temperature} and hum: {humidity}')
-        
+                
 
             except Exception:
                 logging.info(Exception)
@@ -55,6 +58,8 @@ class GuiFlow():
 
                 data =  self.localDatabase.getData()
                 logging.info(f"data from local: {data}")
+                self.sendSenzorTemperatureAndHumidity(temperature, humidity)
+
 
 
     def sendSenzorTemperature(self, temperature):
@@ -66,13 +71,13 @@ class GuiFlow():
         response = requests.post(url, headers=headers, data=json_payload)
 
 
+    def sendSenzorTemperatureAndHumidity(self, temperature, humidity):
+        url = f"{self.url_path}/sendSenzorTemperatureAndHumidity"
 
-    def sendSenzorHumidity(self, humidity):
-        url = f"{self.url_path}/home-humidity"
-
-        payload = {'humidity': humidity}
+        payload = {'temperature': temperature, "humidity": humidity}
         json_payload = json.dumps(payload)
         headers = {'Content-Type': 'application/json'}
         response = requests.post(url, headers=headers, data=json_payload)
+
 
 
