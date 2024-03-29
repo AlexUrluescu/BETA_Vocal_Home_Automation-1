@@ -16,10 +16,10 @@ import io from "socket.io-client";
 // const url = "https://smarthome-dowt.onrender.com";
 
 // DEV
-const url = "https://beta-vocal-home-automation-1.onrender.com";
+// const url = "https://beta-vocal-home-automation-1.onrender.com";
 
 // LOCAL
-// const url = "http://localhost:3001";
+const url = "http://localhost:3001";
 
 const socket = io.connect(url, {
   transports: ["websocket"],
@@ -30,35 +30,13 @@ function App() {
   const [tempHome, setTempHome] = useState(0);
   const [humHome, setHumHome] = useState(0);
   const [statusHeating, setStatusHeating] = useState(0);
-  const [heatingTemp, setHeatingTemp] = useState(0);
+  const [treshold, setTreshold] = useState(0);
 
   const [isToggled, setIsToggled] = useState(false);
 
   // eslint-disable-next-line
   const [finalTemp, setFinalTemp] = useState();
   const [styleHeating, setStyleHeating] = useState(0);
-
-  // useEffect(() => {
-  //   const intervalId = setInterval(async () => {
-  //     try {
-  //       const res = await fetch(`${url}/senzor`);
-  //       const senzorsLiveData = await res.json();
-
-  //       console.log(`senzorsLiveData: ${senzorsLiveData}`);
-
-  //       // MOMENTAN SENZORII NU SUNT CONECTATI
-  //       setTempHome(senzorsLiveData.temperature);
-  //       setHumHome(senzorsLiveData.humidity);
-  //     } catch (error) {
-  //       console.log(error);
-  //     }
-  //   }, 5000);
-
-  //   // Cleanup: oprește timer-ul când componenta se demontează
-  //   return () => {
-  //     clearInterval(intervalId);
-  //   };
-  // }, []);
 
   useEffect(() => {
     try {
@@ -72,18 +50,9 @@ function App() {
 
   useEffect(() => {
     try {
-      socket.on("senzorTemperature", (senzorTemperature) => {
-        setTempHome(senzorTemperature);
-      });
-    } catch (error) {
-      console.log(error);
-    }
-  }, []);
-
-  useEffect(() => {
-    try {
-      socket.on("senzorHumidity", (senzorHumidity) => {
-        setHumHome(senzorHumidity);
+      socket.on("socket_temperature_And_Humidity", (data) => {
+        setHumHome(data.humidity);
+        setTempHome(data.temperature);
       });
     } catch (error) {
       console.log(error);
@@ -93,8 +62,8 @@ function App() {
   // cod adaugat in idee_socket
   useEffect(() => {
     try {
-      socket.on("heatingTempFromServer", (data) => {
-        setHeatingTemp(data);
+      socket.on("socket_treshold", (data) => {
+        setTreshold(data);
       });
     } catch (error) {
       console.log(error);
@@ -119,7 +88,7 @@ function App() {
     // get the status of the heating system
     const fetchStatus = async () => {
       try {
-        const res = await fetch(`${url}/heatingstatus`);
+        const res = await fetch(`${url}/status`);
         const data1 = await res.json();
 
         setStatusHeating(data1[0].status);
@@ -131,10 +100,10 @@ function App() {
     // get the temperature of the heating system
     const fetchHeatingTemp = async () => {
       try {
-        const res = await fetch(`${url}/heatingtemp`);
+        const res = await fetch(`${url}/treshold`);
         const data = await res.json();
 
-        setHeatingTemp(data[0].temperature);
+        setTreshold(data[0].temperature);
       } catch (error) {
         console.log(error);
       }
@@ -147,17 +116,17 @@ function App() {
 
   useEffect(() => {
     const timer = setTimeout(async () => {
-      setFinalTemp(heatingTemp);
+      setFinalTemp(treshold);
 
       setStyleHeating(1);
 
       setTimeout(async () => {
         try {
-          const temperature = heatingTemp;
+          const temperature = treshold;
 
           const id = "64889e83c192652234604219";
 
-          const data = await fetch(`${url}/changeheatingtemp-from-web/${id}`, {
+          const data = await fetch(`${url}/update-treshold-from-web/${id}`, {
             method: "PUT",
             headers: {
               "Content-Type": "application/json",
@@ -168,7 +137,7 @@ function App() {
           const res = await data.json();
 
           if (res.message === "ok") {
-            setFinalTemp({ ...heatingTemp, temperature: temperature });
+            setFinalTemp({ ...treshold, temperature: temperature });
             // send the socket
           }
         } catch (error) {
@@ -182,7 +151,7 @@ function App() {
     return () => {
       clearTimeout(timer);
     };
-  }, [heatingTemp]);
+  }, [treshold]);
 
   useEffect(() => {
     if (statusHeating === 0) {
@@ -196,14 +165,14 @@ function App() {
 
   // increment the value of the temperature
   const handlePLus = () => {
-    let temperature = heatingTemp + 0.5;
-    setHeatingTemp(temperature);
+    let temperature = treshold + 0.5;
+    setTreshold(temperature);
   };
 
   // decrement the value of the temperature
   const handleMinus = () => {
-    let temperature = heatingTemp - 0.5;
-    setHeatingTemp(temperature);
+    let temperature = treshold - 0.5;
+    setTreshold(temperature);
   };
 
   const handleSlider = () => {
@@ -317,7 +286,7 @@ function App() {
                 <Treshold
                   isToggled={isToggled}
                   tempHome={tempHome}
-                  heatingTemp={heatingTemp}
+                  heatingTemp={treshold}
                   classStyle1="drop_btn_treshold_active"
                   classStyle2="drop_btn_treshold"
                   // classStyle1="bg-gray-900 h-40 w-40 flex justify-center items-center rounded-full text-6xl border-4 border-white-300"
