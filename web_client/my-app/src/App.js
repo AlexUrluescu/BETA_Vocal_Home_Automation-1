@@ -12,35 +12,24 @@ import {
 
 import io from "socket.io-client";
 
-// PROD
-// const url = "https://smarthome-dowt.onrender.com";
-
-// DEV
-// const url = "https://beta-vocal-home-automation-1.onrender.com";
-
-// LOCAL
-const url = "http://localhost:3001";
+const url = process.env.REACT_APP_SERVER_URL;
 
 const socket = io.connect(url, {
   transports: ["websocket"],
 });
 
 function App() {
-  // eslint-disable-next-line
   const [tempHome, setTempHome] = useState(0);
   const [humHome, setHumHome] = useState(0);
   const [statusHeating, setStatusHeating] = useState(0);
   const [treshold, setTreshold] = useState(0);
-
   const [isToggled, setIsToggled] = useState(false);
-
-  // eslint-disable-next-line
-  const [finalTemp, setFinalTemp] = useState();
-  const [styleHeating, setStyleHeating] = useState(0);
+  const [showTresholdUpdateMessage, setShowTresholdUpdateMessage] =
+    useState(false);
 
   useEffect(() => {
     try {
-      socket.on("serverMessage", (status) => {
+      socket.on("socket_status", (status) => {
         setStatusHeating(status);
       });
     } catch (error) {
@@ -59,7 +48,6 @@ function App() {
     }
   }, []);
 
-  // cod adaugat in idee_socket
   useEffect(() => {
     try {
       socket.on("socket_treshold", (data) => {
@@ -71,21 +59,6 @@ function App() {
   }, []);
 
   useEffect(() => {
-    // get all the temperatures and humiditys
-    // eslint-disable-next-line
-    const fetchData = async () => {
-      try {
-        const res = await fetch(`${url}/datasenzors`);
-        const data1 = await res.json();
-
-        setTempHome(data1[0].temperature);
-        setHumHome(data1[0].humidity);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
-    // get the status of the heating system
     const fetchStatus = async () => {
       try {
         const res = await fetch(`${url}/status`);
@@ -97,8 +70,7 @@ function App() {
       }
     };
 
-    // get the temperature of the heating system
-    const fetchHeatingTemp = async () => {
+    const fetchTreshold = async () => {
       try {
         const res = await fetch(`${url}/treshold`);
         const data = await res.json();
@@ -109,16 +81,13 @@ function App() {
       }
     };
 
-    // fetchData();
     fetchStatus();
-    fetchHeatingTemp();
+    fetchTreshold();
   }, []);
 
   useEffect(() => {
     const timer = setTimeout(async () => {
-      setFinalTemp(treshold);
-
-      setStyleHeating(1);
+      setShowTresholdUpdateMessage(true);
 
       setTimeout(async () => {
         try {
@@ -137,14 +106,11 @@ function App() {
           const res = await data.json();
 
           if (res.message === "ok") {
-            setFinalTemp({ ...treshold, temperature: temperature });
-            // send the socket
+            setShowTresholdUpdateMessage(false);
           }
         } catch (error) {
           console.log(error);
         }
-
-        setStyleHeating(0);
       }, 3000);
     }, 5000);
 
@@ -163,15 +129,13 @@ function App() {
     }
   }, [statusHeating]);
 
-  // increment the value of the temperature
   const handlePLus = () => {
-    let temperature = treshold + 0.5;
+    const temperature = treshold + 0.5;
     setTreshold(temperature);
   };
 
-  // decrement the value of the temperature
   const handleMinus = () => {
-    let temperature = treshold - 0.5;
+    const temperature = treshold - 0.5;
     setTreshold(temperature);
   };
 
@@ -185,7 +149,7 @@ function App() {
 
           const id = "64889d6ce1b6713667bf6c89";
 
-          const data = await fetch(`${url}/test/${id}`, {
+          const data = await fetch(`${url}/update-status/${id}`, {
             method: "PUT",
             headers: {
               "Content-Type": "application/json",
@@ -213,7 +177,7 @@ function App() {
         const id = "64889d6ce1b6713667bf6c89";
 
         try {
-          const data = await fetch(`${url}/test/${id}`, {
+          const data = await fetch(`${url}/update-status/${id}`, {
             method: "PUT",
             headers: {
               "Content-Type": "application/json",
@@ -263,7 +227,7 @@ function App() {
             </div>
             <div className="w-full border-x-0 border-white-500 border-t-2 border-white-500 p-5 sm:w-2/4 sm:border-l-4 border-white-500 sm:border-t-0">
               <InfoMessage
-                styleHeating={styleHeating}
+                showTresholdUpdateMessage={showTresholdUpdateMessage}
                 classStyle="h-10 mb-5 flex justify-center"
                 textStyle="bg-green-500 text-white p-5 text-xl rounded-md w-90 flex justify-center items-center ease-in-out duration-300"
                 text="Temperatura este actualizata"
@@ -289,7 +253,6 @@ function App() {
                   heatingTemp={treshold}
                   classStyle1="drop_btn_treshold_active"
                   classStyle2="drop_btn_treshold"
-                  // classStyle1="bg-gray-900 h-40 w-40 flex justify-center items-center rounded-full text-6xl border-4 border-white-300"
                   text="° C"
                 />
 
