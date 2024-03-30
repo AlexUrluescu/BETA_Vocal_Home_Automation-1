@@ -235,7 +235,7 @@ class MainWindow(QMainWindow):
 
             payload = {'status': 0}
             json_payload = json.dumps(payload)
-            url = f"{self.url}/test/{self.id_status}"
+            url = f"{self.url}/update-status/{self.id_status}"
             headers = {'Content-Type': 'application/json'}
             response = requests.put(url, headers=headers, data=json_payload)
             
@@ -254,7 +254,7 @@ class MainWindow(QMainWindow):
 
             payload = {'status': 1}
             json_payload = json.dumps(payload)
-            url = f"{self.url}/test/{self.id_status}"
+            url = f"{self.url}/update-status/{self.id_status}"
             headers = {'Content-Type': 'application/json'}
             response = requests.put(url, headers=headers, data=json_payload)
             
