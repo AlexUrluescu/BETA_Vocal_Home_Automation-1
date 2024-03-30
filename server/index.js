@@ -13,64 +13,32 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
-    // origin: "https://smarthomeurluescu.go.ro/",
-    // origin: "https://stalwart-eclair-182177.netlify.app",
     origin: "*",
     methods: ["GET", "POST", "PUT"],
   },
 });
 
-router.put("/test/:id", async (req, res) => {
+router.put("/update-status/:id", async (req, res) => {
   try {
-    const status = req.body.status;
+    const updateStatus = await HeatingStatus.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true }
+    );
 
-    const _id = req.params.id;
+    console.log("updateStatus", updateStatus);
 
-    if (status == 1) {
-      try {
-        const updateStatus = await HeatingStatus.findByIdAndUpdate(
-          req.params.id,
-          req.body,
-          { new: true }
-        );
+    io.emit("socket_status", updateStatus.status);
 
-        io.emit("serverMessage", 1);
-        return res.json({ message: "On" });
-      } catch (error) {
-        console.log(error);
-      }
-    }
-    if (status == 0) {
-      try {
-        const updateStatus = await HeatingStatus.findByIdAndUpdate(
-          req.params.id,
-          req.body,
-          { new: true }
-        );
-
-        io.emit("serverMessage", 0);
-        return res.json({ message: "Off" });
-      } catch (error) {
-        console.log(error);
-      }
+    if (updateStatus.status === 1) {
+      return res.json({ message: "On" });
+    } else {
+      return res.json({ message: "Off" });
     }
   } catch (error) {
-    return res.status(500).json({ message: error.message });
+    console.log(error);
   }
 });
-
-// router.post("/datasenzor", (req, res) => {
-//   const data = req.body;
-
-//   io.emit("senzorTemperature", data.temperature);
-
-//   const response = {
-//     message: "Datele de la senzori au fost primite cu succes!",
-//     body: data,
-//   };
-
-//   res.json(response);
-// });
 
 router.post("/sendSenzorTemperatureAndHumidity", (req, res) => {
   const data = req.body;
