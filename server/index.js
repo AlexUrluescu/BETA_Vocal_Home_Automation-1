@@ -28,7 +28,7 @@ router.put("/update-status/:id", async (req, res) => {
 
     console.log("updateStatus", updateStatus);
 
-    io.emit("socket_status", updateStatus.status);
+    io.emit("socket_status", updateStatus);
 
     if (updateStatus.status === 1) {
       return res.json({ message: "On" });
