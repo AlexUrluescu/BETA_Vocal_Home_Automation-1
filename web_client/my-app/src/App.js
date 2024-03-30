@@ -7,8 +7,9 @@ import {
   Treshold,
   CustomButton,
   InfoMessage,
-  StatusHeating,
 } from "./components";
+
+import { AppFlow } from "./flow/flow";
 
 import io from "socket.io-client";
 
@@ -21,7 +22,7 @@ const socket = io.connect(url, {
 function App() {
   const [tempHome, setTempHome] = useState(0);
   const [humHome, setHumHome] = useState(0);
-  const [statusHeating, setStatusHeating] = useState(0);
+  const [statusHeating, setStatusHeating] = useState({});
   const [treshold, setTreshold] = useState(0);
   const [isToggled, setIsToggled] = useState(false);
   const [showTresholdUpdateMessage, setShowTresholdUpdateMessage] =
@@ -29,27 +30,15 @@ function App() {
 
   useEffect(() => {
     try {
-      socket.on("socket_status", (status) => {
-        setStatusHeating(status);
+      socket.on("socket_status", (statusData) => {
+        setStatusHeating(statusData);
       });
-    } catch (error) {
-      console.log(error);
-    }
-  }, []);
 
-  useEffect(() => {
-    try {
       socket.on("socket_temperature_And_Humidity", (data) => {
         setHumHome(data.humidity);
         setTempHome(data.temperature);
       });
-    } catch (error) {
-      console.log(error);
-    }
-  }, []);
 
-  useEffect(() => {
-    try {
       socket.on("socket_treshold", (data) => {
         setTreshold(data);
       });
@@ -60,25 +49,15 @@ function App() {
 
   useEffect(() => {
     const fetchStatus = async () => {
-      try {
-        const res = await fetch(`${url}/status`);
-        const data1 = await res.json();
+      const statusData = await AppFlow.fetchStatus();
 
-        setStatusHeating(data1[0].status);
-      } catch (error) {
-        console.log(error);
-      }
+      setStatusHeating(statusData);
     };
 
     const fetchTreshold = async () => {
-      try {
-        const res = await fetch(`${url}/treshold`);
-        const data = await res.json();
+      const treshold = await AppFlow.fetchTreshold();
 
-        setTreshold(data[0].temperature);
-      } catch (error) {
-        console.log(error);
-      }
+      setTreshold(treshold);
     };
 
     fetchStatus();
@@ -120,11 +99,11 @@ function App() {
   }, [treshold]);
 
   useEffect(() => {
-    if (statusHeating === 0) {
+    if (statusHeating.status === 0) {
       setIsToggled(false);
     }
 
-    if (statusHeating === 1) {
+    if (statusHeating.status === 1) {
       setIsToggled(true);
     }
   }, [statusHeating]);
@@ -139,63 +118,18 @@ function App() {
     setTreshold(temperature);
   };
 
-  const handleSlider = () => {
+  const handleSlider = async () => {
     setIsToggled(!isToggled);
 
-    if (isToggled === false) {
-      const statusOn = async () => {
-        try {
-          const status = 1;
+    try {
+      const id = statusHeating._id;
+      const status = isToggled ? 0 : 1;
 
-          const id = "64889d6ce1b6713667bf6c89";
+      const statusValue = await AppFlow.updateStatus(id, status);
 
-          const data = await fetch(`${url}/update-status/${id}`, {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ status }),
-          });
-
-          const res = await data.json();
-
-          if (res.message === "On") {
-            setStatusHeating(1);
-          }
-        } catch (error) {
-          console.log(error);
-        }
-      };
-
-      statusOn();
-    }
-
-    if (isToggled) {
-      const statusOff = async () => {
-        const status = 0;
-
-        const id = "64889d6ce1b6713667bf6c89";
-
-        try {
-          const data = await fetch(`${url}/update-status/${id}`, {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ status }),
-          });
-
-          const res = await data.json();
-
-          if (res.message === "Off") {
-            setStatusHeating(0);
-          }
-        } catch (error) {
-          console.log(error);
-        }
-      };
-
-      statusOff();
+      setStatusHeating({ ...statusHeating, status: statusValue });
+    } catch (error) {
+      console.log(error);
     }
   };
 
@@ -233,14 +167,9 @@ function App() {
                 text="Temperatura este actualizata"
               />
               <div className="text-center">
-                <StatusHeating
-                  isToggled={isToggled}
-                  textStyle="text-2xl"
-                  text1="On"
-                  text2="Off"
-                />
+                <h2 className="text-2xl">{isToggled ? "On" : "Off"}</h2>
                 <Slider
-                  statusHeating={statusHeating}
+                  statusHeating={statusHeating.status}
                   rounded={true}
                   isToggled={isToggled}
                   onToggle={handleSlider}
@@ -259,7 +188,7 @@ function App() {
                 <div className="flex flex-col h-full gap-20">
                   <CustomButton
                     functie={handlePLus}
-                    classStyle="drop_btn"
+                    classStyle={isToggled ? "drop_btn" : "drop-btn-disabled "}
                     text="+"
                     textStyle="text-7xl font-medium mt-2 ml-2"
                     disabled={isToggled}
@@ -267,7 +196,7 @@ function App() {
 
                   <CustomButton
                     functie={handleMinus}
-                    classStyle="drop_btn"
+                    classStyle={isToggled ? "drop_btn" : "drop-btn-disabled "}
                     text="-"
                     textStyle="text-8xl font-medium mt-2 ml-2"
                     disabled={isToggled}
